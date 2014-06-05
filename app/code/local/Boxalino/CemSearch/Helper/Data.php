@@ -300,7 +300,7 @@
 
 
 		public static function __loadClass($name) {
-			if (strpos($name, 'CEM_') === 0) {
+			if (strpos($name, 'CEM_') === 0  || true) {
 				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Lib/'.$name.'.class.php');
 			}
 		}
