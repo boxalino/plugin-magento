@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Boxalino_CemSearch>
+			<version>1.0.0</version>
+		</Boxalino_CemSearch>
+	</modules>
+	<frontend>
+		<routers>
+			<routeurfrontend>
+				<use>standard</use>
+				<args>
+					<module>Boxalino_CemSearch</module>
+					<frontName>test</frontName>
+				</args>
+			</routeurfrontend>
+			<catalogsearch>
+				<args>
+					<modules>
+						<Boxalino_CemSearch before="Mage_CatalogSearch">Boxalino_CemSearch</Boxalino_CemSearch>
+					</modules>
+				</args>
+			</catalogsearch>
+		</routers>
+		<layout>
+			<updates>
+				<test>
+					<file>test.xml</file>
+				</test>
+			</updates>
+		</layout>
+	</frontend>
+
+	<admin>
+		<routers>
+			<test>
+				<use>admin</use>
+				<args>
+					<module>Boxalino_CemSearch</module>
+					<frontName>admintest</frontName>
+				</args>
+			</test>
+		</routers>
+	</admin>
+	<adminhtml>
+		<layout>
+			<updates>
+				<test>
+					<file>test.xml</file>
+				</test>
+			</updates>
+		</layout>
+		<menu>
+			<test translate="title" module="adminhtml">
+				<title>Boxalino Cem Search</title>
+				<sort_order>100</sort_order>
+				<children>
+					<set_time>
+						<title>Boxalino Cem Search</title>
+						<action>admintest/adminhtml_index</action>
+					</set_time>
+				</children>
+			</test>
+		</menu>
+	</adminhtml>
+
+	<global>
+		<helpers>
+			<Boxalino_CemSearch>
+				<class>Boxalino_CemSearch_Helper</class>
+			</Boxalino_CemSearch>
+		</helpers>
+		<blocks>
+			<test>
+				<class>Boxalino_CemSearch_Block</class>
+			</test>
+		</blocks>
+		<models>
+			<test>
+				<class>Boxalino_CemSearch_Model</class>
+				<resourceModel>test_mysql4</resourceModel>
+			</test>
+			<test_mysql4>
+				<class>Boxalino_CemSearch_Model_Mysql4</class>
+				<entities>
+					<test>
+						<table>boxalino_person</table>
+					</test>
+				</entities>
+			</test_mysql4>
+
+
+			<catalogsearch_resource>
+				<rewrite>
+					<fulltext>Boxalino_CemSearch_Model_Resource_Fulltext</fulltext>
+				</rewrite>
+			</catalogsearch_resource>
+
+
+		</models>
+		<resources>
+			<test_write>
+				<connection>
+					<use>core_write</use>
+				</connection>
+			</test_write>
+			<test_read>
+				<connection>
+					<use>core_read</use>
+				</connection>
+			</test_read>
+		</resources>
+	</global>
+</config>

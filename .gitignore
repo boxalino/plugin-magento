@@ -1,4 +1,17 @@
 .modgit/
+app/community
+app/design
+downloader
+errors
+example
+includes
+js
+lib
+media
+pkgino
+shell
+skin
+var
 app/code/community/Find/
 app/code/community/Phoenix/
 app/code/community/Cm/
@@ -119,3 +132,4 @@ skin/frontend/default/modern/
 skin/frontend/enterprise
 skin/install/
 var/
+!app/code/local/Boxalino

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <Boxalino_CemSearch translate="title" module="Boxalino_CemSearch">
+                                        <title>Boxalino CEM Search</title>
+                                    </Boxalino_CemSearch>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<config>
+	<sections>
+		<Boxalino_CemSearch translate="label" module="Boxalino_CemSearch">
+			<class>separator-top</class>
+			<label>Boxalino CEM Search</label>
+			<tab>service</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>200</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>
+			<groups>
+				<service translate="label" module="Boxalino_CemSearch">
+					<label>Service Configuration</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>10</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<router_url translate="label">
+							<label>Router URL</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</router_url>
+					</fields>
+				</service>
+			</groups>
+		</Boxalino_CemSearch>
+	</sections>
+</config>

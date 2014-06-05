@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <boxalinocem translate="title" module="boxalinocem">
+                                        <title>Boxalino CEM</title>
+                                    </boxalinocem>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

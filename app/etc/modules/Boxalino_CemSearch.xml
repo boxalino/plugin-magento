@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<config>
+	<modules>
+		<Boxalino_CemSearch>
+			<active>true</active>
+			<codePool>local</codePool>
+		</Boxalino_CemSearch>
+	</modules>
+</config>
