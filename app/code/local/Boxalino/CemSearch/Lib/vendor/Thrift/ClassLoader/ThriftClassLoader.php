@@ -25,6 +25,8 @@
 
 namespace Thrift\ClassLoader;
 
+use Thrift\Exception\TException;
+
 class ThriftClassLoader
 {
 	/**
@@ -91,7 +93,17 @@ class ThriftClassLoader
 	 */
 	public function register($prepend = false)
 	{
-		spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+		spl_autoload_register(array($this, 'loadClass'), true, true);
+	}
+	/**
+	 * unRegisters this instance as an autoloader.
+	 */
+	public function unregister()
+	{
+		$functions = spl_autoload_functions();
+		spl_autoload_unregister($functions[0]);
+		$functions = spl_autoload_functions();
+		spl_autoload_unregister($functions[0]);
 	}
 
 	/**
@@ -101,8 +113,6 @@ class ThriftClassLoader
 	 */
 	public function loadClass($class)
 	{
-		echo $class . " <- tu \n";
-		//ms_xxxxxxxxxxxxxxxxx
 		if (
 			(true === $this->apc && ($file = $this->findFileInApc($class))) or
 			($file = $this->findFile($class))
