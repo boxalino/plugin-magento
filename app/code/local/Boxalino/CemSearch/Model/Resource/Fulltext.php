@@ -17,16 +17,30 @@
 
         public function prepareResult($object, $queryText, $query){
 
-			echo 'your prepareResult has been rewrited !! <pre>';
-			//die;
+
+	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
+	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
+	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
+
+	        $p13nConfig = new P13nConfig('cdn.bx-cloud.com', 'testshop', 'codete', 'oNaeGhahVoo7', '.example.com', 'testshop');
+	        $p13nSort = new P13nSort();
+	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
+	        //$p13nSort->push('discountedPrice', true);
+	        //$p13nSort->push('title_en', true);
 
 
-			//print_r($query);
-			echo '</pre>';
+	        $p13n = new P13nAdapter($p13nConfig);
+
+	        $p13n->setupInquiry('quick_search', 'skirt', 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 25);
+	        //$p13n->setupInquiry('recommendation_widget', 'Luggage', 'en', array('entity_id', 'discountedPrice', 'title'), $p13nSort, 0, 25);
+	        $p13n->search();
+	        $p13n->printData();
+
+
+
 
 			$adapter = $this->_getWriteAdapter();
 
-            var_dump($query);
             $this->resetSearchResults($query);
 			if (!$query->getIsProcessed() || true) {
 
@@ -78,7 +92,7 @@
 				}
 
 
-				$entity_ids = array(402, 403, 405, 404);
+				$entity_ids = array(402, 403, 405, 408);
 				//$entity_ids = array(9999999);
 
 				$where  = '( `e`.`entity_id` IN ('.implode(',',$entity_ids).') )';
