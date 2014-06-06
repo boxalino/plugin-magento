@@ -94,8 +94,16 @@
 				<rewrite>
 					<fulltext>Boxalino_CemSearch_Model_Resource_Fulltext</fulltext>
 				</rewrite>
+                <rewrite>
+                    <advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
+                </rewrite>
 			</catalogsearch_resource>
 
+            <catalogsearch>
+                <rewrite>
+                    <advanced>Boxalino_CemSearch_Model_Advanced</advanced>
+                </rewrite>
+            </catalogsearch>
 
 		</models>
 		<resources>
