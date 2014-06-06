@@ -1,4 +1,5 @@
 .modgit/
+*~
 app/community
 app/design
 downloader
