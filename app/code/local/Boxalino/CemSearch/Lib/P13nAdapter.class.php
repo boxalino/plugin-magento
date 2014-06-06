@@ -21,6 +21,10 @@
 			$this->createChoiseRequest();
 		}
 
+		public function __destruct(){
+			unset($this->p13n);
+		}
+
 		/**
 		 * @param $choiceId can be found on admin page /Recommendations/Widgets
 		 * @param $search test to search, eg 'shirt'
@@ -42,11 +46,19 @@
 		}
 
 		public function search(){
-			echo '<pre>';
-
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
-			//print_r($this->choiceResponse);
+		}
 
+		public function getData(){
+			$result = array();
+			foreach($this->choiceResponse->variants as $variant){
+				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
+				$searchResult = $variant->searchResult;
+				foreach($searchResult->hits as $item){
+					$result[] = $item->values['entity_id'][0];
+				}
+			}
+			return $result;
 		}
 
 		public function printData(){
@@ -131,5 +143,7 @@
 		private function createChoiseRequest(){
 			$this->choiceRequest = $this->p13n->getChoiceRequest($this->config->getAccount(), $this->config->getDomain());
 		}
+
+
 
 	}

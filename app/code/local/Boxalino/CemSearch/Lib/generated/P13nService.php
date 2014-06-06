@@ -15,6 +15,7 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Exception\TApplicationException;
 
 
+
 interface P13nServiceIf {
   public function choose(\com\boxalino\p13n\api\thrift\ChoiceRequest $choiceRequest);
   public function batchChoose(\com\boxalino\p13n\api\thrift\BatchChoiceRequest $batchChoiceRequest);
@@ -28,8 +29,9 @@ class P13nServiceClient implements \com\boxalino\p13n\api\thrift\P13nServiceIf {
   protected $seqid_ = 0;
 
   public function __construct($input, $output=null) {
-    $this->input_ = $input;
+	  $this->input_ = $input;
     $this->output_ = $output ? $output : $input;
+
   }
 
   public function choose(\com\boxalino\p13n\api\thrift\ChoiceRequest $choiceRequest)

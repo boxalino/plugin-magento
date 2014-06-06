@@ -31,11 +31,14 @@
 
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        $p13n->setupInquiry('quick_search', 'skirt', 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 25);
+	        // TODO this patameters shoud be moved to settings in admin panel
+	        
+	        $p13n->setupInquiry('quick_search', $query->getQueryText(), 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 25);
 	        //$p13n->setupInquiry('recommendation_widget', 'Luggage', 'en', array('entity_id', 'discountedPrice', 'title'), $p13nSort, 0, 25);
 	        $p13n->search();
-	        $p13n->printData();
-
+	        $entity_ids = $p13n->getData();
+	        print_r($entity_ids);
+			unset($p13n);
 
 
 
@@ -90,10 +93,6 @@
 					$select->columns(array('relevance'  => new Zend_Db_Expr(0)));
 					$where = $likeCond;
 				}
-
-
-				$entity_ids = array(402, 403, 405, 408);
-				//$entity_ids = array(9999999);
 
 				$where  = '( `e`.`entity_id` IN ('.implode(',',$entity_ids).') )';
 				if ( count($entity_ids) > 0) {
