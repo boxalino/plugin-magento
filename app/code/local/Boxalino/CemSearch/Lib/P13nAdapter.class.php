@@ -26,10 +26,11 @@
 		}
 
 		/**
-		 * @param $choiceId can be found on admin page /Recommendations/Widgets
-		 * @param $search test to search, eg 'shirt'
-		 * @param $language 2 letter language code, eg 'en'
-		 * @param $returnFields array of field names, eg array('id', 'name')
+		 * @param String $choiceId can be found on admin page /Recommendations/Widgets
+		 * @param String test to search, eg 'shirt'
+		 * @param String $language 2 letter language code, eg 'en'
+		 * @param array $returnFields of field names, eg array('id', 'name')
+		 * @param P13nSort $sort array('fieldName' => , 'reverse' =>);
 		 * @param int $offset products to skip
 		 * @param int $hitCount how many records
 		 */
@@ -62,7 +63,6 @@
 		}
 
 		public function printData(){
-
 			$results = array();
 			/** @var \com\boxalino\p13n\api\thrift\Variant $variant */
 			foreach($this->choiceResponse->variants as $variant){
@@ -87,15 +87,15 @@
 			echo '<tr>';
 
 			foreach($this->returnFields as $field){
-				echo '<td>'.$field.'</td>';
+				echo '<td>' . $field . '</td>';
 			}
 			echo '</tr>';
 
 			foreach($results as $result){
 				echo '<tr>';
-					foreach($this->returnFields as $field){
-						echo '<td>'.$result[$field].'</td>';
-					}
+				foreach($this->returnFields as $field){
+					echo '<td>' . $result[$field] . '</td>';
+				}
 				echo '</tr>';
 			}
 			echo '</table>';
@@ -114,7 +114,7 @@
 			return $searchQuery;
 		}
 
-		private function setUpSorting($searchQuery,P13nSort $sorting){
+		private function setUpSorting($searchQuery, P13nSort $sorting){
 			$sortFieldsArray = $sorting->getSorts();
 			$sortFields = array();
 			foreach($sortFieldsArray as $sortField){
@@ -127,7 +127,6 @@
 				$searchQuery->sortFields = $sortFields;
 			}
 			return $searchQuery;
-
 		}
 
 		private function createInquiry(){
@@ -143,7 +142,5 @@
 		private function createChoiseRequest(){
 			$this->choiceRequest = $this->p13n->getChoiceRequest($this->config->getAccount(), $this->config->getDomain());
 		}
-
-
 
 	}

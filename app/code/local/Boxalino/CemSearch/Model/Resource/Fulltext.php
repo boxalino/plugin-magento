@@ -22,23 +22,26 @@
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 
-	        $p13nConfig = new P13nConfig('cdn.bx-cloud.com', 'testshop', 'codete', 'oNaeGhahVoo7', '.example.com', 'testshop');
+	        $storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
+
+	        $p13nConfig = new P13nConfig(
+		        $storeConfig['host'],
+		        $storeConfig['account'],
+		        $storeConfig['username'],
+		        $storeConfig['password'],
+		        $storeConfig['domain'],
+		        $storeConfig['indexId']
+	        );
 	        $p13nSort = new P13nSort();
 	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
-	        //$p13nSort->push('discountedPrice', true);
-	        //$p13nSort->push('title_en', true);
-
-
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        // TODO this patameters shoud be moved to settings in admin panel
-	        
-	        $p13n->setupInquiry('quick_search', $query->getQueryText(), 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 25);
-	        //$p13n->setupInquiry('recommendation_widget', 'Luggage', 'en', array('entity_id', 'discountedPrice', 'title'), $p13nSort, 0, 25);
+	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
+
+	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id'), $p13nSort, 0, 25);
 	        $p13n->search();
 	        $entity_ids = $p13n->getData();
-	        print_r($entity_ids);
-			unset($p13n);
+			unset($p13n); // !!!!!
 
 
 
@@ -96,7 +99,6 @@
 
 				$where  = '( `e`.`entity_id` IN ('.implode(',',$entity_ids).') )';
 				if ( count($entity_ids) > 0) {
-					echo 'ok';
 					$select->where($where);
 				}
 				echo '<pre>';

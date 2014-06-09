@@ -86,24 +86,44 @@
 
                     </fields>
                 </backend>
-				<service translate="label" module="Boxalino_CemSearch">
-					<label>Service Configuration</label>
+
+				<recommendation_widgets translate="label" module="Boxalino_CemSearch">
+					<label>Recommendations Widgets</label>
 					<frontend_type>text</frontend_type>
-					<sort_order>50</sort_order>
+					<sort_order>51</sort_order>
 					<show_in_default>1</show_in_default>
 					<show_in_website>1</show_in_website>
-					<show_in_store>1</show_in_store>
+					<show_in_store>0</show_in_store>
 					<fields>
-						<router_url translate="label">
-							<label>Router URL</label>
+						<!-- QUICK SEARCH -->
+						<quick_search translate="label">
+							<label>Quick search</label>
 							<frontend_type>text</frontend_type>
 							<sort_order>1</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
-						</router_url>
+						</quick_search>
+						<!-- ADVANCED SEARCH -->
+						<advanced_search translate="label">
+							<label>Advanced search</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</advanced_search>
+						<!-- AUTOCOMPLETE -->
+						<autocomplete translate="label">
+							<label>Autocomplete</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</autocomplete>
 					</fields>
-				</service>
+				</recommendation_widgets>
 			</groups>
 		</Boxalino_CemSearch>
 	</sections>
