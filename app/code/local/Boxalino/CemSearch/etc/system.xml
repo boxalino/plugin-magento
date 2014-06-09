@@ -5,7 +5,7 @@
 		<Boxalino_CemSearch translate="label" module="Boxalino_CemSearch">
 			<class>separator-top</class>
 			<label>Boxalino CEM Search</label>
-			<tab>service</tab>
+			<tab>catalog</tab>
 			<frontend_type>text</frontend_type>
 			<sort_order>200</sort_order>
 			<show_in_default>1</show_in_default>
