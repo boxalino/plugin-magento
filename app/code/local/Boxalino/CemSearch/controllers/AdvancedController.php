@@ -57,7 +57,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
 //        $p13n->setupInquiry('quick_search', $params['name'], 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 25);
         //$p13n->setupInquiry('recommendation_widget', 'Luggage', 'en', array('entity_id', 'discountedPrice', 'title'), $p13nSort, 0, 25);
         $p13n->search();
-        $entity_ids = $p13n->getData();
+        $entity_ids = $p13n->getEntitiesIds();
 //        print_r($entity_ids);
         unset($p13n);
 

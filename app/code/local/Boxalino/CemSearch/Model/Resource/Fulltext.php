@@ -8,8 +8,9 @@
             $adapter = $this->_getWriteAdapter();
             $adapter->update($this->getTable('catalogsearch/search_query'), array('is_processed' => 0));
 
-            $adapter->delete($this->getTable('catalogsearch/result'), 'query_id=' . $query->getId());
-
+	        if( ! is_null($query) ){
+		        $adapter->delete($this->getTable('catalogsearch/result'), 'query_id=' . $query->getId());
+	        }
             Mage::dispatchEvent('catalogsearch_reset_search_result');
 
             return $this;
@@ -38,12 +39,10 @@
 
 	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
-	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id'), $p13nSort, 0, 25);
+	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id', ''), $p13nSort, 0, 25);
 	        $p13n->search();
-	        $entity_ids = $p13n->getData();
+	        $entity_ids = $p13n->getEntitiesIds();
 			unset($p13n); // !!!!!
-
-
 
 			$adapter = $this->_getWriteAdapter();
 
@@ -101,10 +100,6 @@
 				if ( count($entity_ids) > 0) {
 					$select->where($where);
 				}
-				echo '<pre>';
-
-//				print_r($select);
-				echo '</pre>';
 
 				$sql = $adapter->insertFromSelect($select,
 					$this->getTable('catalogsearch/result'),

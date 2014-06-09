@@ -14,6 +14,13 @@
 					</modules>
 				</args>
 			</catalogsearch>
+			<routeurfrontend>
+				<use>standard</use>
+				<args>
+					<module>Boxalino_CemSearch</module>
+					<frontName>cemsearch</frontName>
+				</args>
+			</routeurfrontend>
 		</routers>
 	</frontend>
 	<global>

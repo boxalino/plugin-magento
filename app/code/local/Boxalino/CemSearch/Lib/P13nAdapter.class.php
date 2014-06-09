@@ -50,13 +50,25 @@
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
 		}
 
-		public function getData(){
+		public function getEntitiesIds(){
 			$result = array();
 			foreach($this->choiceResponse->variants as $variant){
 				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
 				$searchResult = $variant->searchResult;
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
+				}
+			}
+			return $result;
+		}
+
+		public function getEntities(){
+			$result = array();
+			foreach($this->choiceResponse->variants as $variant){
+				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
+				$searchResult = $variant->searchResult;
+				foreach($searchResult->hits as $item){
+					$result[] = $item->values;
 				}
 			}
 			return $result;
