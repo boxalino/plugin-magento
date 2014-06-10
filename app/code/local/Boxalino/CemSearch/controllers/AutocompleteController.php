@@ -26,7 +26,6 @@
 			$recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
 			$p13n->setupInquiry($recommendationConfig['autocomplete'], $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
-			$p13n->setupCategory(8,'Sale');
 			$p13n->search();
 			$entities = $p13n->getEntities();
 			unset($p13n); // !!!!!

@@ -19,6 +19,28 @@
         public function prepareResult($object, $queryText, $query){
 
 
+	        //TODO move to helper
+	        $category_names = array();
+			$category_depth = -1;
+	        if(isset($_GET['cat']) && $_GET['cat'] > 0){
+		        $category_id = $_GET['cat'];
+		        $category = Mage::getModel('catalog/category')->load($category_id);
+		        $path = $category->getPath();
+		        $path_array = explode('/', $path);
+		        print_r($path_array);
+		        $skip = -2 ;
+		        foreach($path_array as $cat_id){
+			        $category_name = Mage::getModel('catalog/category')->load($cat_id)->getName();
+			        if($skip++ > 0){
+				        $category_names[] = $category_name;
+			        }
+		        }
+		        $category_depth = count($category_names) - 1 ;
+	        }
+
+
+
+
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
@@ -39,8 +61,10 @@
 
 	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
-	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id', 'discountedPrice'), $p13nSort, 0, 25);
-	        //$p13n->setupCategory('8', 'Sale');
+	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id', 'categories'), $p13nSort, 0, 25);
+	        if($category_depth > 0){
+		        $p13n->setupCategory($category_depth, $category_names);
+	        }
 	        //$p13n->setupPrice(0, 1000);
 	        $p13n->search();
 	        $entity_ids = $p13n->getEntitiesIds();

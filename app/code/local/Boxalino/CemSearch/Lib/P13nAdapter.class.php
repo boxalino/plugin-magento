@@ -45,11 +45,25 @@
 			$this->inquiry->choiceId = $choiceId;
 		}
 
-		public function setupCategory($category_id, $category){
+		/**
+		 * @param int $hierarchyId how deep is category tree in search, starts from 0 for main categories
+		 * @param array $category names of categories in hierarchy
+		 *
+		 * exaples:
+		 * $hierarchyId = 0;
+		 * $category = array('Men');
+		 * will search all products in category 'Men' (with subcategories)
+		 *
+		 * $hierarchyId = 1;
+		 * $category = array('Men', 'Blazers');
+		 * will search all products in category 'Men' (with subcategories)
+		 *
+		 */
+		public function setupCategory($hierarchyId, $category){
 			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
 				'fieldName' => 'categories',
-				'hierarchyId' => 5,
-				'hierarchy' => array('Man')
+				'hierarchyId' => $hierarchyId,
+				'hierarchy' => $category
 			));
 		}
 
@@ -76,11 +90,15 @@
 
 		public function getEntitiesIds(){
 			$result = array();
+			//print_r($this->choiceResponse);
 			foreach($this->choiceResponse->variants as $variant){
 				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
 				$searchResult = $variant->searchResult;
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
+
+					//print_r($item->values);
+					//echo '<br/>';
 				}
 			}
 			return $result;
