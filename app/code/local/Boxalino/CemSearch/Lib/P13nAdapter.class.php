@@ -43,8 +43,44 @@
 			$inquiry->choiceId = $choiceId;
 			$inquiry->simpleSearchQuery = $searchQuery;
 
+            $inquiry->simpleSearchQuery->filters = array();
+
 			$this->choiceRequest->inquiries = array($inquiry);
 		}
+
+        public function addFilter($field, $value, $lang = null){
+
+            $filter = new \com\boxalino\p13n\api\thrift\Filter();
+
+            if($lang){
+                $filter->fieldName = $field . '_' . substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+            } else{
+                $filter->fieldName = $field;
+            }
+
+            if(is_array($value)){
+                $filter->stringValues = $value;
+            } else{
+                $filter->stringValues = array($value);
+            }
+
+            $this->choiceRequest->inquiries[0]->simpleSearchQuery->filters[] = $filter;
+        }
+
+        public function addFilterFromTo($field, $from, $to, $lang = null){
+            $filter = new \com\boxalino\p13n\api\thrift\Filter();
+
+            if($lang){
+                $filter->fieldName = $field . '_' . substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+            } else{
+                $filter->fieldName = $field;
+            }
+
+            $filter->rangeFrom = $from;
+            $filter->rangeTo =$to;
+
+            $this->choiceRequest->inquiries[0]->simpleSearchQuery->filters[] = $filter;
+        }
 
 		public function search(){
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
