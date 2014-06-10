@@ -13,6 +13,9 @@
 		private $choiceRequest = null;
 		private $choiceResponse = null;
 		private $returnFields = null;
+		private $inquiry = null;
+		private $searchQuery = null;
+		private $filters = array();
 
 		public function __construct(P13nConfig $config){
 			$this->config = $config;
@@ -35,18 +38,39 @@
 		 * @param int $hitCount how many records
 		 */
 		public function setupInquiry($choiceId, $search, $language, $returnFields, $sort, $offset = 0, $hitCount = 10){
-			$inquiry = $this->createInquiry();
+			$this->inquiry = $this->createInquiry();
 			$this->returnFields = $returnFields;
-			$searchQuery = $this->createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount);
-			$searchQuery = $this->setUpSorting($searchQuery, $sort);
+			$this->createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount);
+			$this->setUpSorting($sort);
+			$this->inquiry->choiceId = $choiceId;
+		}
 
-			$inquiry->choiceId = $choiceId;
-			$inquiry->simpleSearchQuery = $searchQuery;
+		public function setupCategory($category_id, $category){
+			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
+				'fieldName' => 'categories',
+				'hierarchyId' => 5,
+				'hierarchy' => array('Man')
+			));
+		}
 
-			$this->choiceRequest->inquiries = array($inquiry);
+		/**
+		 * @param float $from
+		 * @param float $to
+		 */
+		public function setupPrice($from, $to){
+			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
+				'fieldName' => 'discountedPrice',
+				'rangeFrom' => $from,
+				'rangeTo' => $to
+			));
 		}
 
 		public function search(){
+			if (!empty($this->filters)){
+				$this->searchQuery->filters = $this->filters;
+			}
+			$this->inquiry->simpleSearchQuery = $this->searchQuery;
+			$this->choiceRequest->inquiries = array($this->inquiry);
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
 		}
 
@@ -115,18 +139,16 @@
 		}
 
 		private function createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount){
-			$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-			$searchQuery->queryText = $search;
-			$searchQuery->indexId = $this->config->getIndexId();
-			$searchQuery->language = $language;
-			$searchQuery->returnFields = $returnFields;
-			$searchQuery->offset = $offset;
-			$searchQuery->hitCount = $hitCount;
-
-			return $searchQuery;
+			$this->searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
+			$this->searchQuery->queryText = $search;
+			$this->searchQuery->indexId = $this->config->getIndexId();
+			$this->searchQuery->language = $language;
+			$this->searchQuery->returnFields = $returnFields;
+			$this->searchQuery->offset = $offset;
+			$this->searchQuery->hitCount = $hitCount;
 		}
 
-		private function setUpSorting($searchQuery, P13nSort $sorting){
+		private function setUpSorting(P13nSort $sorting){
 			$sortFieldsArray = $sorting->getSorts();
 			$sortFields = array();
 			foreach($sortFieldsArray as $sortField){
@@ -136,9 +158,8 @@
 				));
 			}
 			if(!empty($sortFields)){
-				$searchQuery->sortFields = $sortFields;
+				$this->searchQuery->sortFields = $sortFields;
 			}
-			return $searchQuery;
 		}
 
 		private function createInquiry(){
