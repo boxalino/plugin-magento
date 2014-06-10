@@ -48,6 +48,40 @@
 			$this->choiceRequest->inquiries = array($inquiry);
 		}
 
+        /**
+         * @param int $hierarchyId how deep is category tree in search, starts from 0 for main categories
+         * @param array $category names of categories in hierarchy
+         *
+         * exaples:
+         * $hierarchyId = 0;
+         * $category = array('Men');
+         * will search all products in category 'Men' (with subcategories)
+         *
+         * $hierarchyId = 1;
+         * $category = array('Men', 'Blazers');
+         * will search all products in category 'Men' (with subcategories)
+         *
+         */
+        public function setupCategory($hierarchyId, $category){
+            $this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
+                'fieldName' => 'categories',
+                'hierarchyId' => $hierarchyId,
+                'hierarchy' => $category
+            ));
+        }
+
+        /**
+         * @param float $from
+         * @param float $to
+         */
+        public function setupPrice($from, $to){
+            $this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
+                'fieldName' => 'discountedPrice',
+                'rangeFrom' => $from,
+                'rangeTo' => $to
+            ));
+        }
+
         public function addFilter($field, $value, $lang = null){
 
             $filter = new \com\boxalino\p13n\api\thrift\Filter();
@@ -83,16 +117,25 @@
         }
 
 		public function search(){
+			if (!empty($this->filters)){
+				$this->searchQuery->filters = $this->filters;
+			}
+			$this->inquiry->simpleSearchQuery = $this->searchQuery;
+			$this->choiceRequest->inquiries[] = array($this->inquiry);
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
 		}
 
 		public function getEntitiesIds(){
 			$result = array();
+			//print_r($this->choiceResponse);
 			foreach($this->choiceResponse->variants as $variant){
 				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
 				$searchResult = $variant->searchResult;
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
+
+					//print_r($item->values);
+					//echo '<br/>';
 				}
 			}
 			return $result;
@@ -151,18 +194,16 @@
 		}
 
 		private function createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount){
-			$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-			$searchQuery->queryText = $search;
-			$searchQuery->indexId = $this->config->getIndexId();
-			$searchQuery->language = $language;
-			$searchQuery->returnFields = $returnFields;
-			$searchQuery->offset = $offset;
-			$searchQuery->hitCount = $hitCount;
-
-			return $searchQuery;
+			$this->searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
+			$this->searchQuery->queryText = $search;
+			$this->searchQuery->indexId = $this->config->getIndexId();
+			$this->searchQuery->language = $language;
+			$this->searchQuery->returnFields = $returnFields;
+			$this->searchQuery->offset = $offset;
+			$this->searchQuery->hitCount = $hitCount;
 		}
 
-		private function setUpSorting($searchQuery, P13nSort $sorting){
+		private function setUpSorting(P13nSort $sorting){
 			$sortFieldsArray = $sorting->getSorts();
 			$sortFields = array();
 			foreach($sortFieldsArray as $sortField){
@@ -172,7 +213,7 @@
 				));
 			}
 			if(!empty($sortFields)){
-				$searchQuery->sortFields = $sortFields;
+				$this->searchQuery->sortFields = $sortFields;
 			}
 			return $searchQuery;
 		}
