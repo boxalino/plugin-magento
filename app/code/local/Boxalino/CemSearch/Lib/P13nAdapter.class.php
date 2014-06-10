@@ -13,6 +13,9 @@
 		private $choiceRequest = null;
 		private $choiceResponse = null;
 		private $returnFields = null;
+        private $inquiry = null;
+        private $searchQuery = null;
+        private $filters = array();
 
 		public function __construct(P13nConfig $config){
 			$this->config = $config;
@@ -35,17 +38,14 @@
 		 * @param int $hitCount how many records
 		 */
 		public function setupInquiry($choiceId, $search, $language, $returnFields, $sort, $offset = 0, $hitCount = 10){
-			$inquiry = $this->createInquiry();
+            $this->inquiry = $this->createInquiry();
 			$this->returnFields = $returnFields;
-			$searchQuery = $this->createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount);
-			$searchQuery = $this->setUpSorting($searchQuery, $sort);
+			$this->createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount);
+			$this->setUpSorting($sort);
 
-			$inquiry->choiceId = $choiceId;
-			$inquiry->simpleSearchQuery = $searchQuery;
+            $this->inquiry->choiceId = $choiceId;
 
-            $inquiry->simpleSearchQuery->filters = array();
-
-			$this->choiceRequest->inquiries = array($inquiry);
+//			$this->choiceRequest->inquiries = array($inquiry);
 		}
 
         /**
@@ -98,7 +98,7 @@
                 $filter->stringValues = array($value);
             }
 
-            $this->choiceRequest->inquiries[0]->simpleSearchQuery->filters[] = $filter;
+            $this->filters[] = $filter;
         }
 
         public function addFilterFromTo($field, $from, $to, $lang = null){
@@ -113,7 +113,7 @@
             $filter->rangeFrom = $from;
             $filter->rangeTo =$to;
 
-            $this->choiceRequest->inquiries[0]->simpleSearchQuery->filters[] = $filter;
+            $this->filters[] = $filter;
         }
 
 		public function search(){
@@ -121,7 +121,7 @@
 				$this->searchQuery->filters = $this->filters;
 			}
 			$this->inquiry->simpleSearchQuery = $this->searchQuery;
-			$this->choiceRequest->inquiries[] = array($this->inquiry);
+			$this->choiceRequest->inquiries = array($this->inquiry);
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
 		}
 
@@ -213,9 +213,8 @@
 				));
 			}
 			if(!empty($sortFields)){
-				$this->searchQuery->sortFields = $sortFields;
-			}
-			return $searchQuery;
+                $this->searchQuery->sortFields = $sortFields;
+            }
 		}
 
 		private function createInquiry(){
