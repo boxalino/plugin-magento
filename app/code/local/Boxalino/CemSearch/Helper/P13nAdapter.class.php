@@ -5,7 +5,7 @@
 	 * Date: 28.05.14
 	 */
 
-	require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'Thrift' . DIRECTORY_SEPARATOR . 'HttpP13n.php';
+	require_once __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR .'Lib'. DIRECTORY_SEPARATOR .'vendor' . DIRECTORY_SEPARATOR . 'Thrift' . DIRECTORY_SEPARATOR . 'HttpP13n.php';
 
 	class P13nAdapter{
 		private $config = null;
@@ -62,12 +62,25 @@
          * will search all products in category 'Men' (with subcategories)
          *
          */
-        public function setupCategory($hierarchyId, $category){
-            $this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
-                'fieldName' => 'categories',
-                'hierarchyId' => $hierarchyId,
-                'hierarchy' => $category
-            ));
+        public function addFilterCategory($categoryId){
+	        $categoryNames = array();
+	        if(isset($categoryId) && $categoryId > 0 ){
+		        $category = Mage::getModel('catalog/category')->load($categoryId);
+		        $path = $category->getPath();
+		        $pathArray = explode('/', $path);
+		        $skip = -2 ;
+		        foreach($pathArray as $catId){
+			        $categoryName = Mage::getModel('catalog/category')->load($catId)->getName();
+
+			        if(++$skip > 0){
+				        $categoryNames[] = $categoryName;
+			        }
+		        }
+		        $categoryDepth = count($categoryNames) - 1 ;
+
+		        $this->addFilterHierarchy('categories', $categoryDepth, $categoryNames );
+
+	        }
         }
 
         /**
@@ -83,7 +96,6 @@
         }
 
         public function addFilter($field, $value, $lang = null){
-
             $filter = new \com\boxalino\p13n\api\thrift\Filter();
 
             if($lang){
@@ -100,6 +112,33 @@
 
             $this->filters[] = $filter;
         }
+
+
+		public function addFilterHierarchy($field, $hierarchyId, $hierarchy, $lang = null){
+
+			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
+				'fieldName' => 'categories',
+				'hierarchyId' => $hierarchyId,
+				'hierarchy' => $hierarchy
+			));
+
+			return;
+
+
+			$filter = new \com\boxalino\p13n\api\thrift\Filter();
+
+			if($lang){
+				$filter->fieldName = $field . '_' . substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+			} else{
+				$filter->fieldName = $field;
+			}
+
+			$filter->$hierarchyId = $hierarchyId;
+			print_r($hierarchy[0]);
+			$filter->$hierarchy = $hierarchy[0];
+
+			$this->filters[] = $filter;
+		}
 
         public function addFilterFromTo($field, $from, $to, $lang = null){
             $filter = new \com\boxalino\p13n\api\thrift\Filter();
@@ -134,8 +173,8 @@
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
 
-					//print_r($item->values);
-					//echo '<br/>';
+					print_r($item->values);
+					echo '<br/>';
 				}
 			}
 			return $result;
