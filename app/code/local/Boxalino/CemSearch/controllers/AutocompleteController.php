@@ -13,7 +13,7 @@
 
 			$p13nConfig = new P13nConfig(
 				$storeConfig['host'],
-				$storeConfig['account'],
+				$storeConfig['account'] ,
 				$storeConfig['username'],
 				$storeConfig['password'],
 				$storeConfig['domain'],
@@ -26,6 +26,8 @@
 			$recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
 			$p13n->setupInquiry($recommendationConfig['autocomplete'], $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
+			//$p13n->setupInquiry('autocomplete', $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
+
 			$p13n->search();
 			$entities = $p13n->getEntities();
 			unset($p13n); // !!!!!

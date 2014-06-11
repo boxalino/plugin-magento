@@ -38,6 +38,7 @@
 					<advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
 				</rewrite>
 			</catalogsearch_resource>
+
 			<catalogsearch>
 				<rewrite>
 					<advanced>Boxalino_CemSearch_Model_Advanced</advanced>
@@ -56,5 +57,17 @@
 				</connection>
 			</test_read>
 		</resources>
+		<blocks>
+			<cemsearch>
+				<class>Boxalino_CemSearch_Block</class>
+			</cemsearch>
+			<catalogsearch>
+				<rewrite>
+					<autocomplete>
+						Boxalino_CemSearch_Block_Autocomplete
+					</autocomplete>
+				</rewrite>
+			</catalogsearch>
+		</blocks>
 	</global>
 </config>
