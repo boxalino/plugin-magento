@@ -43,6 +43,5 @@ class Boxalino_CemSearch_AjaxController extends Mage_CatalogSearch_AjaxControlle
         }
 
 		$this->getResponse()->setBody($this->getLayout()->createBlock('cemsearch/autocomplete')->toHtml());
-        //$this->getResponse()->setBody($this->getLayout()->createBlock('catalogsearch/autocomplete')->toHtml());
     }
 }

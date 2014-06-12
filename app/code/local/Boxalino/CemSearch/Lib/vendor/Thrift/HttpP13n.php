@@ -31,10 +31,6 @@ class HttpP13n
 
 	}
 
-	public function __destruct(){
-		self::$thriftClassLoader->unregister();
-	}
-
 	public function __call($name, $arguments)
 	{
 		if (method_exists($this->getClient(), $name)) {
@@ -170,17 +166,11 @@ class HttpP13n
 	protected function initClassLoader()
 	{
 		require_once __DIR__ . DIRECTORY_SEPARATOR . 'ClassLoader' . DIRECTORY_SEPARATOR . 'ThriftClassLoader.php';
-
 		self::$thriftClassLoader = new \Thrift\ClassLoader\ThriftClassLoader(false);
 		self::$thriftClassLoader->registerNamespace('Thrift', __DIR__ . DIRECTORY_SEPARATOR . '..');
 		self::$thriftClassLoader->register();
-
 		foreach ($this->dependencies as $dependency) {
-
 			require_once __DIR__ . DIRECTORY_SEPARATOR . $dependency;
-
 		}
-
 	}
-
 }

@@ -102,17 +102,22 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
 	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
-	        $p13n->setupInquiry($recommendationConfig['quick_search'], '*' . $query . '*', substr(Mage::app()->getLocale()->getLocaleCode(),0,2) , array('entity_id', 'title'), $p13nSort, 0, 25);
+	        //$p13n->setupInquiry($recommendationConfig['quick_search'], '*' . $query . '*', substr(Mage::app()->getLocale()->getLocaleCode(),0,2) , array('entity_id', 'title'), $p13nSort, 0, 25);
+	        $p13n->setupInquiry('quick_search', '*' . $query . '*', substr(Mage::app()->getLocale()->getLocaleCode(),0,2) , array('entity_id', 'title'), $p13nSort, 0, 25);
 
 	        if(isset($_GET['cat'])){
 		        $p13n->addFilterCategory($_GET['cat']);
 	        }
+	        echo '<pre>';
+	        $p13n->autocomplete();
+	        print_r('aaaa');
+	        die;
 	        $p13n->search();
 	        $entity_ids = $p13n->getEntitiesIds();
 	        unset($p13n); // !!!!!
 
 
-	        print_r('aaaa');
+
 	        print_r($entity_ids);
 
 
