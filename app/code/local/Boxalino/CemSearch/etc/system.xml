@@ -143,6 +143,52 @@
                         </entity_id>
 					</fields>
 				</recommendation_widgets>
+				<recommendation_widgets translate="label" module="Boxalino_CemSearch">
+					<label>Recommendations Widgets</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>51</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<!-- QUICK SEARCH -->
+						<quick_search translate="label">
+							<label>Quick search</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</quick_search>
+						<!-- ADVANCED SEARCH -->
+						<advanced_search translate="label">
+							<label>Advanced search</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</advanced_search>
+						<!-- AUTOCOMPLETE -->
+						<autocomplete translate="label">
+							<label>Autocomplete</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</autocomplete>
+						<!-- AUTOCOMPLETE LIMIT-->
+						<autocomplete_limit translate="label">
+							<label>Autocomplete limit</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>4</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</autocomplete_limit>
+					</fields>
+				</recommendation_widgets>
 			</groups>
 		</Boxalino_CemSearch>
 	</sections>

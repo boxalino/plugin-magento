@@ -10,7 +10,9 @@
 	class P13nAdapter{
 		private $config = null;
 		private $p13n = null;
+		private $autocompleteRequest = null;
 		private $choiceRequest = null;
+		private $autocompleteResponse = null;
 		private $choiceResponse = null;
 		private $returnFields = null;
         private $inquiry = null;
@@ -115,16 +117,6 @@
 
 
 		public function addFilterHierarchy($field, $hierarchyId, $hierarchy, $lang = null){
-
-			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
-				'fieldName' => 'categories',
-				'hierarchyId' => $hierarchyId,
-				'hierarchy' => $hierarchy
-			));
-
-			return;
-
-
 			$filter = new \com\boxalino\p13n\api\thrift\Filter();
 
 			if($lang){
@@ -133,9 +125,8 @@
 				$filter->fieldName = $field;
 			}
 
-			$filter->$hierarchyId = $hierarchyId;
-			print_r($hierarchy[0]);
-			$filter->$hierarchy = $hierarchy[0];
+			$filter->hierarchyId = $hierarchyId;
+			$filter->hierarchy = $hierarchy;
 
 			$this->filters[] = $filter;
 		}
@@ -155,6 +146,44 @@
             $this->filters[] = $filter;
         }
 
+		public function autocomplete($text, $limit){
+			$choiceId = 'autocomplete';
+			$fields = array('id', 'title');
+
+			$this->autocompleteRequest = $this->p13n->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
+
+			$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
+			$searchQuery->indexId = $this->config->getAccount();
+			$searchQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+			$searchQuery->returnFields = $fields;
+			$searchQuery->offset = 0;
+			$searchQuery->hitCount = 0;
+			$searchQuery->queryText = $text;
+
+			$autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
+			$autocompleteQuery->indexId = $this->config->getAccount();
+			$autocompleteQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+			$autocompleteQuery->queryText = $text;
+			$autocompleteQuery->suggestionsHitCount = $limit;
+
+			$this->autocompleteRequest->choiceId = $choiceId;
+			$this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
+			$this->autocompleteRequest->searchChoiceId = $choiceId;
+			$this->autocompleteRequest->searchQuery = $searchQuery;
+
+			$this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
+		}
+
+		public function getAutocompleteEntities(){
+			$suggestions = array();
+			//print_r($this->autocompleteResponse);
+
+			foreach($this->autocompleteResponse->hits  as $hit){
+				$suggestions[] = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
+			}
+			return $suggestions;
+		}
+
 		public function search(){
 			if (!empty($this->filters)){
 				$this->searchQuery->filters = $this->filters;
@@ -173,8 +202,8 @@
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
 
-					print_r($item->values);
-					echo '<br/>';
+					//print_r($item->values);
+					//echo '<br/>';
 				}
 			}
 			return $result;

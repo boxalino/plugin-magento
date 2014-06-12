@@ -41,6 +41,8 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
     protected function _toHtml()
     {
+
+	    $query = $this->helper('catalogsearch')->getQueryText();
         $html = '';
 
         if (!$this->_beforeToHtml()) {
@@ -64,7 +66,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li title="'.$this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
+            $html .=  '<li title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
                 . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
         }
 
@@ -76,11 +78,9 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     public function getSuggestData()
     {
         if (!$this->_suggestData) {
-            $collection = $this->helper('catalogsearch')->getSuggestCollection();
             $query = $this->helper('catalogsearch')->getQueryText();
             $counter = 0;
             $data = array();
-
 
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
@@ -96,34 +96,25 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 		        $storeConfig['domain'],
 		        $storeConfig['indexId']
 	        );
-	        $p13nSort = new P13nSort();
-	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
 	        $p13n = new P13nAdapter($p13nConfig);
 
 	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
 
-	        $p13n->setupInquiry($recommendationConfig['quick_search'], '*' . $query . '*', substr(Mage::app()->getLocale()->getLocaleCode(),0,2) , array('entity_id', 'title'), $p13nSort, 0, 25);
-
-	        if(isset($_GET['cat'])){
-		        $p13n->addFilterCategory($_GET['cat']);
+	        if($query){
+		        $p13n->autocomplete('*' . $query . '*', $recommendationConfig['autocomplete_limit']);
+		        $collection = $p13n->getAutocompleteEntities();
+	        }else{
+		        $collection = array();
 	        }
-	        $p13n->search();
-	        $entity_ids = $p13n->getEntitiesIds();
-	        unset($p13n); // !!!!!
-
-
-	        print_r('aaaa');
-	        print_r($entity_ids);
-
 
             foreach ($collection as $item) {
 	            $_data = array(
-                    'title' => $item->getQueryText(),
+                    'title' => $item['text'],
                     'row_class' => (++$counter)%2?'odd':'even',
-                    'num_of_results' => $item->getNumResults()
+                    'num_of_results' =>  $item['hits']
                 );
 
-                if ($item->getQueryText() == $query) {
+                if ($item['text'] == $query) {
                     array_unshift($data, $_data);
                 }
                 else {
