@@ -1,13 +1,13 @@
 <?php
 
-class VacP13nClient
+class BoxalinoP13nClient
 {
 	protected $p13nServerHost = 'bd1.bx-cloud.com';
 //	protected $p13nServerHost = 'di1.bx-cloud.com';
 //	protected $p13nServerHost = 'c1.bx-cloud.com';
 //	protected $p13nServerHost = 'cdn.bx-cloud.com';
 	protected $p13nServerPort = 80;
-	protected $productIdFieldName = 'id';
+	protected $productIdFieldName = 'entity_id';
 
 	protected $account;
 	protected $language;
@@ -19,8 +19,11 @@ class VacP13nClient
 	 * @param string $language
 	 * @param bool $isDevelopment
 	 */
-	public function __construct($account, $language, $isDevelopment = false)
+	public function __construct($account, $language, $entityIdFieldName, $isDevelopment = false)
 	{
+
+        $this->productIdFieldName = $entityIdFieldName;
+
 		$this->account = $account;
 		$this->language = $language;
 		$this->isDevelopment = $isDevelopment;
@@ -82,7 +85,7 @@ class VacP13nClient
 				foreach ($basketContent as $basketItem) {
 					$contextItem = new \com\boxalino\p13n\api\thrift\ContextItem();
 					$contextItem->indexId = $this->account;
-					$contextItem->fieldName = 'id';
+					$contextItem->fieldName = $this->productIdFieldName;
 					$contextItem->contextItemId = $basketItem['id'];
 					$contextItem->role = 'subProduct';
 
@@ -101,6 +104,11 @@ class VacP13nClient
 		}
 
 		$choiceRequest->inquiries = array($inquiry);
+        var_dump($choiceRequest);
+        echo 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+        echo '<pre>';
+        print_r($choiceRequest);
+        echo '</pre>';
 		$choiceResponse = $this->p13n->choose($choiceRequest);
 
 		$results = array();
