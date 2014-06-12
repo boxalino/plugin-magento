@@ -117,16 +117,6 @@
 
 
 		public function addFilterHierarchy($field, $hierarchyId, $hierarchy, $lang = null){
-
-			$this->filters[] = new \com\boxalino\p13n\api\thrift\Filter(array(
-				'fieldName' => 'categories',
-				'hierarchyId' => $hierarchyId,
-				'hierarchy' => $hierarchy
-			));
-
-			return;
-
-
 			$filter = new \com\boxalino\p13n\api\thrift\Filter();
 
 			if($lang){
@@ -135,9 +125,8 @@
 				$filter->fieldName = $field;
 			}
 
-			$filter->$hierarchyId = $hierarchyId;
-			print_r($hierarchy[0]);
-			$filter->$hierarchy = $hierarchy[0];
+			$filter->hierarchyId = $hierarchyId;
+			$filter->hierarchy = $hierarchy;
 
 			$this->filters[] = $filter;
 		}
@@ -157,91 +146,42 @@
             $this->filters[] = $filter;
         }
 
-		public function autocomplete(){
+		public function autocomplete($text, $limit){
+			$choiceId = 'autocomplete';
+			$fields = array('id', 'title');
 
-			$p13nChoiceId = 'autocomplete';
-			$p13nHost = 'cdn.bx-cloud.com';
-			$p13nAccount = 'testshop';
-			$p13nUsername = 'codete';
-			$p13nPassword = 'oNaeGhahVoo7';
-			$cookieDomain = '.example.com';
+			$this->autocompleteRequest = $this->p13n->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
 
-			$p13nSearch = '*oxf*';
-			$p13nLanguage = 'en';
-			$p13nFields = array('id', 'title', 'body', 'mainnumber', 'name', 'net_price', 'standardPrice',
-				'products_mediaId',
-				'products_supplier',
-				'products_net_price',
-				'products_tax',
-				'products_original_id'
-			);
-
-
-			// Create basic P13n client
-			$p13n = new HttpP13n();
-			$p13n->setHost($p13nHost);
-			$p13n->setAuthorization($p13nUsername, $p13nPassword);
-
-			// Create main choice request object
-			$autocompleteRequest = $p13n->getAutocompleteRequest($p13nAccount, $cookieDomain);
-
-			// Setup a search query
 			$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-			$searchQuery->indexId = $p13nAccount;
-			$searchQuery->language = $p13nLanguage;
-			$searchQuery->returnFields = $p13nFields;
+			$searchQuery->indexId = $this->config->getAccount();
+			$searchQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+			$searchQuery->returnFields = $fields;
 			$searchQuery->offset = 0;
-			$searchQuery->hitCount = 10;
-			$searchQuery->queryText = $p13nSearch;
+			$searchQuery->hitCount = 0;
+			$searchQuery->queryText = $text;
 
 			$autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
-			$autocompleteQuery->indexId = $p13nAccount;
-			$autocompleteQuery->language = $this->getShortLocale();
-			$autocompleteQuery->queryText = $p13nSearch;
+			$autocompleteQuery->indexId = $this->config->getAccount();
+			$autocompleteQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+			$autocompleteQuery->queryText = $text;
+			$autocompleteQuery->suggestionsHitCount = $limit;
 
-			// Add inquiry to choice request
-			$autocompleteRequest->choiceId = $p13nChoiceId;
-			$autocompleteRequest->autocompleteQuery = $autocompleteQuery;
-			$autocompleteRequest->searchChoiceId = $p13nChoiceId;
-			$autocompleteRequest->searchQuery = $searchQuery;
+			$this->autocompleteRequest->choiceId = $choiceId;
+			$this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
+			$this->autocompleteRequest->searchChoiceId = $choiceId;
+			$this->autocompleteRequest->searchQuery = $searchQuery;
 
-			// Call the service
-			$choiceResponse = $p13n->autocomplete($autocompleteRequest);
-			return $choiceResponse;
+			$this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
+		}
 
+		public function getAutocompleteEntities(){
+			$suggestions = array();
+			//print_r($this->autocompleteResponse);
 
-			die;
-			$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-			$searchQuery->queryText = '*oxfo*';
-			$searchQuery->indexId = $this->config->getIndexId();
-			$searchQuery->language = 'en';
-			$searchQuery->returnFields = array('id','language','textsuggest','extrasearch','popularity');
-			$searchQuery->offset = 0;
-			$searchQuery->hitCount = 10;
-
-			$userRecord = new \com\boxalino\p13n\api\thrift\UserRecord();
-			$userRecord->username = 'admin';
-
-			$requestContext = new \com\boxalino\p13n\api\thrift\RequestContext();
-
-			$autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
-			$autocompleteQuery->indexId =  $this->config->getIndexId();
-			$autocompleteQuery->language = 'en';
-			$autocompleteQuery->queryText = $searchQuery->queryText;
-
-			$this->autocompleteRequest = new com\boxalino\p13n\api\thrift\AutocompleteRequest(array(
-				'userRecord' => $userRecord,
-				//s'scope' => null,
-				'choiceId' => 'autocomplete',
-				'profileId' => 'x',
-				'requestContext' => $requestContext,
-				'excludeVariantIds' => null,
-				'autocompleteQuery' => $autocompleteQuery,
-				'searchChoiceId' => null,
-				'searchQuery' => $searchQuery
-			));
-			$this->choiceResponse = $this->p13n->autocomplete($this->autocompleteRequest);
-			print_r($this->choiceResponse );
+			foreach($this->autocompleteResponse->hits  as $hit){
+				$suggestions[] = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
+			}
+			return $suggestions;
 		}
 
 		public function search(){
@@ -262,8 +202,8 @@
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values['entity_id'][0];
 
-					print_r($item->values);
-					echo '<br/>';
+					//print_r($item->values);
+					//echo '<br/>';
 				}
 			}
 			return $result;

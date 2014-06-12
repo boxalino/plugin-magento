@@ -26,14 +26,11 @@
 
 	        $p13nConfig = new P13nConfig(
 		        $storeConfig['host'],
-		       // $storeConfig['account'],
-		        'shopware_test',
+		        $storeConfig['account'],
 		        $storeConfig['username'],
 		        $storeConfig['password'],
 		        $storeConfig['domain'],
-		        //$storeConfig['indexId']
-		        'shopware_test'
-
+		        $storeConfig['indexId']
 	        );
 	        $p13nSort = new P13nSort();
 	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
