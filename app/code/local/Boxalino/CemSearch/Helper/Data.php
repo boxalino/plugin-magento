@@ -5,13 +5,13 @@
 			spl_autoload_register(array('Boxalino_CemSearch_Helper_Data', '__loadClass'), TRUE, TRUE);
 		}
 
-		public static function __loadClass($name) {
+		public static function __loadClass($name, $isCem = false, $ext = '.class') {
 			$files = array('P13nAdapter','P13nConfig','P13nSort');
 			if(in_array($name, $files)){
 				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Helper/'.$name.'.class.php');
 
-			}elseif (strpos($name, 'CEM_') !== false  || strpos($name, 'P13n') !== false) {
-				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Lib/'.$name.'.class.php');
+			}elseif (strpos($name, 'CEM_') !== false  || strpos($name, 'P13n') !== false || $isCem) {
+				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Lib/'.$name.$ext.'.php');
 			}
 		}
 	}
