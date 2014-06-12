@@ -23,9 +23,10 @@
 			$p13nSort->push('score', true);   // score / discountedPrice / title_en
 			$p13n = new P13nAdapter($p13nConfig);
 
-			$recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
+			$generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+            $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
-			$p13n->setupInquiry($recommendationConfig['autocomplete'], $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
+			$p13n->setupInquiry($generalConfig['autocomplete'], $query, $lang, array($generalConfig['entity_id'], 'title'), $p13nSort, 0, 25);
 			//$p13n->setupInquiry('autocomplete', $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
 
 			$p13n->search();
@@ -34,18 +35,19 @@
 
 			$suggestions = array();
 			$titles = array();
-			$searchConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
+//			$searchConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
 			foreach($entities as $entity){
 				if( ! in_array($entity['title'][0], $titles) &&
-					(	! isset($searchConfig['autocomplete_limit']) ||
-						$searchConfig['autocomplete_limit'] == 0 ||
-						count($titles) < $searchConfig['autocomplete_limit']
+					(	! isset($generalConfig['autocomplete_limit']) ||
+                        $generalConfig['autocomplete_limit'] == 0 ||
+						count($titles) < $generalConfig['autocomplete_limit']
 					)
 				){
 					$titles[] = $entity['title'][0];
 					$suggestions[] = array(
 						'value' => $entity['title'][0],
 						'data' => $entity['entity_id'][0]
+//						'data' => $entity['entity_id'][0]
 					);
 				}
 
@@ -57,6 +59,7 @@
 			);
 
 			echo json_encode($values);
-			die;
+//			die;
+            return $values;
 		}
 	}

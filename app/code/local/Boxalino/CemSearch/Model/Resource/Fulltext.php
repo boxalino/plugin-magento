@@ -36,9 +36,10 @@
 	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
+	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+            $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
-	        $p13n->setupInquiry($recommendationConfig['quick_search'], $query->getQueryText(), 'en', array('entity_id', 'categories'), $p13nSort, 0, 25);
+	        $p13n->setupInquiry($generalConfig['quick_search'], $query->getQueryText(), $lang, array($generalConfig['entity_id'], 'categories'), $p13nSort, 0, 25);
 
 	        if(isset($_GET['cat'])){
 		        $p13n->addFilterCategory($_GET['cat']);

@@ -45,6 +45,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
 
         //setUp Boxalino
         $storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
+        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
@@ -64,7 +65,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
         $p13n = new P13nAdapter($p13nConfig);
 
         //setup search
-        $p13n->setupInquiry('quick_search', $params['name'], 'en', array('entity_id', 'discountedPrice', 'title_en', 'score'), $p13nSort, 0, 1000);
+        $p13n->setupInquiry($generalConfig['advanced_search'], $params['name'], $lang, array($generalConfig['entity_id'], 'discountedPrice', 'title_' . $lang, 'score'), $p13nSort, 0, 1000);
 //        var_dump($params);
 //        var_dump($criteria);
         ## ADD FILTERS

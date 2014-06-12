@@ -97,6 +97,12 @@
             ));
         }
 
+        /**
+         * @param string $field field name for filter
+         * @param mixed $value filter value
+         * @param string|null $lang
+         *
+         */
         public function addFilter($field, $value, $lang = null){
             $filter = new \com\boxalino\p13n\api\thrift\Filter();
 
@@ -115,7 +121,13 @@
             $this->filters[] = $filter;
         }
 
-
+        /**
+         * @param string $field field name for filter
+         * @param int $hierarchyId names of categories in hierarchy
+         * @param int $hierarchy names of categories in hierarchy
+         * @param string|null $lang
+         *
+         */
 		public function addFilterHierarchy($field, $hierarchyId, $hierarchy, $lang = null){
 			$filter = new \com\boxalino\p13n\api\thrift\Filter();
 
@@ -131,6 +143,13 @@
 			$this->filters[] = $filter;
 		}
 
+        /**
+         * @param string $field field name for filter
+         * @param number $from param from
+         * @param number $to param from
+         * @param string|null $lang
+         *
+         */
         public function addFilterFromTo($field, $from, $to, $lang = null){
             $filter = new \com\boxalino\p13n\api\thrift\Filter();
 

@@ -98,10 +98,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 	        );
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        $recommendationConfig = Mage::getStoreConfig('Boxalino_CemSearch/recommendation_widgets');
+	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
 
 	        if($query){
-		        $p13n->autocomplete('*' . $query . '*', $recommendationConfig['autocomplete_limit']);
+		        $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit']);
 		        $collection = $p13n->getAutocompleteEntities();
 	        }else{
 		        $collection = array();

@@ -6,7 +6,7 @@
 		}
 
 		public static function __loadClass($name, $isCem = false, $ext = '.class') {
-			$files = array('P13nAdapter','P13nConfig','P13nSort');
+			$files = array('P13nAdapter','P13nConfig','P13nSort', 'P13nRecommendation');
 			if(in_array($name, $files)){
 				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Helper/'.$name.'.class.php');
 
