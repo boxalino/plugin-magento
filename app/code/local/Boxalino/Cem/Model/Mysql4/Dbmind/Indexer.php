@@ -324,8 +324,15 @@
 				!$zip->close()) {
 				return FALSE;
 			}
+
+			//prepare accounts
+			$accounts = array();
+			foreach(Mage::app()->getWebsites() as $website) {
+				$accounts[] = Mage::app()->getWebsite($website->getId())->getConfig('boxalinocem/service/account');
+			}
+
 			// upload csv files
-			foreach(explode(',', Mage::getStoreConfig('boxalinocem/service/account')) as $account) {
+			foreach($accounts as $account) {
 				if (strlen(Mage::getStoreConfig('boxalinocem/synchronization/url')) > 0) {
 					$client = new CEM_HttpClient();
 					if (($code = $client->post(
@@ -336,7 +343,8 @@
 								'accessCode' => Mage::getStoreConfig('boxalinocem/synchronization/access_code'),
 								'data' => '@' . $this->zipFile . ';type=application/zip'
 							)
-						)) != 200) {
+						)) != 200
+					) {
 						Mage::throwException(
 							Mage::helper('boxalinocem')->__('Synchronization server failure (code=%s)!', $code)
 						);
