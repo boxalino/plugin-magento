@@ -26,10 +26,6 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
 
         $product = Mage::registry('product');
         /* @var $product Mage_Catalog_Model_Product */
-//        $this->_itemCollection = $product->getUpSellProductCollection()
-//            ->setPositionOrder()
-//            ->addStoreFilter()
-//        ;
 
         ###############################################################
         $_REQUEST['productId'] = $product->getId();
@@ -37,25 +33,23 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nRecommendation');
         $p13nRecommendation = new P13nRecommendation();
 
-        $response = $p13nRecommendation->getRecommendation('upsell', 'product', 'en');
-        $productIds = array();
+        $response = $p13nRecommendation->getRecommendation('upsell');
+        $entityIds = array();
+
+        if($response === null){
+            $this->_itemCollection = new Varien_Data_Collection();
+            return $this;
+        }
 
         foreach($response as $item){
-            $productIds[] = $item['entity_id'];
+            $entityIds[] = $item['entity_id'];
         }
 
-//        var_dump($productIds);
         ###############################################################
 
-        if(count($productIds) == 0){
-            $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
-                ->addFieldToFilter('entity_id', array('-1'))
-                ->addAttributeToSelect('*');
-        } else{
-            $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
-                ->addFieldToFilter('entity_id', $productIds)
-                ->addAttributeToSelect('*');
-        }
+        $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
+            ->addFieldToFilter('entity_id', $entityIds)
+            ->addAttributeToSelect('*');
 
         if (Mage::helper('catalog')->isModuleEnabled('Mage_Checkout')) {
             Mage::getResourceSingleton('checkout/cart')->addExcludeProductFilter($this->_itemCollection,

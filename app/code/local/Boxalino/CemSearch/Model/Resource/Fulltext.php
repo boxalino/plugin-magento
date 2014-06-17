@@ -39,7 +39,16 @@
 	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
             $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
-	        $p13n->setupInquiry($generalConfig['quick_search'], $query->getQueryText(), $lang, array($generalConfig['entity_id'], 'categories'), $p13nSort, 0, 25);
+            $limit = $generalConfig['quick_search_limit']==0?1000:$generalConfig['quick_search_limit'];
+
+	        $p13n->setupInquiry(
+                $generalConfig['quick_search'],
+                $query->getQueryText(),
+                $lang,
+                array($generalConfig['entity_id'], 'categories'),
+                $p13nSort,
+                0, $limit
+            );
 
 	        if(isset($_GET['cat'])){
 		        $p13n->addFilterCategory($_GET['cat']);

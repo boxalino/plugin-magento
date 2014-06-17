@@ -26,41 +26,31 @@ class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_
     {
         $product = Mage::registry('product');
         /* @var $product Mage_Catalog_Model_Product */
+
 ##################################################################################
-//        echo $product->getId() . '  ' . $product->getPrice();
-//        Mage::app()->getRequest()->setParam('productId', $product->getId());
 
         $_REQUEST['productId'] = $product->getId();
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nRecommendation');
         $p13nRecommendation = new P13nRecommendation();
 
-        $response = $p13nRecommendation->getRecommendation('related', 'product', 'en');
-        $productIds = array();
+        $response = $p13nRecommendation->getRecommendation('related');
+        $entityIds = array();
+
+        if($response === null){
+            $this->_itemCollection = new Varien_Data_Collection();
+            return $this;
+        }
 
         foreach($response as $item){
-            $productIds[] = $item['entity_id'];
+            $entityIds[] = $item['entity_id'];
         }
 
-        var_dump($productIds);
-
-//        var_dump($_REQUEST['productId']);
 ###############################################################
-//        $this->_itemCollection = $product->getRelatedProductCollection()
-//            ->addAttributeToSelect('required_options')
-//            ->setPositionOrder()
-//            ->addStoreFilter()
-//        ;
 
-        if(count($productIds) == 0){
-            $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
-                ->addFieldToFilter('entity_id', array('-1'))
-                ->addAttributeToSelect('*');
-        } else{
-            $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
-                ->addFieldToFilter('entity_id', $productIds)
-                ->addAttributeToSelect('*');
-        }
+        $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
+            ->addFieldToFilter('entity_id', $entityIds)
+            ->addAttributeToSelect('*');
 
         if (Mage::helper('catalog')->isModuleEnabled('Mage_Checkout')) {
             Mage::getResourceSingleton('checkout/cart')->addExcludeProductFilter($this->_itemCollection,
@@ -68,7 +58,7 @@ class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_
             );
             $this->_addProductAttributesAndPrices($this->_itemCollection);
         }
-        Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($this->_itemCollection);
+//        Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($this->_itemCollection);
         Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($this->_itemCollection);
 
         $this->_itemCollection->load();

@@ -7,7 +7,7 @@ class BoxalinoP13nClient
 //	protected $p13nServerHost = 'c1.bx-cloud.com';
 //	protected $p13nServerHost = 'cdn.bx-cloud.com';
 	protected $p13nServerPort = 80;
-	protected $productIdFieldName = 'entity_id';
+	protected $productIdFieldName;
 
 	protected $account;
 	protected $language;

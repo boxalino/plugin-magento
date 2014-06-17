@@ -64,8 +64,17 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
 
         $p13n = new P13nAdapter($p13nConfig);
 
+        $limit = $generalConfig['advanced_search_limit']==0?1000:$generalConfig['advanced_search_limit'];
+
         //setup search
-        $p13n->setupInquiry($generalConfig['advanced_search'], $params['name'], $lang, array($generalConfig['entity_id'], 'discountedPrice', 'title_' . $lang, 'score'), $p13nSort, 0, 1000);
+        $p13n->setupInquiry(
+            $generalConfig['advanced_search'],
+            $params['name'],
+            $lang,
+            array($generalConfig['entity_id'], 'discountedPrice', 'title_' . $lang, 'score'),
+            $p13nSort,
+            0, $limit
+        );
 //        var_dump($params);
 //        var_dump($criteria);
         ## ADD FILTERS

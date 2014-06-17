@@ -79,4 +79,37 @@
             </catalog>
 		</blocks>
 	</global>
+    <default>
+        <Boxalino_CemSearch>
+            <backend>
+                <account_dev>0</account_dev>
+            </backend>
+            <general>
+                <quick_search>quick_search</quick_search>
+                <quick_search_limit>0</quick_search_limit>
+                <advanced_search>quick_search</advanced_search>
+                <advanced_search_limit>0</advanced_search_limit>
+                <autocomplete>autocomplete</autocomplete>
+                <autocomplete_limit>6</autocomplete_limit>
+                <entity_id>entity_id</entity_id>
+            </general>
+            <recommendation>
+                <!-- CART -->
+                <cart_status>1</cart_status>
+                <cart_widget>recommendation_cart</cart_widget>
+                <cart_min>0</cart_min>
+                <cart_max>3</cart_max>
+                <!-- RELATED -->
+                <related_status>1</related_status>
+                <related_widget>recommendation_widget</related_widget>
+                <related_min>0</related_min>
+                <related_max>3</related_max>
+                <!-- UPSELL -->
+                <upsell_status>1</upsell_status>
+                <upsell_widget>recommendation_upsell</upsell_widget>
+                <upsell_min>0</upsell_min>
+                <upsell_max>3</upsell_max>
+            </recommendation>
+        </Boxalino_CemSearch>
+    </default>
 </config>

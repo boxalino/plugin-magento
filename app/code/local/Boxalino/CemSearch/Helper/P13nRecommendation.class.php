@@ -6,11 +6,10 @@
 
 class P13nRecommendation {
 
-    public function getRecommendation($widget, $scenario = null, $lang = 'en'){
+    public function getRecommendation($widget){
 
-        $name = 'recommendation_widget';
         $account = $this->getAccount();
-        $language = $lang;
+        $language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
         $returnFields = array(
             'id',
             'entity_id',
@@ -34,16 +33,36 @@ class P13nRecommendation {
         if(isset($entity_id) && $entity_id !== ''){
             $entityIdFieldName = $entity_id;
         }
+        $recommendation = Mage::getStoreConfig('Boxalino_CemSearch/recommendation');
 
-        $name = Mage::getStoreConfig('Boxalino_CemSearch/recommendation/' . $widget);
-//        var_dump($name);
+        if(isset($recommendation[$widget . '_status']) && $recommendation[$widget . '_status'] == 0){
+            return null;
+        }
+
+        $name = isset($recommendation[$widget . '_widget'])?$recommendation[$widget . '_widget']:null;
+
         if($name == "" || $name == null){
-            return array();
+            return null;
+        }
+
+        $min = isset($recommendation[$widget . '_min'])?$recommendation[$widget . '_min']:null;
+        $max = isset($recommendation[$widget . '_max'])?$recommendation[$widget . '_max']:null;
+
+        if($max == null || $min > $max){
+            return null;
+        }
+
+        if($widget == 'related' || $widget == 'upsell'){
+            $scenario = 'product';
+        } elseif ($widget == 'cart'){
+            $scenario = 'basket';
+        } else{
+            $scenario = null;
         }
 
         $p13nClient = new BoxalinoP13nClient($account, $language, $entityIdFieldName, true);
 
-        return $p13nClient->getPersonalRecommendations($name, $returnFields, 0, 6, $scenario);
+        return $p13nClient->getPersonalRecommendations($name, $returnFields, $min, $max, $scenario);
     }
 
     /**
