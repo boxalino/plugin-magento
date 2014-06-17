@@ -12,7 +12,6 @@ lib
 media
 pkgino
 shell
-skin
 var
 app/code/community/Find/
 app/code/community/Phoenix/
@@ -121,8 +120,7 @@ shell/abstract.php
 shell/compiler.php
 shell/indexer.php
 shell/log.php
-skin/adminhtml/default/default/
-skin/adminhtml/default/enterprise
+skin/adminhtml
 skin/frontend/base/
 skin/frontend/default/blank/
 skin/frontend/default/blue/
@@ -133,7 +131,9 @@ skin/frontend/default/iphone/
 skin/frontend/default/modern/
 skin/frontend/enterprise
 skin/install/
+skin/frontend/rwd/default
 var/
 !/app/code/local/Boxalino
 !/app/code/core/Mage/Catalog
 !/app/code/core/Mage/Checkout/controllers/CartController.php
+!skin/frontend/rwd/boxalino/*
