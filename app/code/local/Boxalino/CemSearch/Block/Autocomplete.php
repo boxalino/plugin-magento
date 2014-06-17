@@ -35,10 +35,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected $_suggestData = null;
 
 
-	public function aaa(){
-		echo 'ok2';
-	}
-
     protected function _toHtml()
     {
 
