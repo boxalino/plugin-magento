@@ -8,6 +8,9 @@
 	</modules>
 
 	<global>
+		<blocks>
+			<boxalinocem><class>Boxalino_Cem_Block</class></boxalinocem>
+		</blocks>
 		<helpers>
 			<boxalinocem>
 				<class>Boxalino_Cem_Helper</class>
@@ -67,6 +70,14 @@
 					</boxalinocem_order_success>
 				</observers>
 			</checkout_multishipping_controller_success_action>
+			<catalog_controller_product_view >
+				<observers>
+					<boxalinocem_product_view>
+						<class>boxalinocem/observer</class>
+						<method>onProductPageView</method>
+					</boxalinocem_product_view>
+				</observers>
+			</catalog_controller_product_view >
 		</events>
   		<translate>
 			<modules>
