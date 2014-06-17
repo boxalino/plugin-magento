@@ -104,11 +104,11 @@ class BoxalinoP13nClient
 		}
 
 		$choiceRequest->inquiries = array($inquiry);
-        var_dump($choiceRequest);
-        echo 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-        echo '<pre>';
-        print_r($choiceRequest);
-        echo '</pre>';
+//        var_dump($choiceRequest);
+//        echo 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+//        echo '<pre>';
+//        print_r($choiceRequest);
+//        echo '</pre>';
 		$choiceResponse = $this->p13n->choose($choiceRequest);
 
 		$results = array();
