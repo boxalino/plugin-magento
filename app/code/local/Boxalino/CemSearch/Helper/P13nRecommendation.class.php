@@ -6,10 +6,10 @@
 
 class P13nRecommendation {
 
-    public function getRecommendation($account, $scenario = null, $lang = 'en'){
+    public function getRecommendation($widget, $scenario = null, $lang = 'en'){
 
         $name = 'recommendation_widget';
-//        $account = $account;
+        $account = $this->getAccount();
         $language = $lang;
         $returnFields = array(
             'id',
@@ -28,14 +28,36 @@ class P13nRecommendation {
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13n', true, null);
         Mage::helper('Boxalino_CemSearch')->__loadClass('Utils', true, null);
 
-        $mageConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+        $entity_id = Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id');
         $entityIdFieldName = 'entity_id';
 
-        if(isset($mageConfig['entity_id']) && $mageConfig['entity_id'] !== ''){
-            $entityIdFieldName = $mageConfig['entity_id'];
+        if(isset($entity_id) && $entity_id !== ''){
+            $entityIdFieldName = $entity_id;
         }
 
-        $p13nClient = new BoxalinoP13nClient($account, $language, $entityIdFieldName, 'true');
-        var_dump($p13nClient->getPersonalRecommendations($name, $returnFields, 0, 5, $scenario));
+        $name = Mage::getStoreConfig('Boxalino_CemSearch/recommendation/' . $widget);
+//        var_dump($name);
+        if($name == "" || $name == null){
+            return array();
+        }
+
+        $p13nClient = new BoxalinoP13nClient($account, $language, $entityIdFieldName, true);
+
+        return $p13nClient->getPersonalRecommendations($name, $returnFields, 0, 6, $scenario);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAccount()
+    {
+
+        $isDev = Mage::getStoreConfig('Boxalino_CemSearch/backend/account_dev');
+        $account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
+
+        if ($isDev) {
+            return $account . '_dev';
+        }
+        return $account;
     }
 }

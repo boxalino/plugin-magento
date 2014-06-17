@@ -63,11 +63,20 @@
 			</cemsearch>
 			<catalogsearch>
 				<rewrite>
-					<autocomplete>
-						Boxalino_CemSearch_Block_Autocomplete
-					</autocomplete>
+					<autocomplete>Boxalino_CemSearch_Block_Autocomplete</autocomplete>
 				</rewrite>
 			</catalogsearch>
+            <checkout>
+                <rewrite>
+                    <cart_crosssell>Boxalino_CemSearch_Block_Cart_Crosssell</cart_crosssell>
+                </rewrite>
+            </checkout>
+            <catalog>
+                <rewrite>
+                    <product_list_related>Boxalino_CemSearch_Block_Product_List_Related</product_list_related>
+                    <product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</product_list_upsell>
+                </rewrite>
+            </catalog>
 		</blocks>
 	</global>
 </config>

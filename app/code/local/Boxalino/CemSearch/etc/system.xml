@@ -47,6 +47,17 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </account>
+                        <!-- ACCOUNT DEV -->
+                        <account_dev translate="label">
+                            <label>Dev environment</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </account_dev>
                         <!-- USERNAME -->
                         <username translate="label">
                             <label>Username</label>
@@ -144,6 +155,45 @@
 					</fields>
 				</general>
 				<!--</recommendation_widgets>-->
+
+                <recommendation translate="label" module="Boxalino_CemSearch">
+                    <label>Recommendation Configuration</label>
+                    <comment><![CDATA[This text appears just beneath the field with a small arrow.<span class="notice">It can contain HTML formatting too!</span>]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>71</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <!-- CART -->
+                        <cart translate="label">
+                            <label>Cart widgets</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cart>
+                        <!-- RELATED -->
+                        <related translate="label">
+                            <label>Related widgets</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </related>
+                        <!-- UPSELL -->
+                        <upsell translate="label">
+                            <label>Upsell widgets</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </upsell>
+                    </fields>
+                </recommendation>
 			</groups>
 		</Boxalino_CemSearch>
 	</sections>
