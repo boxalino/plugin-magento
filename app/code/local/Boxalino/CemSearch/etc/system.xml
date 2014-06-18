@@ -1,11 +1,17 @@
 <?xml version="1.0"?>
 
 <config>
+    <tabs>
+        <boxalino translate="label" module="Boxalino_CemSearch">
+            <label>Boxalino Extensions</label>
+            <sort_order>100</sort_order>
+        </boxalino>
+    </tabs>
 	<sections>
 		<Boxalino_CemSearch translate="label" module="Boxalino_CemSearch">
 			<class>separator-top</class>
-			<label>Boxalino CEM Search</label>
-			<tab>catalog</tab>
+			<label>Boxalino Configuration</label>
+			<tab>boxalino</tab>
 			<frontend_type>text</frontend_type>
 			<sort_order>200</sort_order>
 			<show_in_default>1</show_in_default>
@@ -20,15 +26,6 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-
-                        <!--<short_desc_instructions translate="label">-->
-                            <!--<label>Short Description Instructions</label>-->
-                            <!--<frontend_type>textarea</frontend_type>-->
-                            <!--<sort_order>50</sort_order>-->
-                            <!--<show_in_default>1</show_in_default>-->
-                            <!--<show_in_website>1</show_in_website>-->
-                            <!--<show_in_store>0</show_in_store>-->
-                        <!--</short_desc_instructions>-->
                         <!-- HOST -->
                         <host translate="label">
                             <label>Host</label>
@@ -178,19 +175,31 @@
 					</fields>
 				</general>
 				<!--</recommendation_widgets>-->
+			</groups>
+		</Boxalino_CemSearch>
 
-                <recommendation translate="label" module="Boxalino_CemSearch">
-                    <label>Recommendation Configuration</label>
+        <Boxalino_Recommendation translate="label" module="Boxalino_CemSearch">
+            <class>separator-top</class>
+            <label>Boxalino Recommendation</label>
+            <tab>boxalino</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>300</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <!-- CART -->
+                <cart translate="label" module="Boxalino_CemSearch">
+                    <label>Cart Configuration</label>
                     <comment><![CDATA[ COMMENT ]]></comment>
                     <frontend_type>text</frontend_type>
-                    <sort_order>71</sort_order>
+                    <sort_order>100</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-                    <!-- CART -->
                         <!-- STATUS -->
-                        <cart_status translate="label">
+                        <status translate="label">
                             <label>Cart widgets enabled</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
@@ -199,38 +208,58 @@
                             <show_in_store>0</show_in_store>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                        </cart_status>
+                        </status>
                         <!-- WIDGET NAME -->
-                        <cart_widget translate="label">
+                        <widget translate="label">
                             <label>Cart widget name</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>12</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </cart_widget>
+                        </widget>
                         <!-- MINIMUM -->
-                        <cart_min translate="label">
+                        <min translate="label">
                             <label>Cart minimum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>16</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </cart_min>
+                        </min>
                         <!-- MAXIMUM -->
-                        <cart_max translate="label">
+                        <max translate="label">
                             <label>Cart maximum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>18</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </cart_max>
-                    <!-- CART END -->
-                    <!-- RELATED -->
+                        </max>
+                        <!-- SCENARIO -->
+                        <scenario translate="label">
+                            <label>Scenario</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </scenario>
+                    </fields>
+                </cart>
+                <!-- CART END -->
+                <!-- RELATED -->
+                <related translate="label" module="Boxalino_CemSearch">
+                    <label>Related Configuration</label>
+                    <comment><![CDATA[ COMMENT ]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
                         <!-- STATUS -->
-                        <related_status translate="label">
+                        <status translate="label">
                             <label>Related widget enabled</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
@@ -239,38 +268,59 @@
                             <show_in_store>0</show_in_store>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                        </related_status>
+                        </status>
                         <!-- WIDGET NAME -->
-                        <related_widget translate="label">
+                        <widget translate="label">
                             <label>Related widgets name</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>22</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </related_widget>
+                        </widget>
                         <!-- MINIMUM -->
-                        <related_min translate="label">
+                        <min translate="label">
                             <label>Related minimum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>26</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </related_min>
+                        </min>
                         <!-- MAXIMUM -->
-                        <related_max translate="label">
+                        <max translate="label">
                             <label>Related maximum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>28</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </related_max>
-                    <!-- RELATED END -->
-                    <!-- UPSELL -->
+                        </max>
+                        <!-- SCENARIO -->
+                        <scenario translate="label">
+                            <label>Scenario</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </scenario>
+                    </fields>
+                </related>
+                <!-- RELATED END -->
+
+                <!-- UPSELL -->
+                <upsell translate="label" module="Boxalino_CemSearch">
+                    <label>Upsell Configuration</label>
+                    <comment><![CDATA[ COMMENT ]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>300</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
                         <!-- STATUS -->
-                        <upsell_status translate="label">
+                        <status translate="label">
                             <label>Upsell widgets enabled</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
@@ -279,59 +329,49 @@
                             <show_in_store>0</show_in_store>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                        </upsell_status>
+                        </status>
                         <!-- WIDGET NAME -->
-                        <upsell_widget translate="label">
+                        <widget translate="label">
                             <label>Upsell widget name</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>32</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </upsell_widget>
+                        </widget>
                         <!-- MINIMUM -->
-                        <upsell_min translate="label">
+                        <min translate="label">
                             <label>Upsell minimum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>36</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </upsell_min>
+                        </min>
                         <!-- MAXIMUM -->
-                        <upsell_max translate="label">
+                        <max translate="label">
                             <label>Upsell maximum recommendations</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>38</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </upsell_max>
-                    <!-- UPSELL END -->
+                        </max>
+                        <!-- SCENARIO -->
+                        <scenario translate="label">
+                            <label>Scenario</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </scenario>
+                    </fields>
+                </upsell>
+                <!-- UPSELL END -->
+            </groups>
+        </Boxalino_Recommendation>
 
-                        <!--&lt;!&ndash; RELATED &ndash;&gt;-->
-                        <!--<related translate="label">-->
-                            <!--<label>Related widgets</label>-->
-                            <!--<frontend_type>text</frontend_type>-->
-                            <!--<sort_order></sort_order>-->
-                            <!--<show_in_default>1</show_in_default>-->
-                            <!--<show_in_website>1</show_in_website>-->
-                            <!--<show_in_store>0</show_in_store>-->
-                        <!--</related>-->
-                        <!--&lt;!&ndash; UPSELL &ndash;&gt;-->
-                        <!--<upsell translate="label">-->
-                            <!--<label>Upsell widgets</label>-->
-                            <!--<frontend_type>text</frontend_type>-->
-                            <!--<sort_order>5</sort_order>-->
-                            <!--<show_in_default>1</show_in_default>-->
-                            <!--<show_in_website>1</show_in_website>-->
-                            <!--<show_in_store>0</show_in_store>-->
-                        <!--</upsell>-->
-
-                     </fields>
-                </recommendation>
-			</groups>
-		</Boxalino_CemSearch>
 	</sections>
 
 </config>

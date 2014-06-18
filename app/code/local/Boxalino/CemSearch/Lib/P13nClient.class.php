@@ -101,7 +101,10 @@ class BoxalinoP13nClient
 			$contextItem->contextItemId = $productId;
 			$contextItem->role = 'mainProduct';
 			$inquiry->contextItems = array($contextItem);
-		}
+		} elseif ($scenario === 'category' && Utils::requestExists('categoryId')) {
+            $categoryId = Utils::requestString('categoryId');
+            $choiceRequest->requestContext->parameters['category_id'] = array($categoryId);
+        }
 
 		$choiceRequest->inquiries = array($inquiry);
 //        var_dump($choiceRequest);
@@ -109,6 +112,7 @@ class BoxalinoP13nClient
 //        echo '<pre>';
 //        print_r($choiceRequest);
 //        echo '</pre>';
+//        die();
 		$choiceResponse = $this->p13n->choose($choiceRequest);
 
 		$results = array();

@@ -93,23 +93,32 @@
                 <autocomplete_limit>6</autocomplete_limit>
                 <entity_id>entity_id</entity_id>
             </general>
-            <recommendation>
-                <!-- CART -->
-                <cart_status>1</cart_status>
-                <cart_widget>recommendation_cart</cart_widget>
-                <cart_min>0</cart_min>
-                <cart_max>3</cart_max>
-                <!-- RELATED -->
-                <related_status>1</related_status>
-                <related_widget>recommendation_widget</related_widget>
-                <related_min>0</related_min>
-                <related_max>3</related_max>
-                <!-- UPSELL -->
-                <upsell_status>1</upsell_status>
-                <upsell_widget>recommendation_upsell</upsell_widget>
-                <upsell_min>0</upsell_min>
-                <upsell_max>3</upsell_max>
-            </recommendation>
         </Boxalino_CemSearch>
+        <Boxalino_Recommendation>
+            <!-- CART -->
+            <cart>
+                <status>1</status>
+                <widget>recommendation_cart</widget>
+                <min>0</min>
+                <max>3</max>
+                <scenario>basket</scenario>
+            </cart>
+            <!-- RELATED -->
+            <related>
+                <status>1</status>
+                <widget>recommendation_related</widget>
+                <min>0</min>
+                <max>3</max>
+                <scenario>product</scenario>
+            </related>
+            <!-- UPSELL -->
+            <upsell>
+                <status>1</status>
+                <widget>recommendation_upsell</widget>
+                <min>0</min>
+                <max>3</max>
+                <scenario>product</scenario>
+            </upsell>
+        </Boxalino_Recommendation>
     </default>
 </config>

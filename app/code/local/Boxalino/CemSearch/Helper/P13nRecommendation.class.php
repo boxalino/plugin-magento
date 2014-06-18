@@ -33,36 +33,37 @@ class P13nRecommendation {
         if(isset($entity_id) && $entity_id !== ''){
             $entityIdFieldName = $entity_id;
         }
-        $recommendation = Mage::getStoreConfig('Boxalino_CemSearch/recommendation');
+        $recommendation = Mage::getStoreConfig('Boxalino_Recommendation/' . $widget);
 
-        if(isset($recommendation[$widget . '_status']) && $recommendation[$widget . '_status'] == 0){
+        $status = $this->getParamFromConfig($recommendation, 'status');
+        if($status == 0 || $status === null){
             return null;
         }
 
-        $name = isset($recommendation[$widget . '_widget'])?$recommendation[$widget . '_widget']:null;
+        $name = $this->getParamFromConfig($recommendation, 'widget');
 
         if($name == "" || $name == null){
             return null;
         }
 
-        $min = isset($recommendation[$widget . '_min'])?$recommendation[$widget . '_min']:null;
-        $max = isset($recommendation[$widget . '_max'])?$recommendation[$widget . '_max']:null;
+        $min = $this->getParamFromConfig($recommendation, 'min');
+        $max = $this->getParamFromConfig($recommendation, 'max');
 
-        if($max == null || $min > $max){
+        if($max == null || $min > $max || $max == 0){
             return null;
         }
 
-        if($widget == 'related' || $widget == 'upsell'){
-            $scenario = 'product';
-        } elseif ($widget == 'cart'){
-            $scenario = 'basket';
-        } else{
-            $scenario = null;
-        }
+        $scenario =  $this->getParamFromConfig($recommendation, 'scenario');
 
         $p13nClient = new BoxalinoP13nClient($account, $language, $entityIdFieldName, true);
 
+//        var_dump($name);
+
         return $p13nClient->getPersonalRecommendations($name, $returnFields, $min, $max, $scenario);
+    }
+
+    private function getParamFromConfig($config, $param){
+        return isset($config[$param])?$config[$param]:null;
     }
 
     /**

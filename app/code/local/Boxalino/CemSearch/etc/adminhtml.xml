@@ -9,9 +9,12 @@
                         <children>
                             <config>
                                 <children>
-                                    <Boxalino_CemSearch translate="title" module="Boxalino_CemSearch">
+                                    <Boxalino_CemSearch>
                                         <title>Boxalino CEM Search</title>
                                     </Boxalino_CemSearch>
+                                    <Boxalino_Recommendation>
+                                        <title>Boxalino Recommendation</title>
+                                    </Boxalino_Recommendation>
                                 </children>
                             </config>
                         </children>

@@ -65,7 +65,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
             );
             $this->_addProductAttributesAndPrices($itemCollection);
         }
-        Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($itemCollection);
+//        Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($itemCollection);
         Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($itemCollection);
 
         $itemCollection->load();
