@@ -88,13 +88,13 @@
 				</Boxalino_Cem>
 			</modules>
 		</translate>
-		<layout>
-			 <updates>
-				  <boxalinocem>
-						<file>boxalinocem.xml</file>
-				  </boxalinocem>
-			 </updates>
-		</layout>
+		<!--<layout>-->
+			 <!--<updates>-->
+				  <!--<boxalinocem>-->
+						<!--<file>boxalinocem.xml</file>-->
+				  <!--</boxalinocem>-->
+			 <!--</updates>-->
+		<!--</layout>-->
 	</frontend>
 	<adminhtml>
 		<translate>
