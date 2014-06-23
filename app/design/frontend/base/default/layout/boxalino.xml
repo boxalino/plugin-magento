@@ -8,5 +8,8 @@
 
 			<block type="boxalinocem/head" name="cem_head" as="cem_head" template="boxalino/head.phtml"/>
 		</reference>
+        <reference name="top.search">
+            <action method="setTemplate"><template>boxalino/catalogsearch/form.mini.phtml</template></action>
+        </reference>
 	</default>
 </layout>
