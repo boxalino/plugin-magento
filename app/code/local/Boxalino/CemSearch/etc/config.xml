@@ -91,6 +91,7 @@
                 <advanced_search_limit>0</advanced_search_limit>
                 <autocomplete>autocomplete</autocomplete>
                 <autocomplete_limit>6</autocomplete_limit>
+                <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>entity_id</entity_id>
             </general>
         </Boxalino_CemSearch>

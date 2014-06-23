@@ -33,6 +33,7 @@ require_once "Mage/CatalogSearch/Block/Autocomplete.php";
 class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete
 {
     protected $_suggestData = null;
+    protected $_suggestDataProducts = null;
 
 
     protected function _toHtml()
@@ -65,6 +66,16 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $html .=  '<li title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
                 . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
         }
+	    foreach ($this->_suggestDataProducts as $product_id) {
+		    $product = Mage::getModel('catalog/product')->load($product_id);
+		    $html .=  '<li class="product-autocomplete" title="' . $this->escapeHtml($product->getName()).'">';
+		    $html .= '<a href="'.$product->getProductUrl().'" ><table><tr><td>';
+		    $html .= '<img src="'.$product->getThumbnailUrl().'" alt="'.$product->getName().'" />';
+		    $html .= '</td><td>';
+		    $html .= '<span>' . $product->getName() . '</span>';
+			$html .= '</td></tr></table></a>';
+			$html .= '</li>';
+	    }
 
         $html.= '</ul>';
 
@@ -97,7 +108,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
 
 	        if($query){
-		        $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit']);
+		        $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);
 		        $collection = $p13n->getAutocompleteEntities();
 	        }else{
 		        $collection = array();
@@ -118,6 +129,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 }
             }
             $this->_suggestData = $data;
+	        $this->_suggestDataProducts = $p13n->getAutocompleteProducts($generalConfig['autocomplete_products_limit']);
         }
         return $this->_suggestData;
     }

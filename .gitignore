@@ -2,7 +2,11 @@
 .modgit/
 *~
 app/community
-app/design
+app/design/adminhtml
+app/design/install
+app/design/frontend/base
+app/design/frontend/default
+app/design/frontend/rwd/default
 downloader
 errors
 example
@@ -136,4 +140,4 @@ var/
 !/app/code/local/Boxalino
 !/app/code/core/Mage/Catalog
 !/app/code/core/Mage/Checkout/controllers/CartController.php
-!skin/frontend/rwd/boxalino/*
+!skin/frontend/rwd/boxalino/

@@ -165,9 +165,9 @@
             $this->filters[] = $filter;
         }
 
-		public function autocomplete($text, $limit){
+		public function autocomplete($text, $limit, $products_limit = 0){
 			$choiceId = 'autocomplete';
-			$fields = array('id', 'title');
+			$fields = array('entity_id', 'title', 'score');
 
 			$this->autocompleteRequest = $this->p13n->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
 
@@ -176,7 +176,7 @@
 			$searchQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 			$searchQuery->returnFields = $fields;
 			$searchQuery->offset = 0;
-			$searchQuery->hitCount = 0;
+			$searchQuery->hitCount = $products_limit;
 			$searchQuery->queryText = $text;
 
 			$autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
@@ -201,6 +201,41 @@
 				$suggestions[] = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
 			}
 			return $suggestions;
+		}
+
+		public function getAutocompleteProducts($limit){
+			$products = array();
+			$products_ids = array();
+			//print_r($this->autocompleteResponse);
+
+			foreach($this->autocompleteResponse->hits  as $hit){
+				foreach ($hit->searchResult->hits as $productsHit){
+					if(! in_array($productsHit->values['entity_id'][0], $products_ids)){
+						$products_ids[] = $productsHit->values['entity_id'][0];
+						$products[] = array(
+							'id' => $productsHit->values['entity_id'][0],
+							'score' => $productsHit->values['score'][0],
+						);
+					}
+				}
+			}
+
+			usort($products, function($a, $b){
+				if ($a['score'] == $b['score']) {
+					return 0;
+				}
+				return ($a['score'] > $b['score']) ? -1 : 1;
+			});
+
+			$products_tmp = array();
+			$i = 0;
+			foreach($products as $product){
+				if($i++ < $limit){
+					$products_tmp[] = $product['id'];
+				}
+			}
+
+			return $products_tmp;
 		}
 
 		public function search(){
