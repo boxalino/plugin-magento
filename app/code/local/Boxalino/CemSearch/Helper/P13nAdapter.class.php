@@ -191,6 +191,7 @@
 			$this->autocompleteRequest->searchQuery = $searchQuery;
 
 			$this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
+
 		}
 
 		public function getAutocompleteEntities(){
@@ -203,11 +204,22 @@
 			return $suggestions;
 		}
 
-		public function getAutocompleteProducts($limit){
+		public function getAutocompleteProducts(){
 			$products = array();
-			$products_ids = array();
-			//print_r($this->autocompleteResponse);
+			//$products_ids = array();
 
+			foreach($this->autocompleteResponse->hits  as $hit){
+				$id =  substr(md5($hit->suggestion), 0, 10);
+				$products[$id] = array();
+				foreach ($hit->searchResult->hits as $productsHit){
+					$products[$id][] = array(
+						'id' => $productsHit->values['entity_id'][0],
+						'score' => $productsHit->values['score'][0],
+					);
+				}
+			}
+
+			/*
 			foreach($this->autocompleteResponse->hits  as $hit){
 				foreach ($hit->searchResult->hits as $productsHit){
 					if(! in_array($productsHit->values['entity_id'][0], $products_ids)){
@@ -234,8 +246,8 @@
 					$products_tmp[] = $product['id'];
 				}
 			}
-
-			return $products_tmp;
+			*/
+			return $products;
 		}
 
 		public function search(){

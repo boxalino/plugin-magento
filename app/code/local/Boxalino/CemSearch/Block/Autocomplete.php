@@ -63,20 +63,28 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
+            $html .=  '<li data-word="'.$item['id'].'" title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
                 . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
         }
-	    foreach ($this->_suggestDataProducts as $product_id) {
-		    $product = Mage::getModel('catalog/product')->load($product_id);
-		    $html .=  '<li class="product-autocomplete" title="' . $this->escapeHtml($product->getName()).'">';
-		    $html .= '<a href="'.$product->getProductUrl().'" ><table><tr><td>';
-		    $html .= '<img src="'.$product->getThumbnailUrl().'" alt="'.$product->getName().'" />';
-		    $html .= '</td><td>';
-		    $html .= '<span>' . $product->getName() . '</span>';
-			$html .= '</td></tr></table></a>';
-			$html .= '</li>';
-	    }
 
+	    $first_word = true;
+	    foreach ($this->_suggestDataProducts as $key => $word) {
+		    foreach ($word as $product) {
+			    $product = Mage::getModel('catalog/product')->load($product['id']);
+			    $class = '';
+			    if( ! $first_word){
+					$class = 'hide';
+			    }
+			    $html .=  '<li data-word="'.$key.'" class="product-autocomplete '. $class .'" title="' . $this->escapeHtml($product->getName()).'">';
+			    $html .= '<a href="'.$product->getProductUrl().'" ><table><tr><td>';
+			    $html .= '<img src="'.$product->getThumbnailUrl().'" alt="'.$product->getName().'" />';
+			    $html .= '</td><td>';
+			    $html .= '<span>' . $product->getName() . '</span>';
+				$html .= '</td></tr></table></a>';
+				$html .= '</li>';
+		    }
+		    $first_word = false;
+	    }
         $html.= '</ul>';
 
         return $html;
@@ -116,6 +124,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
             foreach ($collection as $item) {
 	            $_data = array(
+                    'id' => substr(md5($item['text']), 0, 10),
                     'title' => $item['text'],
                     'row_class' => (++$counter)%2?'odd':'even',
                     'num_of_results' =>  $item['hits']
@@ -129,7 +138,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 }
             }
             $this->_suggestData = $data;
-	        $this->_suggestDataProducts = $p13n->getAutocompleteProducts($generalConfig['autocomplete_products_limit']);
+	        $this->_suggestDataProducts = $p13n->getAutocompleteProducts();
         }
         return $this->_suggestData;
     }
