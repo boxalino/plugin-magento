@@ -1,4 +1,4 @@
-.autocomplete-suggestions {
+.search-autocomplete .autocomplete-suggestions {
 	border: 1px solid #999;
 	background: #FFFFFF;
 	cursor: default;
@@ -8,22 +8,63 @@
 	box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
 }
 
-.autocomplete-suggestion {
-	padding: 2px 5px;
+.search-autocomplete .autocomplete-suggestion {
+	padding: 0px 5px;
 	white-space: nowrap;
 	overflow: hidden;
 }
 
-.autocomplete-selected {
+.search-autocomplete .autocomplete-selected {
 	background: #F0F0F0;
 }
 
-.autocomplete-suggestions strong {
+.search-autocomplete .autocomplete-suggestions strong {
 	font-weight: normal;
 	color: #3399FF;
 }
 
-.product-autocomplete span{
+.search-autocomplete .product-autocomplete span{
     display: block;
     padding-left: 10px;
 }
+
+.search-autocomplete .product-autocomplete.hide{
+	display: none;
+}
+
+.search-autocomplete ul{
+	position: relative !important;
+	background: #ffffff;
+
+}
+.search-autocomplete ul li{
+	text-align: left;
+}
+.search-autocomplete ul li.selected{
+	background: #bbbbbb;
+}
+.search-autocomplete .amount{
+	float: right;
+	display: block;
+	padding: 0 10px;
+}
+.search-autocomplete ul:first-child{
+	border-bottom: none  !important;
+	-webkit-border-bottom-right-radius: 0px !important;
+	-webkit-border-bottom-left-radius: 0px !important;
+	-moz-border-radius-bottomright: 0px !important;
+	-moz-border-radius-bottomleft: 0px !important;
+	border-bottom-right-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
+.search-autocomplete ul:last-child{
+	top: -1px !important;
+	border-top: none !important;
+	-webkit-border-top-left-radius: 0px !important;
+	-webkit-border-top-right-radius: 0px !important;
+	-moz-border-radius-topleft: 0px !important;
+	-moz-border-radius-topright: 0px !important;
+	border-top-left-radius: 0px !important;
+	border-top-right-radius: 0px !important;
+}
+

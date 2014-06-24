@@ -5,6 +5,9 @@
 		<reference name="head">
 			<action method="addItem"><type>skin_css</type><name>css/boxalinoCemSearch.css</name></action>
 			<action method="addItem"><type>skin_js</type><name>js/ba.js</name></action>
+			<action method="addItem"><type>skin_js</type><name>js/boxalinoAutocomplete.js</name></action>
+			<action method="addItem"><type>skin_js</type><name>js/jquery-1.10.2.min.js</name></action>
+			<action method="addItem"><type>skin_js</type><name>js/jquery-noConflict.js</name></action>
 
 			<block type="boxalinocem/head" name="cem_head" as="cem_head" template="boxalino/head.phtml"/>
 		</reference>

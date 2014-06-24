@@ -66,6 +66,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $html .=  '<li data-word="'.$item['id'].'" title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
                 . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
         }
+	    $html.= '</ul><ul>';
 
 	    $first_word = true;
 	    foreach ($this->_suggestDataProducts as $key => $word) {
@@ -85,7 +86,8 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 		    }
 		    $first_word = false;
 	    }
-        $html.= '</ul>';
+
+	    $html.= '</ul>';
 
         return $html;
     }
