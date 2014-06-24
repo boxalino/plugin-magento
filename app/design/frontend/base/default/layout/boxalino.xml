@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+	<default>
+		<reference name="head">
+			<action method="addItem"><type>skin_css</type><name>css/boxalinoCemSearch.css</name></action>
+			<action method="addItem"><type>skin_js</type><name>js/ba.js</name></action>
+
+			<block type="boxalinocem/head" name="cem_head" as="cem_head" template="boxalino/head.phtml"/>
+		</reference>
+        <reference name="top.search">
+            <action method="setTemplate"><template>boxalino/catalogsearch/form.mini.phtml</template></action>
+        </reference>
+	</default>
+</layout>

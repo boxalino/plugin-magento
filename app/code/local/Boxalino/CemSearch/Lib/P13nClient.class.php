@@ -139,6 +139,7 @@ class BoxalinoP13nClient
 				$results[] = $result;
 			}
 		}
+//        var_dump($results);
 		return $results;
 	}
 
