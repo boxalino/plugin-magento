@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <config>
-   <sections>
+	<sections>
 		<boxalinocem translate="label" module="boxalinocem">
 			<class>separator-top</class>
 			<label>Boxalino Exporter</label>
@@ -162,7 +162,6 @@
 						</maximum_population>
 					</fields>
 				</synchronization>
-
 			</groups>
 		</boxalinocem>
 	</sections>
