@@ -6,9 +6,7 @@
 			<version>1.7</version>
 		</Boxalino_Cem>
 	</modules>
-
 	<global>
-
 		<helpers>
 			<boxalinocem>
 				<class>Boxalino_Cem_Helper</class>
@@ -33,29 +31,17 @@
 			</boxalinocem_mysql4>
 		</models>
 	</global>
-	<frontend>
-  		<translate>
-			<modules>
-				<Boxalino_Cem>
-					 <files>
-						  <default>Boxalino_Cem.csv</default>
-					 </files>
-				</Boxalino_Cem>
-			</modules>
-		</translate>
-	</frontend>
 	<adminhtml>
 		<translate>
 			<modules>
 				<Boxalino_Cem>
-					 <files>
-						  <default>Boxalino_Cem.csv</default>
-					 </files>
+					<files>
+						<default>Boxalino_Cem.csv</default>
+					</files>
 				</Boxalino_Cem>
 			</modules>
 		</translate>
 	</adminhtml>
-
 	<default>
 		<boxalinocem>
 			<service>
@@ -72,9 +58,6 @@
 				<small_image_sizes>standard:70x70</small_image_sizes>
 				<maximum_population>0</maximum_population>
 			</synchronization>
-			<frontend>
-				<charset>UTF-8</charset>
-			</frontend>
 		</boxalinocem>
 	</default>
 </config>
