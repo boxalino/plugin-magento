@@ -6,10 +6,6 @@
 			$this->renderLayout();
 		}
 
-		public function mamethodeAction(){
-			echo 'test mymethod';
-		}
-
 		public function saveAction(){
 			$name = '' . $this->getRequest()->getPost('name');
 			$surname = '' . $this->getRequest()->getPost('surname');

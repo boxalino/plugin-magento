@@ -1,8 +1,9 @@
 <?php
 
-	class Boxalino_Cem_Block_Head extends Boxalino_Cem_Block_Abstract{
+	class Boxalino_CemSearch_Block_Head extends Boxalino_CemSearch_Block_Abstract{
 		public function printScripts(){
-			$session =  Mage::getSingleton('boxalinocem/session');
+
+			$session =  Mage::getSingleton('Boxalino_CemSearch_Model_Session');
 
 			$scripts = $session->getScripts(false);
 			foreach($scripts as $script){
@@ -10,12 +11,12 @@
 			}
 			$session->clearScripts();
 
-			echo Mage::helper('boxalinocem')->reportPageView();
+			echo Mage::helper('Boxalino_CemSearch')->reportPageView();
 
 			$route = Mage::app()->getFrontController()->getRequest()->getRouteName();
 			$controller = Mage::app()->getFrontController()->getRequest()->getControllerName();
 			if( $route == 'catalogsearch' && $controller == 'result' ){
-				echo Mage::helper('boxalinocem')->reportSearch($_GET['q']);
+				echo Mage::helper('Boxalino_CemSearch')->reportSearch($_GET['q']);
 			}
 
 		}

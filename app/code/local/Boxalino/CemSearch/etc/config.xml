@@ -21,6 +21,15 @@
 					<frontName>cemsearch</frontName>
 				</args>
 			</routeurfrontend>
+			<routers>
+				<boxalinocem>
+					<use>standard</use>
+					<args>
+						<module>Boxalino_Cem</module>
+						<frontName>cem</frontName>
+					</args>
+				</boxalinocem>
+			</routers>
 		</routers>
         <layout>
             <updates>
@@ -29,6 +38,40 @@
                 </boxalino>
             </updates>
         </layout>
+		<events>
+			<checkout_cart_product_add_after>
+				<observers>
+					<boxalinocem_cart_add>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onProductAddedToCart</method>
+					</boxalinocem_cart_add>
+				</observers>
+			</checkout_cart_product_add_after>
+			<checkout_onepage_controller_success_action>
+				<observers>
+					<boxalinocem_order_success>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onOrderSuccessPageView</method>
+					</boxalinocem_order_success>
+				</observers>
+			</checkout_onepage_controller_success_action>
+			<checkout_multishipping_controller_success_action>
+				<observers>
+					<boxalinocem_order_success>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onOrderSuccessPageView</method>
+					</boxalinocem_order_success>
+				</observers>
+			</checkout_multishipping_controller_success_action>
+			<catalog_controller_product_view >
+				<observers>
+					<boxalinocem_product_view>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onProductPageView</method>
+					</boxalinocem_product_view>
+				</observers>
+			</catalog_controller_product_view >
+		</events>
 	</frontend>
 	<global>
 		<helpers>
@@ -65,9 +108,9 @@
 			</test_read>
 		</resources>
 		<blocks>
-			<cemsearch>
+			<boxalino>
 				<class>Boxalino_CemSearch_Block</class>
-			</cemsearch>
+			</boxalino>
 			<catalogsearch>
 				<rewrite>
 					<autocomplete>Boxalino_CemSearch_Block_Autocomplete</autocomplete>
