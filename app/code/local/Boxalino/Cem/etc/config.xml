@@ -34,8 +34,6 @@
 		</models>
 	</global>
 	<frontend>
-
-
   		<translate>
 			<modules>
 				<Boxalino_Cem>
@@ -45,13 +43,6 @@
 				</Boxalino_Cem>
 			</modules>
 		</translate>
-		<!--<layout>-->
-			 <!--<updates>-->
-				  <!--<boxalinocem>-->
-						<!--<file>boxalinocem.xml</file>-->
-				  <!--</boxalinocem>-->
-			 <!--</updates>-->
-		<!--</layout>-->
 	</frontend>
 	<adminhtml>
 		<translate>

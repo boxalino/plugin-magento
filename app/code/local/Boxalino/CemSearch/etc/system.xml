@@ -183,10 +183,10 @@
                         </entity_id>
 					</fields>
 				</general>
-				<frontend translate="label" module="boxalinocem">
-					<label>Frontend</label>
+				<tracking translate="label" module="boxalinocem">
+					<label>Tracking</label>
 					<frontend_type>text</frontend_type>
-					<sort_order>30</sort_order>
+					<sort_order>60</sort_order>
 					<show_in_default>1</show_in_default>
 					<show_in_website>1</show_in_website>
 					<show_in_store>1</show_in_store>
@@ -218,14 +218,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
 						</analytics>
-						<pageapi translate="label">
-							<label>Enable pages (ie. '/search.html,/category.html,/product.html,/basket.html')</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>0</show_in_store>
-						</pageapi>
 						<charset translate="label">
 							<label>Character encoding</label>
 							<frontend_type>text</frontend_type>
@@ -244,7 +236,7 @@
 							<show_in_store>0</show_in_store>
 						</debug>
 					</fields>
-				</frontend>
+				</tracking>
 			</groups>
 		</Boxalino_CemSearch>
 

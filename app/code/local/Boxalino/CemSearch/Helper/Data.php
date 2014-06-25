@@ -21,55 +21,6 @@
 
 		//===========================================================================================
 
-		public function isEnabled(){
-			return (Mage::getStoreConfig('Boxalino_CemSearch/frontend/enabled') == 1);
-		}
-
-		public function isAnalyticsEnabled(){
-			return (
-				Mage::getStoreConfig('Boxalino_CemSearch/frontend/enabled') == 1 &&
-				Mage::getStoreConfig('Boxalino_CemSearch/frontend/analytics') == 1
-			);
-		}
-
-		public function isSalesTrackingEnabled(){
-			return (
-				Mage::getStoreConfig('Boxalino_CemSearch/frontend/enabled') == 1 &&
-				Mage::getStoreConfig('Boxalino_CemSearch/frontend/track_sales') == 1
-			);
-		}
-
-		public function isLogEnabled(){
-			return FALSE;
-		}
-
-		public function isDebugEnabled(){
-			return (Mage::getStoreConfig('Boxalino_CemSearch/frontend/debug') == 1);
-		}
-
-		public function getLanguage(){
-			return Mage::getStoreConfig('Boxalino_CemSearch/service/language');
-		}
-
-		public function isProductFacilitated($id){
-			// TODO: track faciliated sales
-			//		$facilitatedProducts = $this->getSession()->getVar('bxcemFacilitatedProducts');
-			//		return ($facilitatedProducts && isset($facilitatedProducts[$id]) ? $facilitatedProducts[$id] : NULL);
-			return FALSE;
-		}
-
-		public function trackFacilitatedProduct($id){
-			if($this->isSalesTrackingEnabled() && isset($_REQUEST['widget'])){
-				// TODO: track faciliated sales
-				/*			$products = $this->getSession()->getVar('bxcemFacilitatedProducts');
-							if ($products === null) {
-								$products = array();
-							}
-							$products[$id] = $_REQUEST['widget'];
-							$this->getSession()->setVar('bxcemFacilitatedProducts', $products);*/
-			}
-		}
-
 		public function getBasketAmount(){
 			$checkout = Mage::getSingleton('checkout/session');
 			$quote = $checkout->getQuote();
@@ -112,14 +63,6 @@
 			return @json_encode($items);
 		}
 
-		public function setSeoBase($value){
-			$this->seoBase = $value;
-		}
-
-		public function setSeoSuffix($value){
-			$this->seoSuffix = $value;
-		}
-
 		public function getApiClient(){
 			if(!$this->client){
 				$this->client = new CEM_MagentoApiClient(Mage::app()->getStore());
@@ -127,126 +70,69 @@
 			return $this->client;
 		}
 
-		public function isPageEnabled($uri){
-			if($this->pagesEnabled == null){
-				$this->pagesEnabled = array();
-				if($this->isEnabled()){
-					foreach(explode(',', Mage::getStoreConfig('Boxalino_CemSearch/frontend/pageapi')) as $entry){
-						$entry = trim($entry);
-						if(strlen($entry) > 0){
-							$this->pagesEnabled[$entry] = TRUE;
-						}
-					}
-				}
-			}
-			return isset($this->pagesEnabled[$uri]);
+		public function isAnalyticsEnabled(){
+			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/analytics');
+			return ($trackSales == 1);
 		}
-
-
-		public function trackAddToBasket($id, $name, $quantity = 1, $price = 0){
-			if($this->isAnalyticsEnabled()){
-				try{
-					$this->getApiClient()->trackAddToBasket(
-						new CEM_ApiTransactionItem($id, $price, $quantity, $name, $this->isProductFacilitated($id))
-					);
-				}catch(Exception $e){
-					if($this->isDebugEnabled()){
-						echo($e);
-						exit;
-					}
-				}
-			}
+		public function isSalesTrackingEnabled(){
+			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/analytics');
+			return ($trackSales == 1);
 		}
-
-		public function trackPurchase($status, $quote){
-			$quote->collectTotals();
-
-			try{
-				if($this->isSalesTrackingEnabled()){
-					foreach($quote->getAllItems() as $item){
-						if($this->isProductFacilitated($item->getProduct()->getId()) != null){
-							// TODO: track faciliated sales
-							/*						$row = array(
-														$quote->getId(),
-														$item->getProduct()->getId(),
-														$item->getQty(),
-														$item->getPrice()
-													);
-													oxDb::getDb()->Execute('INSERT DELAYED IGNORE INTO `bxsales` VALUES ( ?, NOW(), ?, ?, ?, ? )', $row);*/
-						}
-					}
-				}
-				if($this->isAnalyticsEnabled()){
-					$items = array();
-					foreach($quote->getAllItems() as $item){
-						$items[] = new CEM_ApiTransactionItem(
-							$item->getProduct()->getId(),
-							$item->getPrice(),
-							$item->getQty(),
-							$item->getProduct()->getName(),
-							$this->isProductFacilitated($item->getProduct()->getId())
-						);
-					}
-
-					$this->getApiClient()->trackPurchase($status, $quote->getGrandTotal(), $items);
-				}
-			}catch(Exception $e){
-				if($this->isDebugEnabled()){
-					echo($e);
-				}
-			}
-		}
-
 
 		public function buildScript($pushes){
-			return
-				<<<SCRIPT
-				            <script type="text/javascript">
-                var _bxq = _bxq || [];
-                $pushes
+			$enabled = Mage::getStoreConfig('Boxalino_CemSearch/tracking/enabled');
+			if($enabled == 1){
+				$account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
 
-            </script>
-SCRIPT;
+				$script =  '<script type="text/javascript">' . PHP_EOL;
+				$script .= 'var _bxq = _bxq || [];'. PHP_EOL;
+				$script .= "_bxq.push(['setAccount', '" . $account . "']);". PHP_EOL;
+				if($loggedInUserId = $this->getLoggedInUserId()){
+					$script .= "_bxq.push(['setUser', '".$loggedInUserId."']);". PHP_EOL;
+				}
+				$script .= $pushes . PHP_EOL;
+				$script .= '</script>'. PHP_EOL;
+				return $script;
+			}else{
+				return '';
+			}
 		}
 
 		public function reportPageView(){
-			$account = Mage::getStoreConfig('Boxalino_CemSearch/service/account');
-			$script = <<<SCRIPT
-                _bxq.push(['setAccount', '$account']);
-                _bxq.push(['trackPageView']);
-SCRIPT;
-			return $this->buildScript($script);
+			if($this->isAnalyticsEnabled()){
+				$script = "_bxq.push(['trackPageView']);". PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
 		}
 
 		public function reportSearch($term){
-			$logTerm = addslashes($term);
-			$account = Mage::getStoreConfig('Boxalino_CemSearch/service/account');
-
-			$script = <<<SCRIPT
-                _bxq.push(['setAccount', '$account']);
-                _bxq.push(['trackSearch', '$logTerm']);
-SCRIPT;
-			return $this->buildScript($script);
+			if($this->isAnalyticsEnabled()){
+				$logTerm = addslashes($term);
+				$script = "_bxq.push(['trackSearch', '".$logTerm."']);". PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
 		}
 
 		public function reportProductView($product){
-			$account = Mage::getStoreConfig('Boxalino_CemSearch/service/account');
-
-			$script = <<<SCRIPT
-                _bxq.push(['setAccount', '$account']);
-                _bxq.push(['trackProductView', '$product']);
-SCRIPT;
-			return $this->buildScript($script);
+			if($this->isAnalyticsEnabled()){
+				$script = "_bxq.push(['trackProductView', '".$product."'])" . PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
 		}
 
 		public function reportAddToBasket($product, $count, $price, $currency){
-			$account = Mage::getStoreConfig('Boxalino_CemSearch/service/account');
-
-			$script = <<<SCRIPT
-                _bxq.push(['setAccount', '$account']);
-                _bxq.push(['trackAddToBasket', '$product ', $count, $price, '$currency']);
-SCRIPT;
-			return $this->buildScript($script);
+			if($this->isAnalyticsEnabled()){
+				$script = "_bxq.push(['trackAddToBasket', '".$product."', ".$count.", ".$price.", '".$currency."']);". PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
 		}
 
 		/**
@@ -262,20 +148,28 @@ SCRIPT;
 		 * @param $currency string
 		 */
 		public function reportPurchase($products, $orderId, $price, $currency){
-			$account = Mage::getStoreConfig('Boxalino_CemSearch/service/account');
+			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/track_sales');
 
 			$productsJson = json_encode($products);
-			$script = <<<SCRIPT
-                _bxq.push(['setAccount', '$account']);
-                _bxq.push([
-                    'trackPurchase',
-                    $price,
-                    '$currency',
-                    $productsJson,
-                    $orderId
-                 ]);
+			if($trackSales == 1){
+                $script = "_bxq.push([". PHP_EOL;
+                $script .= "'trackPurchase',". PHP_EOL;
+                $script .= $price.",". PHP_EOL;
+                $script .= "'".$currency."',". PHP_EOL;
+                $script .= $productsJson."". PHP_EOL;
+                $script .= "]);". PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
+		}
 
-SCRIPT;
-			return $this->buildScript($script);
+		public function getLoggedInUserId(){
+			if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+				$customerData = Mage::getSingleton('customer/session')->getCustomer();
+				return $customerData->getId();
+			}else{
+				return  null;
+			}
 		}
 	}

@@ -144,7 +144,15 @@
                 <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>entity_id</entity_id>
             </general>
+	        <frontend>
+		        <charset>UTF-8</charset>
+		        <enabled>1</enabled>
+		        <debug>1</debug>
+		        <analytics>1</analytics>
+		        <track_sales>1</track_sales>
+	        </frontend>
         </Boxalino_CemSearch>
+
         <Boxalino_Recommendation>
             <!-- CART -->
             <cart>

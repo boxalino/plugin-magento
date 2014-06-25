@@ -35,7 +35,7 @@ class CEM_MagentoApiClient extends CEM_ApiClient {
 				'%s/%s/%s%s',
 				$store->getConfig('boxalinocem/service/router_url'),
 				$store->getConfig('boxalinocem/service/account'),
-				$store->getConfig('boxalinocem/frontend/debug') == 1 ? '_/' : '',
+				$store->getConfig('boxalinocem/tracking/debug') == 1 ? '_/' : '',
 				$store->getConfig('boxalinocem/service/language')
 			)
 		);
@@ -44,7 +44,7 @@ class CEM_MagentoApiClient extends CEM_ApiClient {
 		$this->setConnectTimeout(intval($this->store->getConfig('boxalinocem/service/connect_timeout')));
 		$this->setConnectMaxTries(intval($this->store->getConfig('boxalinocem/service/connect_tries')));
 		$this->setReadTimeout(intval($this->store->getConfig('boxalinocem/service/read_timeout')));
-		$this->setDisplayCharset($this->store->getConfig('boxalinocem/frontend/charset'));
+		$this->setDisplayCharset($this->store->getConfig('boxalinocem/tracking/charset'));
 	}
 
 
@@ -59,7 +59,7 @@ class CEM_MagentoApiClient extends CEM_ApiClient {
 				'%s/%s/%s%s',
 				$this->store->getConfig('boxalinocem/service/resource_url'),
 				$this->store->getConfig('boxalinocem/service/account'),
-				$this->store->getConfig('boxalinocem/frontend/debug') == 1 ? '_/' : '',
+				$this->store->getConfig('boxalinocem/`/debug') == 1 ? '_/' : '',
 				$this->store->getConfig('boxalinocem/service/language')
 			);
 		}
