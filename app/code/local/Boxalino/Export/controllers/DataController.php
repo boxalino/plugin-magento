@@ -43,7 +43,7 @@ class Boxalino_Export_DataController extends Mage_Core_Controller_Front_Action {
 			}
 			fclose($f);
 		} catch (Exception $e) {
-			if (Mage::getStoreConfig('boxalinocem/frontend/debug') == 1) {
+			if (Mage::getStoreConfig('boxalinocem/service/debug') == 1) {
 				echo($e);
 			}
 		}
@@ -75,7 +75,7 @@ class Boxalino_Export_DataController extends Mage_Core_Controller_Front_Action {
 			}
 			fclose($f);
 		} catch (Exception $e) {
-			if (Mage::getStoreConfig('boxalinocem/frontend/debug') == 1) {
+			if (Mage::getStoreConfig('boxalinocem/service/debug') == 1) {
 				echo($e);
 			}
 		}
