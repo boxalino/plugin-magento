@@ -65,4 +65,33 @@
 				}
 			}
 		}
+		public function onCategoryPageView(Varien_Event_Observer $event){
+
+			try{
+				$categoryId = $event['category']['entity_id'];
+				$script = Mage::helper('Boxalino_CemSearch')->reportCategoryView($categoryId);
+
+				$session = Mage::getSingleton('Boxalino_CemSearch_Model_Session');
+				$session->addScript($script);
+			}catch(Exception $e){
+				if(Mage::helper('Boxalino_CemSearch')->isDebugEnabled()){
+					echo($e);
+					exit;
+				}
+			}
+		}
+		public function onLogin(Varien_Event_Observer $event){
+			try{
+				$userId = $event['customer']['entity_id'];
+				$script = Mage::helper('Boxalino_CemSearch')->reportLogin($userId);
+
+				$session = Mage::getSingleton('Boxalino_CemSearch_Model_Session');
+				$session->addScript($script);
+			}catch(Exception $e){
+				if(Mage::helper('Boxalino_CemSearch')->isDebugEnabled()){
+					echo($e);
+					exit;
+				}
+			}
+		}
 	}

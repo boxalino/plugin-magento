@@ -1,9 +1,6 @@
 <?php
 
 	class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data {
-		protected $client = null;
-
-		protected $lastUri = null;
 
 		public function __construct() {
 			spl_autoload_register(array('Boxalino_CemSearch_Helper_Data', '__loadClass'), TRUE, TRUE);
@@ -18,8 +15,6 @@
 				include_once(Mage::getModuleDir('', 'Boxalino_CemSearch').'/Lib/'.$name.$ext.'.php');
 			}
 		}
-
-		//===========================================================================================
 
 		public function getBasketAmount(){
 			$checkout = Mage::getSingleton('checkout/session');
@@ -134,6 +129,24 @@
 				return '';
 			}
 		}
+
+		public function reportCategoryView($categoryID){
+			if($this->isAnalyticsEnabled()){
+				$script = "_bxq.push(['trackCategoryView', '".$categoryID."'])" . PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
+		}
+		public function reportLogin($customerId){
+			if($this->isAnalyticsEnabled()){
+				$script = "_bxq.push(['trackLogin', '".$customerId."'])" . PHP_EOL;
+				return $this->buildScript($script);
+			}else{
+				return '';
+			}
+		}
+
 
 		/**
 		 * @param $products array example:

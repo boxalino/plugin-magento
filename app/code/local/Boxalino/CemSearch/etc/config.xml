@@ -70,7 +70,23 @@
 						<method>onProductPageView</method>
 					</boxalinocem_product_view>
 				</observers>
-			</catalog_controller_product_view >
+			</catalog_controller_product_view>
+			<catalog_controller_category_init_after>
+				<observers>
+					<boxalinocem_category_view>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onCategoryPageView</method>
+					</boxalinocem_category_view>
+				</observers>
+			</catalog_controller_category_init_after>
+			<customer_login>
+				<observers>
+					<boxalinocem_login>
+						<class>Boxalino_CemSearch_Model_Observer</class>
+						<method>onLogin</method>
+					</boxalinocem_login>
+				</observers>
+			</customer_login>
 		</events>
 	</frontend>
 	<global>
