@@ -39,7 +39,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
-	    $query = $this->helper('Boxalino_CemSearch')->getQueryText();
         $html = '';
 
         if (!$this->_beforeToHtml()) {
