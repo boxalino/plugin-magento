@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_Cem_Model_Mysql4_Product_Collection extends Mage_Catalog_Model_Resource_Eav_Mysql4_Product_Collection {
+class Boxalino_CemExport_Model_Mysql4_Product_Collection extends Mage_Catalog_Model_Resource_Eav_Mysql4_Product_Collection {
 	private $_size = 0;
 	private $_itemsOrdering = array();
 

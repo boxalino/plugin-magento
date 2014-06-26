@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Boxalino Cem event observer
+	 * Boxalino CemExport event observer
 	 *
 	 * @author nitro@boxalino.com
 	 */

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Boxalino Cem indexer model
+ * Boxalino CemExport indexer model
  *
  * @author nitro@boxalino.com
  */
-class Boxalino_Cem_Model_Indexer extends Mage_Index_Model_Indexer_Abstract {
+class Boxalino_CemExport_Model_Indexer extends Mage_Index_Model_Indexer_Abstract {
 	protected function _construct() {
 		$this->_init('boxalinocem/dbmind_indexer');
 

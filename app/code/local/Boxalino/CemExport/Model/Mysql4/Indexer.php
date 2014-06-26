@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Abstract Boxalino Cem Indexer
+ * Abstract Boxalino CemExport Indexer
  *
  * @author nitro@boxalino.com
  */
-abstract class Boxalino_Cem_Model_Mysql4_Indexer extends Mage_Core_Model_Mysql4_Abstract {
+abstract class Boxalino_CemExport_Model_Mysql4_Indexer extends Mage_Core_Model_Mysql4_Abstract {
 	private $_additionalAttributes = array();
 
 	private $_searchableAttributes = null;
@@ -388,7 +388,7 @@ abstract class Boxalino_Cem_Model_Mysql4_Indexer extends Mage_Core_Model_Mysql4_
 					$productItemImage = DIRECTORY_SEPARATOR.ltrim($productItem->getData('image'), DIRECTORY_SEPARATOR);
 					$product['_image'] = is_file($imageBasePath.$productItemImage) ? 'true' : 'false';
 					foreach ($images['image']['list'] as $key => $imageSize) {
-						/** @var Boxalino_Cem_Model_Product_Image $productImage */
+						/** @var Boxalino_CemExport_Model_Product_Image $productImage */
 						$productImage = Mage::getModel('boxalinocem/product_image')
 							->setDestinationSubdir('image')
 							->setWidth($imageSize['width'])
@@ -423,7 +423,7 @@ abstract class Boxalino_Cem_Model_Mysql4_Indexer extends Mage_Core_Model_Mysql4_
 					$productItemSmallImage = DIRECTORY_SEPARATOR.ltrim($productItem->getData('small_image'), DIRECTORY_SEPARATOR);
 					$product['_thumbnail'] = is_file($imageBasePath.$productItemSmallImage) ? 'true' : 'false';
 					foreach ($images['small_image']['list'] as $key => $imageSize) {
-						/** @var Boxalino_Cem_Model_Product_Image $productImage */
+						/** @var Boxalino_CemExport_Model_Product_Image $productImage */
 						$productImage = Mage::getModel('boxalinocem/product_image')
 							->setDestinationSubdir('small_image')
 							->setWidth($imageSize['width'])

@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_Cem_Model_Product extends Mage_Catalog_Model_Product {
+class Boxalino_CemExport_Model_Product extends Mage_Catalog_Model_Product {
 	public function getUrlModel() {
 		if ($this->_urlModel === null) {
 			$this->_urlModel = Mage::getSingleton('boxalinocem/product_url');

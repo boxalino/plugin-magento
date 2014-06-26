@@ -2,9 +2,9 @@
 
 <config>
 	<modules>
-		<Boxalino_Cem>
+		<Boxalino_CemExport>
 			<active>true</active>
 			<codePool>local</codePool>
-		</Boxalino_Cem>
+		</Boxalino_CemExport>
 	</modules>
 </config>
