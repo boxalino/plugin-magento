@@ -146,6 +146,11 @@ skin/frontend/base/default/*
 skin/frontend/base/default/css/*
 !skin/frontend/base/default/css/boxalinoCemSearch.css
 !skin/frontend/base/default/js/
-skin/frontend/base/default/js/*
+skin/frontend/base/default/js/bundle.js
+skin/frontend/base/default/js/checkout
+skin/frontend/base/default/js/giftmessage.js
+skin/frontend/base/default/js/ie6.js
+skin/frontend/base/default/js/msrp.js
+skin/frontend/base/default/js/opcheckout.js
 !skin/frontend/base/default/js/ba.js
 
