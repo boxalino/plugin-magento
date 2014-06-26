@@ -5,7 +5,7 @@
  *
  * @author nitro@boxalino.com
  */
-class Boxalino_CemExport_Model_Indexer extends Mage_Index_Model_Indexer_Abstract {
+class Boxalino_Export_Model_Indexer extends Mage_Index_Model_Indexer_Abstract {
 	protected function _construct() {
 		$this->_init('boxalinocem/dbmind_indexer');
 
@@ -35,11 +35,11 @@ class Boxalino_CemExport_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 
 
 	public function getName() {
-		return Mage::helper('boxalinocem')->__('Boxalino CEM Index');
+		return Mage::helper('boxalinocem')->__('Boxalino Export Index');
 	}
 
 	public function getDescription() {
-		return Mage::helper('boxalinocem')->__('Rebuild Boxalino CEM search index');
+		return Mage::helper('boxalinocem')->__('Rebuild Boxalino Export search index');
 	}
 
 	protected function _registerEvent(Mage_Index_Model_Event $event) {

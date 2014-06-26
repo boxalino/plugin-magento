@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_CemExport_Model_Product_Image extends Mage_Catalog_Model_Product_Image {
+class Boxalino_Export_Model_Product_Image extends Mage_Catalog_Model_Product_Image {
 	public function setSourceFile($file, $placeholder, $design) {
 		$path = Mage::getSingleton('catalog/product_media_config')->getBaseMediaPath();
 		if ((!$file) || (!file_exists($path.$file))) {

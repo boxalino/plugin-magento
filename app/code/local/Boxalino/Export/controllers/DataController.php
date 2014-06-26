@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_CemExport_DataController extends Mage_Core_Controller_Front_Action {
+class Boxalino_Export_DataController extends Mage_Core_Controller_Front_Action {
 	public function transactionsAction() {
 		try {
 			$this->getResponse()->setHeader('content-type', 'text/plain; charset=UTF-8', true);

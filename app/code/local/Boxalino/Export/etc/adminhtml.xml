@@ -10,7 +10,7 @@
                             <config>
                                 <children>
                                     <boxalinocem translate="title" module="boxalinocem">
-                                        <title>Boxalino CEM</title>
+                                        <title>Boxalino Export</title>
                                     </boxalinocem>
                                 </children>
                             </config>

@@ -2,32 +2,32 @@
 
 <config>
 	<modules>
-		<Boxalino_CemExport>
+		<Boxalino_Export>
 			<version>1.7</version>
 			<active>true</active>
 			<codepool>local</codepool>
-		</Boxalino_CemExport>
+		</Boxalino_Export>
 	</modules>
 	<global>
 		<helpers>
 			<boxalinocem>
-				<class>Boxalino_CemExport_Helper</class>
+				<class>Boxalino_Export_Helper</class>
 			</boxalinocem>
 		</helpers>
 		<index>
 			<indexer>
 				<boxalinocem_xmlindexer>
-					<model>Boxalino_CemExport_Model_Indexer</model>
+					<model>Boxalino_Export_Model_Indexer</model>
 				</boxalinocem_xmlindexer>
 			</indexer>
 		</index>
 		<models>
 			<boxalinocem>
-				<class>Boxalino_CemExport_Model</class>
+				<class>Boxalino_Export_Model</class>
 				<resourceModel>boxalinocem_mysql4</resourceModel>
 			</boxalinocem>
 			<boxalinocem_mysql4>
-				<class>Boxalino_CemExport_Model_Mysql4</class>
+				<class>Boxalino_Export_Model_Mysql4</class>
 				<entities>
 				</entities>
 			</boxalinocem_mysql4>
@@ -36,11 +36,11 @@
 	<adminhtml>
 		<translate>
 			<modules>
-				<Boxalino_CemExport>
+				<Boxalino_Export>
 					<files>
 						<default>Boxalino_Cem.csv</default>
 					</files>
-				</Boxalino_CemExport>
+				</Boxalino_Export>
 			</modules>
 		</translate>
 	</adminhtml>

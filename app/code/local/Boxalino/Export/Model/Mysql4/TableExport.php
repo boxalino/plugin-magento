@@ -5,7 +5,7 @@
  *
  * @author nitro@boxalino.com
  */
-class Boxalino_CemExport_Model_Mysql4_TableExport extends Mage_Core_Model_Mysql4_Abstract {
+class Boxalino_Export_Model_Mysql4_TableExport extends Mage_Core_Model_Mysql4_Abstract {
 	protected function _construct() {
 		$this->_init('boxalinocem/tableexport', '');
 	}

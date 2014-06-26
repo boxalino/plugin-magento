@@ -5,7 +5,7 @@
  *
  * @author nitro@boxalino.com
  */
-class Boxalino_CemExport_Model_Mysql4_Dbmind_Indexer extends Boxalino_CemExport_Model_Mysql4_Indexer {
+class Boxalino_Export_Model_Mysql4_Dbmind_Indexer extends Boxalino_Export_Model_Mysql4_Indexer {
     private $zipFile = null;
     private $languagesFile = null;
     private $categoriesFile = null;
