@@ -1,4 +1,4 @@
-# BoxalinoMagento
+# boxalino Magento
 
 
 ## Installation
@@ -10,10 +10,10 @@
   * System > Cache Management > Flush Magento Cache
   * System > Cache Management > Flush Cache Storage
   * System > Permissions > Roles > Administrators > Save Role 
-5. Chmod
+5. Set chmod like:
 
 <pre>
-chmod 755 -R Boxalino/
+chmod 755 -R app/code/local/Boxalino/
 chmod 755 app/design/frontend/base/default/layout/boxalino.xml
 chmod 755 app/design/frontend/base/default/template/boxalino/catalogsearch/form.mini.phtml
 chmod 755 app/design/frontend/base/default/template/boxalino/head.phtml
@@ -51,7 +51,7 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Autocomplete products limit** - Max number of products, returned from Boxalino for autocompelte search.
 + **Id field name** - Product id field name (default: entity_id)
 
-#### Trackick
+#### Tracking
 
 + **Enable plugin** - Tracking plugin status.
 + **Enable Sales Tracking** - Sales trackicj plugin staus.
@@ -76,7 +76,6 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Minimum recommendations** - Minimum number of products, returned from Boxalino for related recommendation.
 + **Maximum recommendations** - Maximum number of products, returned from Boxalino for related recommendation.
 + **Scenario** - Scenario name. Recommended for related: product
-
 
 #### Upsell Configuration
 
@@ -107,3 +106,14 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 
 All fields (unless otherwise stated) are mandatory. Some fields have default parameter.
 
+
+## Export
+
+Export is available in **System > Index Management**.
+To export data, please click on **Reindex Data**, next to Boxalino Export index.
+
+When export is complete correctly, will appear message “Boxalino Export Index index was rebuilt.”, and all data are available in Data Intelligence.
+
+## How It Works
+
+[screencast]
