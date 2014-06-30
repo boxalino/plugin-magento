@@ -6,14 +6,27 @@
 1. Download and unzip the archive.
 2. Go to the directory you just unzipped the plugin into
 3. Copy all files and directories into main Magento directory.
-4. Chmod ???
+4. Chmod
+
+<pre>
+chmod 755 -R Boxalino/
+chmod 755 app/design/frontend/base/default/layout/boxalino.xml
+chmod 755 app/design/frontend/base/default/template/boxalino/catalogsearch/form.mini.phtml
+chmod 755 app/design/frontend/base/default/template/boxalino/head.phtml
+chmod 755 app/etc/modules/Boxalino_CemSearch.xml
+chmod 755 app/etc/modules/Boxalino_Export.xml
+chmod 755 skin/frontend/base/default/css/boxalinoCemSearch.css
+chmod 755 skin/frontend/base/default/js/boxalinoAutocomplete.js
+chmod 755 skin/frontend/base/default/js/jquery-1.10.2.min.js
+chmod 755 skin/frontend/base/default/js/jquery-noConflict.js
+</pre>
 
 ## Configuration
 
 The configuration is available in **System > Configuration** and **Boxalino Extensions** in Magento admin panel.
 
 ### Boxalino Configuration
-git ls-files
+
 #### Boxalino Configuration
 
 + **Host** - Eg: cdn.bx-cloud.com
@@ -83,7 +96,7 @@ git ls-files
 + **Export Categories** - If yes, then categories will be exported to Boxalino
 + **Export Tags** - If yes, then tags will be exported to Boxalino
 + **Product Image Sizes** - Eg: standard:300x300
-+ **Product Thumbnail SIzes** - Eg: standard:70x70,list:235x135r-90
++ **Product Thumbnail Sizes** - Eg: standard:70x70,list:235x135r-90
 + **Additional Attributes (optional)** - Attributes which should be exported with normal attributes (coma-separated list)
 + **Maximum amount of product to export** - Maximum amount of products to export to Boxalino. (0 = all)
 
