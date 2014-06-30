@@ -1,136 +1,105 @@
-BoxalinoMagento
-===============
+# BoxalinoMagento
 
 
+## Installation
 
-1. Installation
-Download and unzip the archive.
-Go to the directory you just unzipped the plugin into, and copy all files and directories into main Magento directory.
-Chmod ???
+1. Download and unzip the archive.
+2. Go to the directory you just unzipped the plugin into
+3. Copy all files and directories into main Magento directory.
+4. Chmod
 
-2. Configuration
+<pre>
+chmod 755 -R Boxalino/
+chmod 755 app/design/frontend/base/default/layout/boxalino.xml
+chmod 755 app/design/frontend/base/default/template/boxalino/catalogsearch/form.mini.phtml
+chmod 755 app/design/frontend/base/default/template/boxalino/head.phtml
+chmod 755 app/etc/modules/Boxalino_CemSearch.xml
+chmod 755 app/etc/modules/Boxalino_Export.xml
+chmod 755 skin/frontend/base/default/css/boxalinoCemSearch.css
+chmod 755 skin/frontend/base/default/js/boxalinoAutocomplete.js
+chmod 755 skin/frontend/base/default/js/jquery-1.10.2.min.js
+chmod 755 skin/frontend/base/default/js/jquery-noConflict.js
+</pre>
 
-The configuration is available in System > Configuration  and Boxalino Extensions in Magento admin panel.
-1. Boxalino Configuration
+## Configuration
 
-Boxalino Configuration
+The configuration is available in **System > Configuration** and **Boxalino Extensions** in Magento admin panel.
 
-Host
-Boxalino host
-Dev environment
-If true, then using is dev account
-Account
-Account name in Boxalino
-Username
-User account to access to API
-Password
-User password to access to API
-Domain
-Shop domain
-IndexId
-?
+### Boxalino Configuration
 
-General Configuration
-Quick search
-Widget name for quick search. It’s create in Boxalino
-Quick search limit
-Max number of products, returned from Boxalino for quick search.
-Advanced search
-Widget name for advanced search. It’s create in Boxalino
-Advanced search limit
-Max number of products, returned from Boxalino for advanced search.
-Autocomplete
-Widget name for autocomplete search. It’s create in Boxalino
-Autocomplete limit
-Max number of words, returned from Boxalino for autocomplete search.
-Autocomplete products limit
-Max number of products, returned from Boxalino for autocompelte search.
-Id field name
-Product id field name (default: entity_id)
+#### Boxalino Configuration
 
-Trackick
++ **Host** - Eg: cdn.bx-cloud.com
++ **Dev environment** - If true, then using is dev account
++ **Account** - Account name in Boxalino
++ **Username** - User account to access to API
++ **Password** - User password to access to API
++ **Domain** - Actual shop domain
++ **IndexId** - ???
 
-Enable plugin
-Tracking plugin status.
-Enable Sales Tracking
-Sales trackicj plugin staus.
-Enable Analytics
-Analytisc plugin status
-Character encoding
-Character encoding for page (default: UTF-8)
+#### General Configuration
++ **Quick search** - Widget name for quick search. It’s create in Boxalino
++ **Quick search limit** - Max number of products, returned from Boxalino for quick search.
++ **Advanced search** - Widget name for advanced search. It’s create in Boxalino
++ **Advanced search limit** - Max number of products, returned from Boxalino for advanced search.
++ **Autocomplete** - Widget name for autocomplete search. It’s create in Boxalino
++ **Autocomplete limit** - Max number of words, returned from Boxalino for autocomplete search.
++ **Autocomplete products limit** - Max number of products, returned from Boxalino for autocompelte search.
++ **Id field name** - Product id field name (default: entity_id)
+
+#### Trackick
+
++ **Enable plugin** - Tracking plugin status.
++ **Enable Sales Tracking** - Sales trackicj plugin staus.
++ **Enable Analytics** - Analytisc plugin status
++ **Character encoding** - Character encoding for page (default: UTF-8)
 
 
-2. Boxalino Recommendation configuration
+### Boxalino Recommendation
 
-Cart Configuration
+#### Cart Configuration
 
-Widget enabled
-Plugin status
-Widget name
-Widget name for cart recommendation. It’s create in Boxalino
-Minimum recommendations
-Minimum number of products, returned from Boxalino for cart recommendation.
-Maximum recommendations
-Maximum number of products, returned from Boxalino for cart recommendation.
-Scenario
-Scenario name. Recommended for cart: basket
++ **Widget enabled** - Plugin status
++ **Widget name** - Widget name for cart recommendation. It’s create in Boxalino
++ **Minimum recommendations** - Minimum number of products, returned from Boxalino for cart recommendation.
++ **Maximum recommendations** - Maximum number of products, returned from Boxalino for cart recommendation.
++ **Scenario** - Scenario name. Recommended for cart: basket
 
-Related Configuration
+#### Related Configuration
 
-Widget enabled
-Plugin status
-Widget name
-Widget name for related recommendation. It’s create in Boxalino
-Minimum recommendations
-Minimum number of products, returned from Boxalino for related recommendation.
-Maximum recommendations
-Maximum number of products, returned from Boxalino for related recommendation.
-Scenario
-Scenario name. Recommended for related: product
++ **Widget enabled** - Plugin status
++ **Widget name** - Widget name for related recommendation. It’s create in Boxalino
++ **Minimum recommendations** - Minimum number of products, returned from Boxalino for related recommendation.
++ **Maximum recommendations** - Maximum number of products, returned from Boxalino for related recommendation.
++ **Scenario** - Scenario name. Recommended for related: product
 
 
-Upsell Configuration
+#### Upsell Configuration
 
-Widget enabled
-Plugin status
-Widget name
-Widget name for upsell recommendation. It’s create in Boxalino
-Minimum recommendations
-Minimum number of products, returned from Boxalino for upsell recommendation.
-Maximum recommendations
-Maximum number of products, returned from Boxalino for upsell recommendation.
-Scenario
-Scenario name. Recommended for upsell: product
++ **Widget enabled** - Plugin status
++ **Widget name** - Widget name for upsell recommendation. It’s create in Boxalino
++ **Minimum recommendations** - Minimum number of products, returned from Boxalino for upsell recommendation.
++ **Maximum recommendations** - Maximum number of products, returned from Boxalino for upsell recommendation.
++ **Scenario** - Scenario name. Recommended for upsell: product
 
 
-3. Boxalino Exporter Configuration
+### Boxalino Exporter
 
-Service Configuration
-Router URL - info
-Router cluster - info
+#### Service Configuration
 
++ **Display debug output** - Display debug when something went wrong with export.
 
-Display debug output
-Display debug when something went wrong with export.
+#### Data Synchronization
 
-Data Synchronization
++ **Bridge URL** - Place where data are send after reindex (Eg: http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/files/csv/push/)
++ **Access Code** - Data connector access code filled to DI
++ **Export Categories** - If yes, then categories will be exported to Boxalino
++ **Export Tags** - If yes, then tags will be exported to Boxalino
++ **Product Image Sizes** - Eg: standard:300x300
++ **Product Thumbnail Sizes** - Eg: standard:70x70,list:235x135r-90
++ **Additional Attributes (optional)** - Attributes which should be exported with normal attributes (coma-separated list)
++ **Maximum amount of product to export** - Maximum amount of products to export to Boxalino. (0 = all)
 
-Bridge URL
-Place where data are send after reindex
-http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/files/csv/push/
-Access Code
-Data connector access code filled to DI
-Export Categories
-If yes, then categories will be exported to Boxalino
-Export Tags
-If yes, then tags will be exported to Boxalino
-Product Image Sizes
-Eg: standard:300x300
-Product Thumbnail SIzes
-Eg: standard:70x70,list:235x135r-90
-Additional Attributes (optional)
-Attributes which should be exported with normal attributes (coma-separated list)
-Maximum amount of product to export
-Maximum amount of products to export to Boxalino. (0 = all)
 
 All fields (unless otherwise stated) are mandatory. Some fields have default parameter.
+
