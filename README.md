@@ -1,6 +1,5 @@
 # boxalino Magento
 
-
 ## Installation
 
 1. Download and unzip the archive.
