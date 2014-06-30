@@ -1,15 +1,14 @@
-# BoxalinoMagento
-
+# boxalino Magento
 
 ## Installation
 
 1. Download and unzip the archive.
 2. Go to the directory you just unzipped the plugin into
 3. Copy all files and directories into main Magento directory.
-4. Chmod
+4. Set chmod like:
 
 <pre>
-chmod 755 -R Boxalino/
+chmod 755 -R app/code/local/Boxalino/
 chmod 755 app/design/frontend/base/default/layout/boxalino.xml
 chmod 755 app/design/frontend/base/default/template/boxalino/catalogsearch/form.mini.phtml
 chmod 755 app/design/frontend/base/default/template/boxalino/head.phtml
@@ -35,7 +34,6 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Username** - User account to access to API
 + **Password** - User password to access to API
 + **Domain** - Actual shop domain
-+ **IndexId** - ???
 
 #### General Configuration
 + **Quick search** - Widget name for quick search. It’s create in Boxalino
@@ -47,7 +45,7 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Autocomplete products limit** - Max number of products, returned from Boxalino for autocompelte search.
 + **Id field name** - Product id field name (default: entity_id)
 
-#### Trackick
+#### Tracking
 
 + **Enable plugin** - Tracking plugin status.
 + **Enable Sales Tracking** - Sales trackicj plugin staus.
@@ -72,7 +70,6 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Minimum recommendations** - Minimum number of products, returned from Boxalino for related recommendation.
 + **Maximum recommendations** - Maximum number of products, returned from Boxalino for related recommendation.
 + **Scenario** - Scenario name. Recommended for related: product
-
 
 #### Upsell Configuration
 
@@ -103,3 +100,14 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 
 All fields (unless otherwise stated) are mandatory. Some fields have default parameter.
 
+
+## Export
+
+Export is available in **System > Index Management**.
+To export data, please click on **Reindex Data**, next to Boxalino Export index.
+
+When export is complete correctly, will appear message “Boxalino Export Index index was rebuilt.”, and all data are available in Data Intelligence.
+
+## How It Works
+
+[screencast]
