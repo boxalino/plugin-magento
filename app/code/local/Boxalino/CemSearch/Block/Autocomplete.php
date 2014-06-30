@@ -47,7 +47,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
         $suggestData = $this->getSuggestData();
         if (!($count = count($suggestData))) {
-            return $html;
+            return '<ul><li>' . $this->helper('catalogsearch')->getQueryText() . '</li></ul>';
         }
 
         $count--;
