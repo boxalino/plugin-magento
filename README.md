@@ -5,7 +5,11 @@
 1. Download and unzip the archive.
 2. Go to the directory you just unzipped the plugin into
 3. Copy all files and directories into main Magento directory.
-4. Set chmod like:
+4. In admin panel:
+  * System > Cache Management > Flush Magento Cache
+  * System > Cache Management > Flush Cache Storage
+  * System > Permissions > Roles > Administrators > Save Role 
+5. Set chmod like:
 
 <pre>
 chmod 755 -R app/code/local/Boxalino/
@@ -34,6 +38,7 @@ The configuration is available in **System > Configuration** and **Boxalino Exte
 + **Username** - User account to access to API
 + **Password** - User password to access to API
 + **Domain** - Actual shop domain
++ **IndexId** - ???
 
 #### General Configuration
 + **Quick search** - Widget name for quick search. It’s create in Boxalino
