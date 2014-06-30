@@ -6,7 +6,11 @@
 1. Download and unzip the archive.
 2. Go to the directory you just unzipped the plugin into
 3. Copy all files and directories into main Magento directory.
-4. Chmod
+4. In admin panel:
+  * System > Cache Management > Flush Magento Cache
+  * System > Cache Management > Flush Cache Storage
+  * System > Permissions > Roles > Administrators > Save Role 
+5. Chmod
 
 <pre>
 chmod 755 -R Boxalino/
