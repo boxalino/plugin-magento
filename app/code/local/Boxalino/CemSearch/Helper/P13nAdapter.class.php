@@ -330,7 +330,7 @@
 		private function createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount){
 			$this->searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
 			$this->searchQuery->queryText = $search;
-			$this->searchQuery->indexId = $this->config->getIndexId();
+			$this->searchQuery->indexId = $this->config->getAccount();
 			$this->searchQuery->language = $language;
 			$this->searchQuery->returnFields = $returnFields;
 			$this->searchQuery->offset = $offset;

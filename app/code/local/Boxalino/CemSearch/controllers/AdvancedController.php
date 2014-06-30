@@ -53,11 +53,10 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
 
         $p13nConfig = new P13nConfig(
             $storeConfig['host'],
-            $storeConfig['account'],
+            Mage::helper('Boxalino_CemSearch')->getAccount(),
             $storeConfig['username'],
             $storeConfig['password'],
-            $storeConfig['domain'],
-            $storeConfig['indexId']
+            $storeConfig['domain']
         );
         $p13nSort = new P13nSort();
         $p13nSort->push('score', true);

@@ -21,13 +21,12 @@ class P13nConfig{
 	 * @param $domain shop domain
 	 * @param $indexId propably same as account name
 	 */
-	public function __construct($host, $account, $username, $password, $domain, $indexId){
+	public function __construct($host, $account, $username, $password, $domain){
 		$this->host = $host;
 		$this->account = $account;
 		$this->username = $username;
 		$this->password = $password;
 		$this->domain = $domain;
-		$this->indexId = $indexId;
 	}
 
 	public function getAccount(){
@@ -50,7 +49,4 @@ class P13nConfig{
 		return $this->username;
 	}
 
-	public function getIndexId(){
-		return $this->indexId;
-	}
 } 

@@ -106,11 +106,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
 	        $p13nConfig = new P13nConfig(
 		        $storeConfig['host'],
-		        $storeConfig['account'],
+		        Mage::helper('Boxalino_CemSearch')->getAccount(),
 		        $storeConfig['username'],
 		        $storeConfig['password'],
-		        $storeConfig['domain'],
-		        $storeConfig['indexId']
+		        $storeConfig['domain']
 	        );
 	        $p13n = new P13nAdapter($p13nConfig);
 

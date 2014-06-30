@@ -8,7 +8,7 @@ class P13nRecommendation {
 
     public function getRecommendation($widget){
 
-        $account = $this->getAccount();
+        $account = Mage::helper('Boxalino_CemSearch')->getAccount();
         $language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
         $returnFields = array(
             'id',
@@ -66,18 +66,4 @@ class P13nRecommendation {
         return isset($config[$param])?$config[$param]:null;
     }
 
-    /**
-     * @return string
-     */
-    protected function getAccount()
-    {
-
-        $isDev = Mage::getStoreConfig('Boxalino_CemSearch/backend/account_dev');
-        $account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
-
-        if ($isDev) {
-            return $account . '_dev';
-        }
-        return $account;
-    }
 }

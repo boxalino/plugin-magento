@@ -185,4 +185,14 @@
 				return  null;
 			}
 		}
+
+        public function getAccount(){
+            $isDev = Mage::getStoreConfig('Boxalino_CemSearch/backend/account_dev');
+            $account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
+
+            if ($isDev) {
+                return $account . '_dev';
+            }
+            return $account;
+        }
 	}
