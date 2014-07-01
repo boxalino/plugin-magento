@@ -328,9 +328,8 @@ class Boxalino_Export_Model_Mysql4_Dbmind_Indexer extends Boxalino_Export_Model_
         //prepare accounts
         $accounts = array();
         foreach(Mage::app()->getWebsites() as $website) {
-            $isDev = Mage::getStoreConfig('Boxalino_CemSearch/backend/account_dev');
             $account = Mage::app()->getWebsite($website->getId())->getConfig('Boxalino_CemSearch/backend/account');
-            $accounts[] = $isDev ? $account . '_dev': $account;
+            $accounts[] = $account;
         }
 
         //prepare url
