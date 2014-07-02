@@ -233,7 +233,7 @@
                 <!-- CART -->
                 <cart translate="label" module="Boxalino_CemSearch">
                     <label>Cart Configuration</label>
-                    <comment><![CDATA[ COMMENT ]]></comment>
+                    <comment><![CDATA[ Widget configuration for recommendation on basket page. ]]></comment>
                     <frontend_type>text</frontend_type>
                     <sort_order>100</sort_order>
                     <show_in_default>1</show_in_default>
@@ -293,7 +293,7 @@
                 <!-- RELATED -->
                 <related translate="label" module="Boxalino_CemSearch">
                     <label>Related Configuration</label>
-                    <comment><![CDATA[ COMMENT ]]></comment>
+                    <comment><![CDATA[ Widget configuration for related recommendation on product page. ]]></comment>
                     <frontend_type>text</frontend_type>
                     <sort_order>200</sort_order>
                     <show_in_default>1</show_in_default>
@@ -354,7 +354,7 @@
                 <!-- UPSELL -->
                 <upsell translate="label" module="Boxalino_CemSearch">
                     <label>Upsell Configuration</label>
-                    <comment><![CDATA[ COMMENT ]]></comment>
+                    <comment><![CDATA[ Widget configuration for upsell recommendation on product page. ]]></comment>
                     <frontend_type>text</frontend_type>
                     <sort_order>300</sort_order>
                     <show_in_default>1</show_in_default>
