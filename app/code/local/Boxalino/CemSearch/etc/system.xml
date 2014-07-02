@@ -48,7 +48,7 @@
                         </account>
                         <!-- ACCOUNT DEV -->
                         <account_dev translate="label">
-                            <label>Dev environment</label>
+                            <label>Development environment</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
