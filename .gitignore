@@ -153,4 +153,8 @@ skin/frontend/base/default/js/ie6.js
 skin/frontend/base/default/js/msrp.js
 skin/frontend/base/default/js/opcheckout.js
 !skin/frontend/base/default/js/ba.js
-
+.gitignore~
+.htaccess
+.htaccess.sample
+files.txt
+app/code/local/Boxalino/Cem
