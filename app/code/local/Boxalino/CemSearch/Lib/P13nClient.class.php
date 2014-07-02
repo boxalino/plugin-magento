@@ -66,7 +66,7 @@ class BoxalinoP13nClient
 				usort($basketContent, function($a, $b) {
 					if ($a['price'] > $b['price']) {
 						return -1;
-					} elseif ($b['price'] > $b['price']) {
+					} elseif ($b['price'] > $a['price']) {
 						return 1;
 					}
 					return 0;
