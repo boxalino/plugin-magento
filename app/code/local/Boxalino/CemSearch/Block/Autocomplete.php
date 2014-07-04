@@ -39,6 +39,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
+        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            return null;
+        }
+
         $html = '';
 
         if (!$this->_beforeToHtml()) {
@@ -93,6 +97,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
     public function getSuggestData()
     {
+
+        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            return parent::getSuggestData();
+        }
+
         if (!$this->_suggestData) {
             $query = $this->helper('catalogsearch')->getQueryText();
             $counter = 0;

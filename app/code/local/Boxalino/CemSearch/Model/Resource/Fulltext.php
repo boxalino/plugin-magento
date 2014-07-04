@@ -18,7 +18,11 @@
 
         public function prepareResult($object, $queryText, $query){
 
-	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
+            if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+                return parent::prepareResult($object, $queryText, $query);
+            }
+
+            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 

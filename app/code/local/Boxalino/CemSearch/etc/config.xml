@@ -148,6 +148,7 @@
     <default>
         <Boxalino_CemSearch>
             <backend>
+                <enabled>1</enabled>
                 <account_dev>0</account_dev>
             </backend>
             <general>

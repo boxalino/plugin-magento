@@ -4,13 +4,16 @@
  * Created at: 06.06.14 11:45
  */
 
+require_once "Mage/CatalogSearch/Model/Advanced.php";
+
 /**
  *
  * @category    Mage
  * @package     Mage_CatalogSearch
  * @author      Szymon Nosal <szymon.nosal@codete.com>
  */
-class Boxalino_CemSearch_Model_Advanced extends Mage_Core_Model_Abstract
+//class Boxalino_CemSearch_Model_Advanced extends Mage_Core_Model_Abstract
+class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advanced
 {
     /**
      * User friendly search criteria list
@@ -113,6 +116,11 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_Core_Model_Abstract
      */
     public function addFilters($values, $ids = null)
     {
+
+        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            return parent::addFilters($values, $ids);
+        }
+
         $attributes     = $this->getAttributes();
         $hasConditions  = true;
         $allConditions  = array();

@@ -4,6 +4,8 @@
  * Created at: 06.06.14 11:36
  */
 
+require_once "Mage/CatalogSearch/controllers/AdvancedController.php";
+
 /**
  * Catalog Search Controller
  *
@@ -11,7 +13,8 @@
  * @package    Mage_CatalogSearch
  * @module     Catalog
  */
-class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_Action
+//class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_Action
+class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedController
 {
 
     public function indexAction()
@@ -23,6 +26,11 @@ class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_A
 
     public function resultAction()
     {
+
+        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            return parent::resultAction();
+        }
+
         $this->loadLayout();
 
         $params = $this->getRequest()->getQuery();

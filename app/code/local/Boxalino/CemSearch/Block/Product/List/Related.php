@@ -24,6 +24,11 @@ class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_
 
     protected function _prepareData()
     {
+
+        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            return parent::_prepareData();
+        }
+
         $product = Mage::registry('product');
         /* @var $product Mage_Catalog_Model_Product */
 
