@@ -1,0 +1,8 @@
+<config>
+    <modules>
+        <Boxalino_Exporter>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Boxalino_Exporter>
+    </modules>
+</config>
