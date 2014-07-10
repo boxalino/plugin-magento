@@ -145,7 +145,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             // Add simple product to collection of parent.
             $this->simpleIds[$parentId][] = $productId;
             // Add parent to simple product.
-            $this->parentId[$productId][] = $parentId;
+            $this->parentId[$productId] = $parentId;
         }
     }
 
