@@ -8,6 +8,13 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     const FULL_URL = '';
 
+    public  $XML_DELIMITER = '|';
+    public  $XML_ENCLOSURE = "'";
+    public  $XML_NEWLINE = '\n';
+    public  $XML_ESCAPE = '\\\\';
+    public  $XML_ENCODE = 'UTF-8';
+    public  $XML_FORMAT = 'CSV';
+
     /**
      * Array of parent_id for specified products.
      * IMPORTANT: We assume that every simple product has at most one configurable parent.
