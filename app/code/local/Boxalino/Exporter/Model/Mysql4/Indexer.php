@@ -589,12 +589,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //Create name for file
         $exportFile = '/tmp/boxalino/' . 'magento_' . $website->getId() . '_' . md5(uniqid($website->getName()));
 
-        //Create zip
-        $this->createZip($exportFile . '.zip', $csvFiles);
-
         //Create xml
-        $fileXML = $exportFile . '.xml';
-        $this->createXML();
+        try{
+            $this->createXML($exportFile . '.xml');
+        } catch(Exception $e){
+            var_dump($e->getMessage());
+        }
+
+
+        //Create zip
+
+        try{
+            $this->createZip($exportFile . '.zip', $csvFiles, $exportFile . '.xml');
+        } catch(Exception $e){
+            var_dump($e->getMessage());
+        }
+
 
         return $exportFile;
 
@@ -602,7 +612,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     }
 
-    protected function createXML(){
+    protected function createXML($name){
 
         $helper = Mage::helper('boxalinoexporter');
 
@@ -832,7 +842,7 @@ XML;
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
-        $dom->save('/tmp/boxalino/test.xml');
+        $dom->save($name);
 
     }
 
@@ -990,7 +1000,7 @@ XML;
      * @param $name
      * @param $csvFiles
      */
-    protected function createZip($name, $csvFiles){
+    protected function createZip($name, $csvFiles, $xml){
 
         $zip = new ZipArchive();
         if ($zip->open($name, ZIPARCHIVE::CREATE) ){
@@ -999,6 +1009,10 @@ XML;
                 if(!$zip->addFile('/tmp/boxalino/' . $f, $f)){
                     throw new Exception('Synchronization failure. Please try again.');
                 }
+            }
+
+            if(!$zip->addFile($xml, 'properties.xml')){
+                throw new Exception('Synchronization failure. Please try again.');
             }
 
             if(!$zip->close()){
