@@ -315,6 +315,7 @@ class Boxalino_Export_Model_Mysql4_Dbmind_Indexer extends Boxalino_Export_Model_
         if (!$zip->open($this->zipFile, ZIPARCHIVE::CREATE) ||
             !$zip->addFile($this->languagesFile, 'languages.csv') ||
             !$zip->addFile($this->categoriesFile, 'categories.csv') ||
+            !$zip->addFile($this->categoriesFile, 'categories.csv') ||
             !$zip->addFile($this->tagsFile, 'tags.csv') ||
             !$zip->addFile($this->fieldsFile, 'fields.csv') ||
             !$zip->addFile($this->itemsMainFile, 'items.csv') ||

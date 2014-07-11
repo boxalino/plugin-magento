@@ -4,9 +4,11 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     protected $_attributesWithIds = array();
     protected $_allTags = array();
 
-    const DELTA_URL = '';
+    const URL_XML = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/source/update';
+    const URL_XML_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/source/update';
 
-    const FULL_URL = '';
+    const URL_ZIP = "http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push";
+    const URL_ZIP_DEV = "http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push";
 
     public  $XML_DELIMITER = '|';
     public  $XML_ENCLOSURE = "'";
@@ -105,20 +107,29 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     /**
      * @return string URL to normal data sync
-     * @TODO: Add url to data sync
+     * @param $dev
      */
-    public function getDataSyncUrl()
+    public function getZIPSyncUrl($dev = false)
     {
-        return self::FULL_URL;
+        if($dev){
+            return self::URL_ZIP_DEV;
+        } else{
+            return self::URL_ZIP;
+        }
     }
 
     /**
      * @return string URL to delta sync
-     * @TODO: Add url to delta sync
+     * @param $dev
      */
-    public function getDeltaSyncUrl()
+    public function getXMLSyncUrl($dev = false)
     {
-        return self::DELTA_URL;
+        if($dev){
+            return self::URL_XML_DEV;
+        } else{
+            return self::URL_XML;
+        }
+
     }
 
     /**
