@@ -167,7 +167,7 @@
 
 		public function autocomplete($text, $limit, $products_limit = 0){
 			$choiceId = 'autocomplete';
-			$fields = array('entity_id', 'title', 'score');
+			$fields = array(Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id'), 'title', 'score');
 
 			$this->autocompleteRequest = $this->p13n->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
 
@@ -213,7 +213,7 @@
 				$products[$id] = array();
 				foreach ($hit->searchResult->hits as $productsHit){
 					$products[$id][] = array(
-						'id' => $productsHit->values['entity_id'][0],
+						'id' => $productsHit->values[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')][0],
 						'score' => $productsHit->values['score'][0],
 					);
 				}
@@ -266,7 +266,7 @@
 				/** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
 				$searchResult = $variant->searchResult;
 				foreach($searchResult->hits as $item){
-					$result[] = $item->values['entity_id'][0];
+					$result[] = $item->values[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')][0];
 
 					//print_r($item->values);
 					//echo '<br/>';

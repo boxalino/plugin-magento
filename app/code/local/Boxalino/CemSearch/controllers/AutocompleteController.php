@@ -45,7 +45,7 @@
 					$titles[] = $entity['title'][0];
 					$suggestions[] = array(
 						'value' => $entity['title'][0],
-						'data' => $entity['entity_id'][0]
+						'data' => $entity[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')][0]
 //						'data' => $entity['entity_id'][0]
 					);
 				}

@@ -54,7 +54,11 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
         }
 
         foreach($response as $item){
-            $entityIds[] = $item['entity_id'];
+            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')];
+        }
+
+        if(empty($entityIds)){
+            return parent::getItems();
         }
 
         #########################################################################################

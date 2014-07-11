@@ -46,7 +46,7 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         }
 
         foreach($response as $item){
-            $entityIds[] = $item['entity_id'];
+            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')];
         }
 
         ###############################################################
