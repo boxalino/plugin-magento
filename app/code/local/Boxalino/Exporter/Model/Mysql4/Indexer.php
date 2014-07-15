@@ -1061,7 +1061,7 @@ XML;
         $fields = array(
             "username"  => $this->_storeConfig['account'],
             "password"  => $this->_storeConfig['account_password'],
-            "account"   => $this->_storeConfig['access_key'],
+            "account"   => $this->_storeConfig['account'],
             "dev"       => $this->_storeConfig['dev_environment']==0?'false':'true',
             "delta"     => $this->_getIndexType()=='delta' ? "true" : "false", // I know...
             "data"       => '@' . $file . '.zip;type=application/zip'
@@ -1077,7 +1077,7 @@ XML;
         $fields = array(
             "username"  => $this->_storeConfig['account'],
             "password"  => $this->_storeConfig['account_password'],
-            "account"   => $this->_storeConfig['access_key'],
+            "account"   => $this->_storeConfig['account'],
             "template" => 'standard_source',
             "xml"      => file_get_contents($file . '.xml')
         );

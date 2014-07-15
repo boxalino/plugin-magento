@@ -54,15 +54,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </account_password>
-                        <access_key translate="label">
-                            <label>Access Key</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
-                            <comment>Set your access key</comment>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </access_key>
                         <dev_environment translate="label">
                             <label>Development Environment</label>
                             <frontend_type>select</frontend_type>
