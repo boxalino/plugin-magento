@@ -274,10 +274,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
 
                     if(isset($this->_transformedProducts['productsMtM'][$attr])){
-                        $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                        // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
+                        if ($attr == 'visibility' && $val == '4') {
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '3');
+                        } else {
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => $val);
+                        }
                     } else{
                         $this->_transformedProducts['productsMtM'][$attr] = array();
-                        $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                        // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
+                        if ($attr == 'visibility' && $val == '4') {
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '3');
+                        } else {
+                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => $val);
+                        }
                     }
 
                     continue;
@@ -299,6 +311,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             }
 
+
             if(!isset($this->_transformedProducts['products'][$id])){
                 $productParam['entity_id'] = $id;
                 $productParam['parent_id'] = $helper->getParentId($id);
@@ -317,9 +330,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             ksort($this->_transformedProducts['products'][$id]);
-
         }
-
         return  $this->_transformedProducts;
     }
 
@@ -593,7 +604,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     }
 
-    protected function createXML($name){
+    protected function createXML($name)
+    {
 
         $helper = Mage::helper('boxalinoexporter');
 
@@ -625,6 +637,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             </sources>
             <properties>
                 <property id="id" type="id">
+                    <transform>
+                        <logic source="customer_vals" type="direct">
+                            <field column="customer_id"/>
+                        </logic>
+                    </transform>
+                    <params/>
+                </property>
+                <property id="customer_id" type="string">
                     <transform>
                         <logic source="customer_vals" type="direct">
                             <field column="customer_id"/>
@@ -676,7 +696,7 @@ XML;
                     <file value="transactions.csv"/>
                     <orderIdColumn value="order_id"/>
                     <customerIdColumn value="customer_id" customer_property_id="customer_id"/>
-                    <productIdColumn value="entity_id" product_property_id="entity_id"/>
+                    <productIdColumn value="entity_id" product_property_id="product_entity_id"/>
                     <productListPriceColumn value="price"/>
                     <productDiscountedPriceColumn value="discounted_price"/>
                     <totalOrderValueColumn value="total_order_value"/>
@@ -720,7 +740,7 @@ XML;
             $attr[] = 'tag';
         }
 
-        foreach($attr as $attr){
+        foreach($attr as $attr) {
 
             //attribute
             $source = $sources->addChild('source');
@@ -791,7 +811,9 @@ XML;
         $props = $this->prepareProperties();
 
         foreach($props as $prop){
+            if($prop['id'] == 'entity_id') {
 
+            }
             $property = $properties->addChild('property');
             $property->addAttribute('id', $prop['id']);
             $property->addAttribute('type', $prop['ptype']);
@@ -817,7 +839,6 @@ XML;
             }
 
         }
-
         if ($this->_storeConfig['export_customers']){
             $customer = simplexml_load_string($customerString);
             $this->sxml_append($containers, $customer);
@@ -846,7 +867,8 @@ XML;
      * @param SimpleXMLElement $to
      * @param SimpleXMLElement $from
      */
-    function sxml_append(SimpleXMLElement $to, SimpleXMLElement $from) {
+    function sxml_append(SimpleXMLElement $to, SimpleXMLElement $from)
+    {
         $toDom = dom_import_simplexml($to);
         $fromDom = dom_import_simplexml($from);
         $toDom->appendChild($toDom->ownerDocument->importNode($fromDom, true));
@@ -856,7 +878,8 @@ XML;
      * desciption: add default xmlElements
      * @param SimpleXMLElement $xml
      */
-    function sxml_append_options(SimpleXMLElement &$xml){
+    function sxml_append_options(SimpleXMLElement &$xml)
+    {
 
         $helper = Mage::helper('boxalinoexporter');
 
@@ -871,7 +894,8 @@ XML;
     /**
      * @return array
      */
-    function prepareProperties(){
+    function prepareProperties()
+    {
 
         $properties = array();
 
@@ -973,6 +997,7 @@ XML;
                 'reference' => 'categories'
             );
         }
+        $properties[] = array('id' => 'product_entity_id', 'name' => null, 'ptype' => 'string', 'type' => 'direct', 'field' => 'entity_id', 'has_lang' => false, 'reference' => null);
 
         return $properties;
 
@@ -984,7 +1009,8 @@ XML;
      * @param $csv
      * @return string
      */
-    protected function createCsv($name, $data, $csv){
+    protected function createCsv($name, $data, $csv)
+    {
         $file = $name . '.csv';
         $csvdata = array_merge(array(array_keys(end($data))), $data);
         $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
@@ -998,7 +1024,8 @@ XML;
      * @param $name
      * @param $csvFiles
      */
-    protected function createZip($name, $csvFiles, $xml){
+    protected function createZip($name, $csvFiles, $xml)
+    {
 
         @unlink($name);
 
@@ -1029,7 +1056,8 @@ XML;
     /**
      * @param $zip
      */
-    protected function pushZip($file){
+    protected function pushZip($file)
+    {
         $fields = array(
             "username"  => $this->_storeConfig['account'],
             "password"  => $this->_storeConfig['account_password'],
@@ -1044,7 +1072,8 @@ XML;
         return $this->pushFile($fields, $url);
     }
 
-    protected function pushXML($file){
+    protected function pushXML($file)
+    {
         $fields = array(
             "username"  => $this->_storeConfig['account'],
             "password"  => $this->_storeConfig['account_password'],
@@ -1059,7 +1088,8 @@ XML;
 
     }
 
-    protected function pushFile($fields, $url){
+    protected function pushFile($fields, $url)
+    {
 
         $s = curl_init();
 

@@ -58,7 +58,7 @@
 			);
 
 			echo json_encode($values);
-//			die;
+
             return $values;
 		}
 	}
