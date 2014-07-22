@@ -10,8 +10,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     const URL_ZIP = "http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push";
     const URL_ZIP_DEV = "http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push";
 
-    public  $XML_DELIMITER = '|';
-    public  $XML_ENCLOSURE = "'";
+    public  $XML_DELIMITER = ',';
+    public  $XML_ENCLOSURE = '"';
+    public  $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
     public  $XML_NEWLINE = '\n';
     public  $XML_ESCAPE = '\\\\';
     public  $XML_ENCODE = 'UTF-8';

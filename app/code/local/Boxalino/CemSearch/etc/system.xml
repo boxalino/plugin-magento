@@ -183,7 +183,7 @@
                         </entity_id>
 					</fields>
 				</general>
-				<tracking translate="label" module="boxalinocem">
+				<tracking translate="label" module="Boxalino_CemSearch">
 					<label>Tracking</label>
 					<frontend_type>text</frontend_type>
 					<sort_order>60</sort_order>

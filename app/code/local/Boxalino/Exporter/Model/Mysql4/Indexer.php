@@ -31,6 +31,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     protected $_attributesValuesByName = array();
 
+    protected $_tmp = array();
+
     protected $_files = array();
 
     /** @var int Actually used storeId */
@@ -53,6 +55,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $this->_websiteExport();
         $this->_closeExport();
+        die();
         return $this;
     }
 
@@ -74,9 +77,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         foreach (Mage::app()->getWebsites() as $website) {
             $t1 = microtime();
             $data = $this->_storeExport($website);
+
+            if(!$this->_isEnabled()){
+                continue;
+            }
+
             $t2 = microtime();
             $file = $this->prepareFiles($website, $data['products'], $data['categories'], $data['customers'], $data['tags'], $data['transactions']);
-            $t3 = microtime();
+            $t3 = microtime();;
+//            die();
             $this->pushXML($file);
             $this->pushZip($file);
 
@@ -85,6 +94,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_transformedProducts = array();
             $this->_categoryParent = array();
             $this->_availableLanguages = array();
+            $this->_tmp = array();
 
 //            echo "<br><br>Start: " . $this->getmicrotime($t1) . " <br><br>";
 //            echo "Export: " . $this->getmicrotime($t2) . " <br>";
@@ -259,11 +269,32 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $helper = Mage::helper('boxalinoexporter');
 
+        $countMax = $this->_storeConfig['maximum_population'];
+        $count = 0;
+
+
         foreach($products as $product) {
+
+
+            if(count($product->getWebsiteIds()) == 0 ){
+                continue;
+            }
 
             $id = $product->getId();
 
             $productParam = array();
+            $haveParent = false;
+
+//            if($id == 234 || $id == 235 || $id == 236 || $id == 403){
+//                var_dump(array($helper->getParentId($id), $id, $product->getData()));
+//            }
+
+            if($helper->getParentId($id) != null && $product->getTypeId() == 'simple'){
+                $id = $helper->getParentId($id);
+                $haveParent = true;
+            } else if($product->getVisibility() == 1 && $helper->getParentId($id) == null){
+                continue;
+            }
 
             foreach($attrs as $attr){
                 if(isset($this->_attributesValuesByName[$attr])){
@@ -273,22 +304,30 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         continue;
                     }
 
+                    if(in_array($val, $this->_tmp[$attr][$id])){
+                        continue;
+                    }
+
                     if(isset($this->_transformedProducts['productsMtM'][$attr])){
                         // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                         if ($attr == 'visibility' && $val == '4') {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '2');
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '3');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => '3');
+                            $this->_tmp[$attr][$id][] = $val;
                         } else {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => $val);
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                            $this->_tmp[$attr][$id][] = $val;
                         }
                     } else{
                         $this->_transformedProducts['productsMtM'][$attr] = array();
                         // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                         if ($attr == 'visibility' && $val == '4') {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '2');
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => '3');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/ 'entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 2,*/ 'entity_id' => $id, $attr . '_id' => '3');
+                            $this->_tmp[$attr][$id] = array($val);
                         } else {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array('entity_id' => $id, $attr . '_id' => $val);
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                            $this->_tmp[$attr][$id] = array($val);
                         }
                     }
 
@@ -300,7 +339,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     case 'description':
                     case 'short_description':
                     case 'name':
-                        $productParam[$attr . '_' . $this->_storeConfig['language']] = trim($product->$attr);
+                        $productParam[$attr . '_' . $this->_storeConfig['language']] = $helper->XML_ENCLOSURE . htmlspecialchars(str_replace(',', ' ', trim($product->$attr))) . $helper->XML_ENCLOSURE;
                         break;
                     case 'category_ids':
                         break;
@@ -311,10 +350,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             }
 
+            if($haveParent){
+                continue;
+            }
 
             if(!isset($this->_transformedProducts['products'][$id])){
                 $productParam['entity_id'] = $id;
-                $productParam['parent_id'] = $helper->getParentId($id);
+//                $productParam['parent_id'] = $helper->getParentId($id);
                 $this->_transformedProducts['products'][$id] = $productParam;
 
                 //Add categories
@@ -330,6 +372,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             ksort($this->_transformedProducts['products'][$id]);
+
+            $count++;
+            if($countMax > 0 && $count >= $countMax){
+                break;
+            }
         }
         return  $this->_transformedProducts;
     }
@@ -540,8 +587,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $csvFiles = array();
         mkdir("/tmp/boxalino");
         $csv = new Varien_File_Csv();
-        $csv->setDelimiter('|');
-        $csv->setEnclosure('"');
+
+        $helper = Mage::helper('boxalinoexporter');
+        $csv->setDelimiter($helper->XML_DELIMITER);
+        $csv->setEnclosure(null);
 
         //create csv
         //save attributes
@@ -570,7 +619,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         //save transactions
-        if($transactions != null){
+        if($transactions != null && count($transactions) > 0){
             $csvFiles[] = $this->createCsv('transactions', $transactions, $csv);
         }
 
@@ -630,7 +679,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     <format value="$helper->XML_FORMAT"/>
                     <encoding value="$helper->XML_ENCODE"/>
                     <delimiter value="$helper->XML_DELIMITER"/>
-                    <enclosure value="$helper->XML_ENCLOSURE"/>
+                    <enclosure value="$helper->XML_ENCLOSURE_TEXT"/>
                     <escape value="$helper->XML_ESCAPE"/>
                     <lineSeparator value="$helper->XML_NEWLINE"/>
                 </source>
@@ -708,7 +757,7 @@ XML;
                     <format value="$helper->XML_FORMAT"/>
                     <encoding value="$helper->XML_ENCODE"/>
                     <delimiter value="$helper->XML_DELIMITER"/>
-                    <enclosure value="$helper->XML_ENCLOSURE"/>
+                    <enclosure value="$helper->XML_ENCLOSURE_TEXT"/>
                     <escape value="$helper->XML_ESCAPE"/>
                     <lineSeparator value="$helper->XML_NEWLINE"/>
                 </source>
@@ -849,6 +898,8 @@ XML;
             $this->sxml_append($containers, $transaction);
         }
 
+//        var_dump($containers);
+
         $dom = new DOMDocument("1.0");
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -900,7 +951,7 @@ XML;
         $properties = array();
 
         $attrs = $this->_listOfAttributes;
-        $attrs[] = 'parent_id';
+//        $attrs[] = 'parent_id';
 
         foreach($attrs as $attr){
 
@@ -1112,7 +1163,7 @@ XML;
     protected function _closeExport()
     {
         foreach($this->_files as $f){
-            @unlink($f);
+//            @unlink($f);
         }
     }
 

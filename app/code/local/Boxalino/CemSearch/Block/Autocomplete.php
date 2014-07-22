@@ -132,6 +132,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 	        }
 
             foreach ($collection as $item) {
+
+                if($item['hits'] <= 0){
+                    continue;
+                }
+
 	            $_data = array(
                     'id' => substr(md5($item['text']), 0, 10),
                     'title' => $item['text'],
