@@ -118,6 +118,11 @@
                 $filter->stringValues = array($value);
             }
 
+            $count = count($filter->stringValues);
+//            for($i = 0; $i < $count; $i++){
+//                $filter->stringValues[$i] = strtolower($filter->stringValues[$i]);
+//            }
+
             $this->filters[] = $filter;
         }
 
@@ -257,6 +262,14 @@
 			$this->inquiry->simpleSearchQuery = $this->searchQuery;
 			$this->choiceRequest->inquiries = array($this->inquiry);
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
+
+//            echo '<pre>';
+//            echo 'Request:<br/>';
+//            print_r($this->choiceRequest);
+//            echo '<br><br><br>Response:<br>';
+//            print_r($this->choiceResponse);
+//            echo '</pre>';
+
 		}
 
 		public function getEntitiesIds(){

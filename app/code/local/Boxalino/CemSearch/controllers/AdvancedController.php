@@ -104,24 +104,15 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
                 $skip[] = $key;
 
                 if($key == 'price'){
-                    $key = 'discountedPrice';
+                    $key = 'standardPrice';
                 }
 
+                if($from == null && $to == null){
+                    continue;
+                }
                 $p13n->addFilterFromTo($key, $from, $to);
 
             }
-//            elseif(is_array($value) || in_array($key, $not_filter) || $value == '') {
-//                echo 'xxx   ';
-//                continue;
-//            } else{
-//
-//                if($key == 'description'){
-//                    $p13n->addFilter('body', $value, $lang);
-//                } else{
-//                    $p13n->addFilter($key, $value);
-//                }
-//
-//            }
         }
 
         foreach($criteria as $criterium){
@@ -136,17 +127,18 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
             if($name == 'description'){
                 $name = 'body';
+            } else{
+                $name = 'products_' . $name;
             }
 
-            $p13n->addFilter($name, $values, $lang);
+//            $p13n->addFilter($name, $values, $lang);
+            $p13n->addFilter($name, $values, null);
         }
 
         //get result from boxalino
         $p13n->search();
         $entity_ids = $p13n->getEntitiesIds();
         unset($p13n);
-//
-//        var_dump($entity_ids);
 
         try {
             Mage::getSingleton('catalogsearch/advanced')->addFilters($params, $entity_ids);
@@ -163,4 +155,5 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         $this->renderLayout();
 
     }
+
 }

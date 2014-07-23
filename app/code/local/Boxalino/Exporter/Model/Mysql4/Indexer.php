@@ -1,5 +1,7 @@
 <?php
 
+//ini_set('memory_limit', '-1');
+
 abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_Mysql4_Abstract
 {
     /** @var array Configuration for each Store View */
@@ -55,7 +57,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $this->_websiteExport();
         $this->_closeExport();
-        die();
         return $this;
     }
 
@@ -81,11 +82,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if(!$this->_isEnabled()){
                 continue;
             }
+            if($this->_getIndexType() == 'delta' && count($data['products'] == 0 && count($data['customers'] == 0 && count($data['transactions'] == 0)))){
+                continue;
+            }
 
             $t2 = microtime();
             $file = $this->prepareFiles($website, $data['products'], $data['categories'], $data['customers'], $data['tags'], $data['transactions']);
-            $t3 = microtime();;
-//            die();
+
+            $t3 = microtime();
             $this->pushXML($file);
             $this->pushZip($file);
 
@@ -198,13 +202,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         if(isset($this->_attributesValuesByName[$attribute])){
 
                             if(isset($this->_attributesValuesByName[$attribute][$value])){
-                                $this->_attributesValuesByName[$attribute][$value][$name] = strtolower($option['label']);
+                                $this->_attributesValuesByName[$attribute][$value][$name] = /*strtolower*/($option['label']);
                             } else{
-                                $this->_attributesValuesByName[$attribute][$value] = array($attribute . '_id' => $value, $name => strtolower($option['label']));
+                                $this->_attributesValuesByName[$attribute][$value] = array($attribute . '_id' => $value, $name => /*strtolower*/($option['label']));
                             }
 
                         } else{
-                            $this->_attributesValuesByName[$attribute] = array($value => array($attribute . '_id' => $value, $name => strtolower($option['label'])));
+                            $this->_attributesValuesByName[$attribute] = array($value => array($attribute . '_id' => $value, $name => /*strtolower*/($option['label'])));
                         }
 
                     }
@@ -277,6 +281,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
 
             if(count($product->getWebsiteIds()) == 0 ){
+                unset($product);
                 continue;
             }
 
@@ -293,6 +298,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $id = $helper->getParentId($id);
                 $haveParent = true;
             } else if($product->getVisibility() == 1 && $helper->getParentId($id) == null){
+                unset($product);
                 continue;
             }
 
@@ -377,7 +383,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if($countMax > 0 && $count >= $countMax){
                 break;
             }
+            unset($product);
         }
+        unset($products);
         return  $this->_transformedProducts;
     }
 
