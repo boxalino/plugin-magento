@@ -37,6 +37,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     protected $_files = array();
 
+    protected $_count = 0;
+
     /** @var int Actually used storeId */
     protected $_storeId = 0;
 
@@ -99,6 +101,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_categoryParent = array();
             $this->_availableLanguages = array();
             $this->_tmp = array();
+            $this->_count = 0;
 
 //            echo "<br><br>Start: " . $this->getmicrotime($t1) . " <br><br>";
 //            echo "Export: " . $this->getmicrotime($t2) . " <br>";
@@ -179,6 +182,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($fields as $field) {
                 $this->_listOfAttributes[] = $field;
             }
+            unset($fields);
         }
     }
 
@@ -213,8 +217,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     }
                 }
+                unset($options);
             }
         }
+        unset($attributesWithId);
     }
 
     /**
@@ -241,6 +247,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($products as $product) {
                 $this->_productsStockQty[$product->getProductId()] = $product->getQty();
             }
+            unset($products);
         }
 
         return $this->_productsStockQty;
@@ -257,6 +264,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($tags as $tag) {
                 $this->_allProductTags[$tag['entity_id']] = $tag['tag_id'];
             }
+            unset($tags);
         }
 
         return $this->_allProductTags;
@@ -274,8 +282,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $helper = Mage::helper('boxalinoexporter');
 
         $countMax = $this->_storeConfig['maximum_population'];
-        $count = 0;
-
 
         foreach($products as $product) {
 
@@ -361,6 +367,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             if(!isset($this->_transformedProducts['products'][$id])){
+                if($countMax > 0 && $this->_count >= $countMax ){
+                    break;
+                }
                 $productParam['entity_id'] = $id;
 //                $productParam['parent_id'] = $helper->getParentId($id);
                 $this->_transformedProducts['products'][$id] = $productParam;
@@ -372,17 +381,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $cat = $this->_transformedCategories[$cat]['parent_id'];
                     }
                 }
+                $this->_count++;
 
-            } else{
+            } elseif(isset($this->_transformedProducts['products'][$id])){
                 $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
             }
 
             ksort($this->_transformedProducts['products'][$id]);
 
-            $count++;
-            if($countMax > 0 && $count >= $countMax){
-                break;
-            }
             unset($product);
         }
         unset($products);
@@ -646,7 +652,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //csv done
 
         //Create name for file
-//        $exportFile = '/tmp/boxalino/' . 'magento_' . $website->getId() . '_' . md5(uniqid($website->getName()));
         $exportFile = '/tmp/boxalino/' . $this->_storeConfig['account'];
 
         //Create xml
@@ -1166,12 +1171,11 @@ XML;
 
     /**
      * @description Closing sync to export
-     * @TODO: merging everything and sending
      */
     protected function _closeExport()
     {
         foreach($this->_files as $f){
-//            @unlink($f);
+            @unlink($f);
         }
     }
 

@@ -104,7 +104,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
                 $skip[] = $key;
 
                 if($key == 'price'){
-                    $key = 'standardPrice';
+                    $key = 'discountedPrice';
                 }
 
                 if($from == null && $to == null){
