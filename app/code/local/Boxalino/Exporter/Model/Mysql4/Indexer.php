@@ -282,6 +282,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $helper = Mage::helper('boxalinoexporter');
 
         $countMax = $this->_storeConfig['maximum_population'];
+        $localeCount = 0;
 
         foreach($products as $product) {
 
@@ -384,7 +385,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $this->_count++;
 
             } elseif(isset($this->_transformedProducts['products'][$id])){
+                if($countMax > 0 && $localeCount >= $countMax ){
+                    break;
+                }
                 $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
+
+                $localeCount++;
             }
 
             ksort($this->_transformedProducts['products'][$id]);
@@ -1133,7 +1139,7 @@ XML;
 
         $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['dev_environment']);
 
-        return $this->pushFile($fields, $url);
+        return $this->pushFile($fields, $url, 'zip');
     }
 
     protected function pushXML($file)
@@ -1148,11 +1154,11 @@ XML;
 
         $url = Mage::helper('boxalinoexporter')->getXMLSyncUrl($this->_storeConfig['dev_environment']);
 
-        return $this->pushFile($fields, $url);
+        return $this->pushFile($fields, $url, 'xml');
 
     }
 
-    protected function pushFile($fields, $url)
+    protected function pushFile($fields, $url, $type)
     {
 
         $s = curl_init();
@@ -1161,7 +1167,13 @@ XML;
         curl_setopt($s, CURLOPT_TIMEOUT, 35000);
         curl_setopt($s, CURLOPT_POST, true);
         curl_setopt($s, CURLOPT_ENCODING, "");
-        curl_setopt($s, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
+
+        if($type == 'zip'){
+            curl_setopt($s, CURLOPT_FRESH_CONNECT, true);
+            curl_setopt($s, CURLOPT_TIMEOUT_MS, 1);
+        }
+
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
 
         $responseBody = curl_exec($s);
