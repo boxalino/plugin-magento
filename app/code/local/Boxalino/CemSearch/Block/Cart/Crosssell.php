@@ -22,7 +22,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
     public function getItems()
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return parent::getItems();
         }
 
@@ -54,7 +54,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
         }
 
         foreach($response as $item){
-            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')];
+            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_General/search/entity_id')];
         }
 
         if(empty($entityIds)){

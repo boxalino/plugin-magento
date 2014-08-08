@@ -66,18 +66,18 @@
 		}
 
 		public function isAnalyticsEnabled(){
-			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/analytics');
+			$trackSales = Mage::getStoreConfig('Boxalino_General/tracker/analytics');
 			return ($trackSales == 1);
 		}
 		public function isSalesTrackingEnabled(){
-			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/analytics');
+			$trackSales = Mage::getStoreConfig('Boxalino_General/tracker/analytics');
 			return ($trackSales == 1);
 		}
 
 		public function buildScript($pushes){
-			$enabled = Mage::getStoreConfig('Boxalino_CemSearch/tracking/enabled');
+			$enabled = Mage::getStoreConfig('Boxalino_General/tracker/enabled');
 			if($enabled == 1){
-				$account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
+				$account = Mage::getStoreConfig('Boxalino_General/general/p13n_account');
 
 				$script =  '<script type="text/javascript">' . PHP_EOL;
 				$script .= 'var _bxq = _bxq || [];'. PHP_EOL;
@@ -161,7 +161,7 @@
 		 * @param $currency string
 		 */
 		public function reportPurchase($products, $orderId, $price, $currency){
-			$trackSales = Mage::getStoreConfig('Boxalino_CemSearch/tracking/track_sales');
+			$trackSales = Mage::getStoreConfig('Boxalino_General/tracker/track_sales');
 
 			$productsJson = json_encode($products);
 			if($trackSales == 1){
@@ -187,8 +187,8 @@
 		}
 
         public function getAccount(){
-            $isDev = Mage::getStoreConfig('Boxalino_CemSearch/backend/account_dev');
-            $account = Mage::getStoreConfig('Boxalino_CemSearch/backend/account');
+            $isDev = Mage::getStoreConfig('Boxalino_General/general/account_dev');
+            $account = Mage::getStoreConfig('Boxalino_General/general/p13n_account');
 
             if ($isDev) {
                 return $account . '_dev';

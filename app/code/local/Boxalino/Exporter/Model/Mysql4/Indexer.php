@@ -160,7 +160,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _prepareStoreConfig($storeId)
     {
         $this->_storeId = $storeId;
-        $this->_storeConfig = Mage::app()->getStore($this->_storeId)->getConfig('boxalinoexporter/export_data');
+        $this->_storeConfig = array_merge(Mage::app()->getStore($this->_storeId)->getConfig('boxalinoexporter/export_data'),Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_General/general'));
+
         $tmp = Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_CemSearch/backend');
         $this->_storeConfig['username'] = $tmp['username'];
         $this->_storeConfig['password'] = $tmp['password'];
@@ -230,7 +231,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      */
     protected function _isEnabled()
     {
-        if ($this->_storeConfig['enable_module']) {
+        if ($this->_storeConfig['enabled']) {
             return true;
         }
 
@@ -659,7 +660,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //csv done
 
         //Create name for file
-        $exportFile = '/tmp/boxalino/' . $this->_storeConfig['account'];
+        $exportFile = '/tmp/boxalino/' . $this->_storeConfig['di_username'];
 
         //Create xml
         $this->createXML($exportFile . '.xml');
@@ -1130,9 +1131,9 @@ XML;
     protected function pushZip($file)
     {
         $fields = array(
-            "username"  => $this->_storeConfig['account'],
-            "password"  => $this->_storeConfig['account_password'],
-            "account"   => $this->_storeConfig['account'],
+            "username"  => $this->_storeConfig['di_username'],
+            "password"  => $this->_storeConfig['di_password'],
+            "account"   => $this->_storeConfig['di_account'],
             "dev"       => $this->_storeConfig['dev_environment']==0?'false':'true',
             "delta"     => $this->_getIndexType()=='delta' ? "true" : "false", // I know...
             "data"       => '@' . $file . '.zip;type=application/zip'
@@ -1146,9 +1147,9 @@ XML;
     protected function pushXML($file)
     {
         $fields = array(
-            "username"  => $this->_storeConfig['account'],
-            "password"  => $this->_storeConfig['account_password'],
-            "account"   => $this->_storeConfig['account'],
+            "username"  => $this->_storeConfig['di_username'],
+            "password"  => $this->_storeConfig['di_password'],
+            "account"   => $this->_storeConfig['di_account'],
             "template" => 'standard_source',
             "xml"      => file_get_contents($file . '.xml')
         );

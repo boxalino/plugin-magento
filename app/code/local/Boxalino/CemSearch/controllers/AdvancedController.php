@@ -27,7 +27,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
     public function resultAction()
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return parent::resultAction();
         }
 
@@ -52,8 +52,8 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
         //setUp Boxalino
-        $storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
-        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
@@ -62,8 +62,8 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         $p13nConfig = new P13nConfig(
             $storeConfig['host'],
             Mage::helper('Boxalino_CemSearch')->getAccount(),
-            $storeConfig['username'],
-            $storeConfig['password'],
+            $storeConfig['p13n_username'],
+            $storeConfig['p13n_password'],
             $storeConfig['domain']
         );
         $p13nSort = new P13nSort();

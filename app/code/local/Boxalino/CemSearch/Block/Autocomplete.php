@@ -39,7 +39,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return null;
         }
 
@@ -98,7 +98,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     public function getSuggestData()
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return parent::getSuggestData();
         }
 
@@ -111,18 +111,18 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 
-	        $storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
+	        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
 	        $p13nConfig = new P13nConfig(
 		        $storeConfig['host'],
 		        Mage::helper('Boxalino_CemSearch')->getAccount(),
-		        $storeConfig['username'],
-		        $storeConfig['password'],
+		        $storeConfig['p13n_username'],
+		        $storeConfig['p13n_password'],
 		        $storeConfig['domain']
 	        );
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+	        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
 	        if($query){
 		        $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);

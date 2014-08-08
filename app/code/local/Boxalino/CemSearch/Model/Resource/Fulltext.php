@@ -18,7 +18,7 @@
 
         public function prepareResult($object, $queryText, $query){
 
-            if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+            if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
                 return parent::prepareResult($object, $queryText, $query);
             }
 
@@ -26,20 +26,20 @@
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 
-	        $storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
+	        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
 	        $p13nConfig = new P13nConfig(
 		        $storeConfig['host'],
                 Mage::helper('Boxalino_CemSearch')->getAccount(),
-		        $storeConfig['username'],
-		        $storeConfig['password'],
+		        $storeConfig['p13n_username'],
+		        $storeConfig['p13n_password'],
 		        $storeConfig['domain']
 	        );
 	        $p13nSort = new P13nSort();
 	        $p13nSort->push('score', true);   // score / discountedPrice / title_en
 	        $p13n = new P13nAdapter($p13nConfig);
 
-	        $generalConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
+	        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
             $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
             $limit = $generalConfig['quick_search_limit']==0?1000:$generalConfig['quick_search_limit'];

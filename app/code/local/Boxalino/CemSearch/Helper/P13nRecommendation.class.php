@@ -27,7 +27,7 @@ class P13nRecommendation {
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13n', true, null);
         Mage::helper('Boxalino_CemSearch')->__loadClass('Utils', true, null);
 
-        $entity_id = Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id');
+        $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
         $entityIdFieldName = 'entity_id';
 
         if(isset($entity_id) && $entity_id !== ''){

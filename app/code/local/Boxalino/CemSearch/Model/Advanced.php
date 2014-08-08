@@ -117,7 +117,7 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
     public function addFilters($values, $ids = null)
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return parent::addFilters($values, $ids);
         }
 

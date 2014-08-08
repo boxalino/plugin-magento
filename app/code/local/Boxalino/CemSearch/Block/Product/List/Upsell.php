@@ -24,7 +24,7 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
     protected function _prepareData()
     {
 
-        if(Mage::getStoreConfig('Boxalino_CemSearch/backend/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
             return parent::_prepareData();
         }
 
@@ -46,7 +46,7 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         }
 
         foreach($response as $item){
-            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')];
+            $entityIds[] = $item[Mage::getStoreConfig('Boxalino_General/search/entity_id')];
         }
 
         ###############################################################

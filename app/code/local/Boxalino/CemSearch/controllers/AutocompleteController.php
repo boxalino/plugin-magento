@@ -9,13 +9,13 @@
 			Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
 			Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 
-			$storeConfig = Mage::getStoreConfig('Boxalino_CemSearch/backend');
+			$storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
 			$p13nConfig = new P13nConfig(
 				$storeConfig['host'],
                 Mage::helper('Boxalino_CemSearch')->getAccount() ,
-				$storeConfig['username'],
-				$storeConfig['password'],
+				$storeConfig['p13n_username'],
+				$storeConfig['p13n_password'],
 				$storeConfig['domain']
 			);
 			$p13nSort = new P13nSort();
@@ -26,7 +26,6 @@
             $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
 
 			$p13n->setupInquiry($generalConfig['autocomplete'], $query, $lang, array($generalConfig['entity_id'], 'title'), $p13nSort, 0, 25);
-			//$p13n->setupInquiry('autocomplete', $query, 'en', array('entity_id', 'title'), $p13nSort, 0, 25);
 
 			$p13n->search();
 			$entities = $p13n->getEntities();
@@ -34,7 +33,6 @@
 
 			$suggestions = array();
 			$titles = array();
-//			$searchConfig = Mage::getStoreConfig('Boxalino_CemSearch/general');
 			foreach($entities as $entity){
 				if( ! in_array($entity['title'][0], $titles) &&
 					(	! isset($generalConfig['autocomplete_limit']) ||
@@ -45,8 +43,7 @@
 					$titles[] = $entity['title'][0];
 					$suggestions[] = array(
 						'value' => $entity['title'][0],
-						'data' => $entity[Mage::getStoreConfig('Boxalino_CemSearch/general/entity_id')][0]
-//						'data' => $entity['entity_id'][0]
+						'data' => $entity[Mage::getStoreConfig('Boxalino_General/search/entity_id')][0]
 					);
 				}
 
