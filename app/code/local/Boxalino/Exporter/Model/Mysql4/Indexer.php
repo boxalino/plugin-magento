@@ -59,6 +59,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $this->_websiteExport();
         $this->_closeExport();
+        die();
         return $this;
     }
 
@@ -1170,14 +1171,15 @@ XML;
         curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
 
         if($type == 'zip'){
-            curl_setopt($s, CURLOPT_FRESH_CONNECT, true);
-            curl_setopt($s, CURLOPT_TIMEOUT_MS, 1);
+//            curl_setopt($s, CURLOPT_FRESH_CONNECT, true);
+//            curl_setopt($s, CURLOPT_TIMEOUT_MS, 1);
         }
 
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
 
         $responseBody = curl_exec($s);
         curl_close($s);
+        print($responseBody);
         return $responseBody;
     }
 
