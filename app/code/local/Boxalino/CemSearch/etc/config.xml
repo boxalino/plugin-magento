@@ -146,29 +146,30 @@
 		</blocks>
 	</global>
     <default>
-        <Boxalino_CemSearch>
-            <backend>
+        <Boxalino_General>
+            <general>
                 <enabled>1</enabled>
                 <account_dev>0</account_dev>
-            </backend>
-            <general>
-                <quick_search>quick_search</quick_search>
+                <host>cdn.bx-cloud.com</host>
+            </general>
+            <search>
+                <quick_search>search</quick_search>
                 <quick_search_limit>0</quick_search_limit>
-                <advanced_search>quick_search</advanced_search>
+                <advanced_search>host</advanced_search>
                 <advanced_search_limit>0</advanced_search_limit>
                 <autocomplete>autocomplete</autocomplete>
                 <autocomplete_limit>6</autocomplete_limit>
                 <autocomplete_products_limit>3</autocomplete_products_limit>
-                <entity_id>entity_id</entity_id>
-            </general>
-	        <frontend>
+                <entity_id>id</entity_id>
+            </search>
+	        <tracker>
 		        <charset>UTF-8</charset>
 		        <enabled>1</enabled>
 		        <debug>1</debug>
 		        <analytics>1</analytics>
 		        <track_sales>1</track_sales>
-	        </frontend>
-        </Boxalino_CemSearch>
+	        </tracker>
+        </Boxalino_General>
 
         <Boxalino_Recommendation>
             <!-- CART -->

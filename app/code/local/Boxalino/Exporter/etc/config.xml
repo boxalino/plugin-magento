@@ -44,8 +44,6 @@
     <default>
         <boxalinoexporter>
             <export_data>
-                <dev_environment>0</dev_environment>
-                <enable_module>0</enable_module>
                 <maximum_population>0</maximum_population>
                 <language>en</language>
                 <export_categories>1</export_categories>

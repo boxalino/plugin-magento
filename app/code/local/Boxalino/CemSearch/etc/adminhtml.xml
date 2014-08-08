@@ -9,9 +9,9 @@
                         <children>
                             <config>
                                 <children>
-                                    <Boxalino_CemSearch>
+                                    <Boxalino_General>
                                         <title>Boxalino CEM Search</title>
-                                    </Boxalino_CemSearch>
+                                    </Boxalino_General>
                                     <Boxalino_Recommendation>
                                         <title>Boxalino Recommendation</title>
                                     </Boxalino_Recommendation>

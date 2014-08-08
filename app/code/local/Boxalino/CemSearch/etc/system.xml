@@ -8,9 +8,9 @@
         </boxalino>
     </tabs>
 	<sections>
-		<Boxalino_CemSearch translate="label" module="Boxalino_CemSearch">
+		<Boxalino_General translate="label" module="Boxalino_CemSearch">
 			<class>separator-top</class>
-			<label>Boxalino Configuration</label>
+			<label>Boxalino General Configuration</label>
 			<tab>boxalino</tab>
 			<frontend_type>text</frontend_type>
 			<sort_order>200</sort_order>
@@ -18,8 +18,8 @@
 			<show_in_website>1</show_in_website>
 			<show_in_store>1</show_in_store>
 			<groups>
-                <backend translate="label">
-                    <label>Boxalino Configuration</label>
+                <general translate="label">
+                    <label>Boxalino General Configuration</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
@@ -37,70 +37,86 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </enabled>
-                        <!-- HOST -->
-                        <host translate="label">
-                            <label>Host</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <validate>required-entry</validate>
-                        </host>
-                        <!-- ACCOUNT -->
-                        <account translate="label">
-                            <label>Account</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <validate>required-entry</validate>
-                        </account>
                         <!-- ACCOUNT DEV -->
                         <account_dev translate="label">
                             <label>Development environment</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
+                            <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </account_dev>
-                        <!-- USERNAME -->
-                        <username translate="label">
-                            <label>Username</label>
+                        <!-- DOMAIN -->
+                        <domain translate="label">
+                            <label>Domain</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </domain>
+                        <!-- HOST -->
+                        <host translate="label">
+                            <label>Host</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <validate>required-entry</validate>
-                        </username>
-                        <!-- PASSWORD -->
-                        <password translate="label">
-                            <label>Password</label>
+                        </host>
+                        <di_username translate="label">
+                            <label>Data Intelligence Username</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <validate>required-entry</validate>
-                        </password>
-                        <!-- DOMAIN -->
-                        <domain translate="label">
-                            <label>Domain</label>
+                        </di_username>
+                        <di_password translate="label">
+                            <label>Data Intelligence Password</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </domain>
+                        </di_password>
+                        <!-- ACCOUNT -->
+                        <di_account translate="label">
+                            <label>Data Intelligence Account</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <validate>required-entry</validate>
+                        </di_account>
+                        <!-- USERNAME -->
+                        <p13n_username translate="label">
+                            <label>P13n Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <validate>required-entry</validate>
+                        </p13n_username>
+                        <!-- PASSWORD -->
+                        <p13n_password translate="label">
+                            <label>P13n Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <validate>required-entry</validate>
+                        </p13n_password>
                     </fields>
-                </backend>
+                </general>
 
-				<general translate="label" module="Boxalino_CemSearch">
+				<search translate="label" module="Boxalino_CemSearch">
 					<!--<label>Recommendations Widgets</label>-->
 					<label>General Configuration</label>
 					<frontend_type>text</frontend_type>
@@ -182,8 +198,8 @@
                             <show_in_store>0</show_in_store>
                         </entity_id>
 					</fields>
-				</general>
-				<tracking translate="label" module="Boxalino_CemSearch">
+				</search>
+				<tracker translate="label" module="Boxalino_CemSearch">
 					<label>Tracking</label>
 					<frontend_type>text</frontend_type>
 					<sort_order>60</sort_order>
@@ -227,9 +243,9 @@
 							<show_in_store>0</show_in_store>
 						</charset>
 					</fields>
-				</tracking>
+				</tracker>
 			</groups>
-		</Boxalino_CemSearch>
+		</Boxalino_General>
 
         <Boxalino_Recommendation translate="label" module="Boxalino_CemSearch">
             <class>separator-top</class>
