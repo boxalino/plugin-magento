@@ -4,15 +4,15 @@
 	<default>
 		<reference name="head">
 			<action method="addItem"><type>skin_css</type><name>css/boxalinoCemSearch.css</name></action>
-			<block type="core/text" name="jquery">
-				<action method="setText"><text><![CDATA[<script src="http://cdn.bx-cloud.com/frontend/rc/js/ba.js"></script>]]></text></action>
-			</block>
 			<action method="addItem"><type>skin_js</type><name>js/boxalinoAutocomplete.js</name></action>
 			<action method="addItem"><type>skin_js</type><name>js/jquery-1.10.2.min.js</name></action>
 			<action method="addItem"><type>skin_js</type><name>js/jquery-noConflict.js</name></action>
+			<!--<action method="addItem"><type>skin_js</type><name>js/ba.js</name></action>-->
 
+            <block type="boxalino/head" name="boxalino_head" as="boxalino_head" template="boxalino/head.phtml"/>
 		</reference>
         <reference name="top.search">
+            <action method="setTemplate"><template>boxalino/catalogsearch/form.mini.phtml</template></action>
         </reference>
 	</default>
 </layout>

@@ -228,9 +228,6 @@ class BoxalinoP13nClient
 	protected function createP13n()
 	{
 		$p13n = new P13n();
-//		$p13n->setHost($this->getBigDataHost());
-//		$p13n->setPort($this->p13nServerPort);
-
 		return $p13n;
 	}
 

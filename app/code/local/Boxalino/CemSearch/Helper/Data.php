@@ -74,29 +74,10 @@
 			return ($trackSales == 1);
 		}
 
-		public function buildScript($pushes){
-			$enabled = Mage::getStoreConfig('Boxalino_General/tracker/enabled');
-			if($enabled == 1){
-				$account = Mage::getStoreConfig('Boxalino_General/general/p13n_account');
-
-				$script =  '<script type="text/javascript">' . PHP_EOL;
-				$script .= 'var _bxq = _bxq || [];'. PHP_EOL;
-				$script .= "_bxq.push(['setAccount', '" . $account . "']);". PHP_EOL;
-				if($loggedInUserId = $this->getLoggedInUserId()){
-					$script .= "_bxq.push(['setUser', '".$loggedInUserId."']);". PHP_EOL;
-				}
-				$script .= $pushes . PHP_EOL;
-				$script .= '</script>'. PHP_EOL;
-				return $script;
-			}else{
-				return '';
-			}
-		}
-
 		public function reportPageView(){
 			if($this->isAnalyticsEnabled()){
 				$script = "_bxq.push(['trackPageView']);". PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -106,7 +87,7 @@
 			if($this->isAnalyticsEnabled()){
 				$logTerm = addslashes($term);
 				$script = "_bxq.push(['trackSearch', '".$logTerm."']);". PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -115,7 +96,7 @@
 		public function reportProductView($product){
 			if($this->isAnalyticsEnabled()){
 				$script = "_bxq.push(['trackProductView', '".$product."'])" . PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -124,7 +105,7 @@
 		public function reportAddToBasket($product, $count, $price, $currency){
 			if($this->isAnalyticsEnabled()){
 				$script = "_bxq.push(['trackAddToBasket', '".$product."', ".$count.", ".$price.", '".$currency."']);". PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -133,7 +114,7 @@
 		public function reportCategoryView($categoryID){
 			if($this->isAnalyticsEnabled()){
 				$script = "_bxq.push(['trackCategoryView', '".$categoryID."'])" . PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -141,7 +122,7 @@
 		public function reportLogin($customerId){
 			if($this->isAnalyticsEnabled()){
 				$script = "_bxq.push(['trackLogin', '".$customerId."'])" . PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -169,9 +150,10 @@
                 $script .= "'trackPurchase',". PHP_EOL;
                 $script .= $price.",". PHP_EOL;
                 $script .= "'".$currency."',". PHP_EOL;
-                $script .= $productsJson."". PHP_EOL;
+                $script .= $productsJson.",". PHP_EOL;
+                $script .= $orderId."". PHP_EOL;
                 $script .= "]);". PHP_EOL;
-				return $this->buildScript($script);
+				return $script;
 			}else{
 				return '';
 			}
@@ -188,11 +170,36 @@
 
         public function getAccount(){
             $isDev = Mage::getStoreConfig('Boxalino_General/general/account_dev');
-            $account = Mage::getStoreConfig('Boxalino_General/general/p13n_account');
+            $account = Mage::getStoreConfig('Boxalino_General/general/di_account');
 
             if ($isDev) {
                 return $account . '_dev';
             }
             return $account;
+        }
+
+        public function scriptBegin()
+        {
+            $account = Mage::getStoreConfig('Boxalino_General/general/di_account');
+
+            $script =  '<script type="text/javascript">' . PHP_EOL;
+            $script .= 'var _bxq = _bxq || [];'. PHP_EOL;
+            $script .= "_bxq.push(['setAccount', '" . $account . "']);". PHP_EOL;
+
+            echo $script;
+        }
+
+        public function scriptEnd()
+        {
+            $script = "(function(){
+                    var s = document.createElement('script');
+                    s.async = 1;
+                    s.src = '//cdn.bx-cloud.com/frontend/rc/js/ba.min.js';
+                    document.getElementsByTagName('head')[0].appendChild(s);
+                    })();". PHP_EOL;
+
+            $script .= '</script>'. PHP_EOL;
+
+            echo $script;
         }
 	}

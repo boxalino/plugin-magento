@@ -12,7 +12,7 @@
 				$script = Mage::helper('Boxalino_CemSearch')->reportAddToBasket(
 					$event->getProduct()->getId(),
 					$event->getQuoteItem()->getQty(),
-					$event->getProduct()->getPrice(),
+                    $event->getProduct()->getSpecialPrice() > 0 ? $event->getProduct()->getSpecialPrice() : $event->getProduct()->getPrice(),
 					Mage::app()->getStore()->getCurrentCurrencyCode()
 				);
 				$session->addScript($script);
@@ -30,7 +30,7 @@
 				$quote = Mage::getModel('sales/quote')->load($quoteId);
 
 				$products = array();
-				$price = 0;
+				$fullPrice = 0;
 				foreach($quote->getAllItems() as $item){
 					if($item->getPrice() > 0){
 						$products[] = array(
@@ -38,9 +38,10 @@
 							'quantity' => $item->getQty(),
 							'price' => $item->getPrice()
 						);
+                        $fullPrice = $fullPrice + $item->getPrice();
 					}
 				}
-				$script = Mage::helper('Boxalino_CemSearch')->reportPurchase($products, $quoteId, $price, Mage::app()->getStore()->getCurrentCurrencyCode());
+				$script = Mage::helper('Boxalino_CemSearch')->reportPurchase($products, $quoteId, $fullPrice, Mage::app()->getStore()->getCurrentCurrencyCode());
 
 				$session = Mage::getSingleton('Boxalino_CemSearch_Model_Session');
 				$session->addScript($script);
