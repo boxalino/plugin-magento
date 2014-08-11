@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <boxalino_manager_main translate="title" module="boxalino_manager">
+            <title>Boxalino Manager</title>
+            <sort_order>89</sort_order>
+            <children>
+                <password>
+                    <title>Change Password</title>
+                    <sort_order>1</sort_order>
+                    <action>boxalino_manager/password/index</action>
+                </password>
+                <field>
+                    <title>Fields</title>
+                    <sort_order>2</sort_order>
+                    <action>boxalino_manager/field/index</action>
+                </field>
+                <task_processes>
+                    <title>Task Processes</title>
+                    <sort_order>3</sort_order>
+                    <action>boxalino_manager/task_processes/index</action>
+                </task_processes>
+                <email_campaign>
+                    <title>Email Campaigns</title>
+                    <sort_order>4</sort_order>
+                    <action>boxalino_manager/email_campaign/index</action>
+                </email_campaign>
+                <choice>
+                    <title>Choices</title>
+                    <sort_order>5</sort_order>
+                    <action>boxalino_manager/choice/index</action>
+                </choice>
+                <choice_variant>
+                    <title>Choice Variants</title>
+                    <sort_order>6</sort_order>
+                    <action>boxalino_manager/choice_variant/index</action>
+                </choice_variant>
+                <configuration>
+                    <title>Configuration</title>
+                    <sort_order>7</sort_order>
+                    <action>boxalino_manager/configuration/index</action>
+                </configuration>
+            </children>
+        </boxalino_manager_main>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <boxalino_manager_main translate="title" module="boxalino_manager">
+                        <title>Boxalino Manager</title>
+                        <sort_order>1</sort_order>
+                        <children>
+                            <password>
+                                <title>Change Password</title>
+                                <sort_order>1</sort_order>
+                            </password>
+                            <field>
+                                <title>Fields</title>
+                                <sort_order>2</sort_order>
+                            </field>
+                            <task_processes>
+                                <title>Task Processes</title>
+                                <sort_order>3</sort_order>
+                            </task_processes>
+                            <email_campaign>
+                                <title>Email Campaigns</title>
+                                <sort_order>4</sort_order>
+                            </email_campaign>
+                            <choice>
+                                <title>Choices</title>
+                                <sort_order>5</sort_order>
+                            </choice>
+                            <choice_variant>
+                                <title>Choice Variants</title>
+                                <sort_order>6</sort_order>
+                            </choice_variant>
+                            <configuration>
+                                <title>Configuration</title>
+                                <sort_order>7</sort_order>
+                            </configuration>
+                        </children>
+                    </boxalino_manager_main>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

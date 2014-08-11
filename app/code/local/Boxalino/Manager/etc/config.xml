@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Boxalino_Manager>
+            <version>1.0.0</version>
+        </Boxalino_Manager>
+    </modules>
+    <admin>
+        <routers>
+            <boxalino_manager>
+                <use>admin</use>
+                <args>
+                    <module>Boxalino_Manager</module>
+                    <frontName>boxalino_manager</frontName>
+                </args>
+            </boxalino_manager>
+        </routers>
+    </admin>
+    <global>
+        <helpers>
+            <boxalino_manager>
+                <class>Boxalino_Manager_Helper</class>
+            </boxalino_manager>
+        </helpers>
+        <models>
+            <boxalino_manager>
+                <class>Boxalino_Manager_Model</class>
+            </boxalino_manager>
+        </models>
+    </global>
+</config>

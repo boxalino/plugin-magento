@@ -2,9 +2,9 @@
 
 <config>
 	<modules>
-		<Boxalino_DataIntelligenceManager>
+		<Boxalino_Manager>
 			<active>true</active>
 			<codePool>local</codePool>
-		</Boxalino_DataIntelligenceManager>
+		</Boxalino_Manager>
 	</modules>
 </config>
