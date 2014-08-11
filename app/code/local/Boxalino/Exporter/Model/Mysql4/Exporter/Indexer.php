@@ -54,7 +54,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
      */
     protected function _getStoreProducts()
     {
-        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect(array($this->_listOfAttributes) );
+        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect($this->_listOfAttributes);
         return $products;
     }
 

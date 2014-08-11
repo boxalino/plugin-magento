@@ -59,7 +59,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $this->_websiteExport();
         $this->_closeExport();
-        die();
         return $this;
     }
 
@@ -319,7 +318,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         continue;
                     }
 
-                    if(in_array($val, $this->_tmp[$attr][$id])){
+                    if(isset($this->_tmp[$attr][$id]) && in_array($val, $this->_tmp[$attr][$id])){
                         continue;
                     }
 
@@ -380,8 +379,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 //Add categories
                 foreach($product->getCategoryIds() as $cat){
                     while($cat != null){
-                        $this->_transformedProducts['productsMtM']['categories'][] = array(/*'id' => $loop++, */'entity_id' => $id, 'category_id' => $cat);
-                        $cat = $this->_transformedCategories[$cat]['parent_id'];
+                        $this->_transformedProducts['productsMtM']['categories'][] = array('entity_id' => $id, 'category_id' => $cat);
+                        if(isset($this->_transformedCategories[$cat]['parent_id'])) {
+                            $cat = $this->_transformedCategories[$cat]['parent_id'];
+                        } else{
+                            $cat = null;
+                        }
                     }
                 }
                 $this->_count++;
@@ -607,7 +610,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //Prepare attributes
         $csvFiles = array();
-        mkdir("/tmp/boxalino");
+        if(!file_exists("/tmp/boxalino")) {
+            mkdir("/tmp/boxalino");
+        }
         $csv = new Varien_File_Csv();
 
         $helper = Mage::helper('boxalinoexporter');
@@ -806,7 +811,7 @@ XML;
         #########################################################################
 
         $attr = array_keys($this->_attributesValuesByName);
-        if($this->_storeConfig['export_tag']){
+        if($this->_storeConfig['export_tags']){
             $attr[] = 'tag';
         }
 
@@ -1045,7 +1050,7 @@ XML;
             }
         }
         //tag
-        if($this->_storeConfig['export_tag']){
+        if($this->_storeConfig['export_tags']){
             $properties[] = array(
                 'id' => 'tag',
                 'name' => 'tag',
@@ -1098,8 +1103,9 @@ XML;
      */
     protected function createZip($name, $csvFiles, $xml)
     {
-
-        @unlink($name);
+        if(file_exists($name)) {
+            @unlink($name);
+        }
 
         $this->_files[] = $name;
 
@@ -1134,12 +1140,12 @@ XML;
             "username"  => $this->_storeConfig['di_username'],
             "password"  => $this->_storeConfig['di_password'],
             "account"   => $this->_storeConfig['di_account'],
-            "dev"       => $this->_storeConfig['dev_environment']==0?'false':'true',
+            "dev"       => $this->_storeConfig['account_dev']==0?'false':'true',
             "delta"     => $this->_getIndexType()=='delta' ? "true" : "false", // I know...
-            "data"       => '@' . $file . '.zip;type=application/zip'
+            "data"       => $file . '.zip'
         );
 
-        $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['dev_environment']);
+        $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['account_dev']);
 
         return $this->pushFile($fields, $url, 'zip');
     }
@@ -1154,7 +1160,7 @@ XML;
             "xml"      => file_get_contents($file . '.xml')
         );
 
-        $url = Mage::helper('boxalinoexporter')->getXMLSyncUrl($this->_storeConfig['dev_environment']);
+        $url = Mage::helper('boxalinoexporter')->getXMLSyncUrl($this->_storeConfig['account_dev']);
 
         return $this->pushFile($fields, $url, 'xml');
 
@@ -1172,8 +1178,10 @@ XML;
         curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
 
         if($type == 'zip'){
-//            curl_setopt($s, CURLOPT_FRESH_CONNECT, true);
-//            curl_setopt($s, CURLOPT_TIMEOUT_MS, 1);
+            $fields['data'] = new CURLFile($fields['data'], 'application/zip', $fields['data']);
+            curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
+        } else {
+            curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
         }
 
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);

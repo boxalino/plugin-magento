@@ -152,20 +152,25 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         $this->_simples = array();
         $this->_configurables = array();
 
+        $simpleIds = array();
+        $parentIds = array();
         // Iterate through collection
         foreach ($connection->fetchAll($query) as $row) {
             $productId = $row['product_id'];
             $parentId = $row['parent_id'];
 
             // Set simpleIds array if not set yet for specified parent.
-            if (!isset($this->simpleIds[$parentId])) {
-                $this->simpleIds[$parentId] = array();
+            if (!isset($simpleIds[$parentId])) {
+                $simpleIds[$parentId] = array();
             }
             // Add simple product to collection of parent.
-            $this->simpleIds[$parentId][] = $productId;
+            $simpleIds[$parentId][] = $productId;
             // Add parent to simple product.
-            $this->parentId[$productId] = $parentId;
+            $parentIds[$productId] = $parentId;
         }
+
+        self::$simpleIds = $simpleIds;
+        self::$parentId = $parentIds;
     }
 
     /**
