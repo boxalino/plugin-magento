@@ -4,14 +4,7 @@
  * Created at: 16.06.14 12:29
  */
 
-/**
- * Catalog product related items block
- *
- * @category   Mage
- * @package    Mage_Catalog
- * @author      Magento Core Team <core@magentocommerce.com>
- */
-class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_Product_List_Related
+class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_Product_List_Related
 {
     /**
      * Default MAP renderer type
@@ -25,7 +18,7 @@ class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_
     protected function _prepareData()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0 ){
             return parent::_prepareData();
         }
 
@@ -63,7 +56,7 @@ class  Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_
             );
             $this->_addProductAttributesAndPrices($this->_itemCollection);
         }
-//        Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($this->_itemCollection);
+
         Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($this->_itemCollection);
 
         $this->_itemCollection->load();
