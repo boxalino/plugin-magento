@@ -103,8 +103,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
      */
     protected function _getStoreProducts()
     {
-        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect(array($this->_listOfAttributes) );
-        var_dump($products->getData());
+        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect($this->_listOfAttributes);
         return $products;
     }
 
