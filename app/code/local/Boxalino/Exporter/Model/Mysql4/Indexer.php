@@ -1142,7 +1142,7 @@ XML;
             "account"   => $this->_storeConfig['di_account'],
             "dev"       => $this->_storeConfig['account_dev']==0?'false':'true',
             "delta"     => $this->_getIndexType()=='delta' ? "true" : "false", // I know...
-            "data"       => $file . '.zip'
+            "data"       => '@' . $file . '.zip;type=application/zip'
         );
 
         $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['account_dev']);
@@ -1176,14 +1176,6 @@ XML;
         curl_setopt($s, CURLOPT_POST, true);
         curl_setopt($s, CURLOPT_ENCODING, "");
         curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
-
-        if($type == 'zip'){
-            $fields['data'] = new CURLFile($fields['data'], 'application/zip', $fields['data']);
-            curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
-        } else {
-            curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
-        }
-
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
 
         $responseBody = curl_exec($s);
