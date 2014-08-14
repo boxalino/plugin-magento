@@ -1188,7 +1188,9 @@ XML;
 
         $responseBody = curl_exec($s);
         curl_close($s);
-        print($responseBody);
+        if(strpos($responseBody, 'Internal Server Error')) {
+            Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));
+        }
         return $responseBody;
     }
 

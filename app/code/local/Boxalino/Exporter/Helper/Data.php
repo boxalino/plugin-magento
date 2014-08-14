@@ -222,4 +222,16 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         // No simple ids - return null.
         return null;
     }
+
+    public function getError($responseBody)
+    {
+        $htmlTagsToReplace = array('body', 'p', 'br');
+        $startPosition = strpos($responseBody, '<p>');
+        $endPosition = strpos($responseBody, '&lt;br&gt;')+3;
+        $error = html_entity_decode(substr($responseBody, $startPosition, $endPosition));
+        foreach($htmlTagsToReplace as $tag) {
+            $error = str_replace('<'.$tag.'>', PHP_EOL, $error);
+        }
+        return $error;
+    }
 }
