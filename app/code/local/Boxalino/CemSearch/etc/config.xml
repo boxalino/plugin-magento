@@ -155,7 +155,7 @@
             <search>
                 <quick_search>search</quick_search>
                 <quick_search_limit>0</quick_search_limit>
-                <advanced_search>host</advanced_search>
+                <advanced_search>search</advanced_search>
                 <advanced_search_limit>0</advanced_search_limit>
                 <autocomplete>autocomplete</autocomplete>
                 <autocomplete_limit>6</autocomplete_limit>

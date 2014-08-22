@@ -223,35 +223,6 @@
 					);
 				}
 			}
-
-			/*
-			foreach($this->autocompleteResponse->hits  as $hit){
-				foreach ($hit->searchResult->hits as $productsHit){
-					if(! in_array($productsHit->values['entity_id'][0], $products_ids)){
-						$products_ids[] = $productsHit->values['entity_id'][0];
-						$products[] = array(
-							'id' => $productsHit->values['entity_id'][0],
-							'score' => $productsHit->values['score'][0],
-						);
-					}
-				}
-			}
-
-			usort($products, function($a, $b){
-				if ($a['score'] == $b['score']) {
-					return 0;
-				}
-				return ($a['score'] > $b['score']) ? -1 : 1;
-			});
-
-			$products_tmp = array();
-			$i = 0;
-			foreach($products as $product){
-				if($i++ < $limit){
-					$products_tmp[] = $product['id'];
-				}
-			}
-			*/
 			return $products;
 		}
 
@@ -262,14 +233,6 @@
 			$this->inquiry->simpleSearchQuery = $this->searchQuery;
 			$this->choiceRequest->inquiries = array($this->inquiry);
 			$this->choiceResponse = $this->p13n->choose($this->choiceRequest);
-
-//            echo '<pre>';
-//            echo 'Request:<br/>';
-//            print_r($this->choiceRequest);
-//            echo '<br><br><br>Response:<br>';
-//            print_r($this->choiceResponse);
-//            echo '</pre>';
-
 		}
 
 		public function getEntitiesIds(){
@@ -280,9 +243,6 @@
 				$searchResult = $variant->searchResult;
 				foreach($searchResult->hits as $item){
 					$result[] = $item->values[Mage::getStoreConfig('Boxalino_General/search/entity_id')][0];
-
-					//print_r($item->values);
-					//echo '<br/>';
 				}
 			}
 			return $result;
