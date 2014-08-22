@@ -19,7 +19,8 @@
  *
  * @author nitro@boxalino.com
  */
-class Utils {
+class Utils
+{
     /** Start time */
     private static $startTime = 0;
 
@@ -58,17 +59,60 @@ class Utils {
 
     /** Statistics markers */
     private static $profilerMarks = array();
+    /**
+     * List of valid organic parameters
+     */
+    private static $organicReferrers = array(
+        "q" => array(
+            'alltheweb.com', 'altavista.com', 'aol.com', 'ask.com', 'bing.com', 'google', 'kvasir.no', 'msn.com', 'mynet.com', 'ozu.es', 'search.com'
+        ),
+        "query" => array(
+            'aol.com', 'lycos.com', 'mamma.com', 'netscape.com', 'terra.com'
+        ),
+        "encquery" => array(
+            'aol.com'
+        ),
+        "search_word" => array(
+            'eniro.se'
+        ),
+        "terms" => array(
+            'about.com'
+        ),
+        "p" => array(
+            'yahoo'
+        ),
+        "qs" => array(
+            'alice.com', 'virgilio.it'
+        ),
+        "rdata/" => array(
+            'voila.fr'
+        ),
+        "wd" => array(
+            'baidu.com'
+        ),
+        "words" => array(
+            'rambler.ru'
+        )
+    );
 
+    /**
+     * Constructor.
+     *
+     */
+    private function __construct()
+    {
+    }
 
     /**
      * Debug facility, prints message if debug is enabled
      *
      * @param $message string or variable to debug
      */
-    public static function debug($message) {
-        if(self::$debug) {
+    public static function debug($message)
+    {
+        if (self::$debug) {
             echo '<pre>';
-            if(is_string($message)) {
+            if (is_string($message)) {
                 echo $message;
             } else {
                 var_dump($message);
@@ -77,58 +121,13 @@ class Utils {
         }
     }
 
-
-    /**
-     * Report generic failure and abort processing
-     *
-     * @param $code error code
-     * @param $message error message
-     * @param $description error description (optional)
-     * @param $shift stack trace shift (optional)
-     */
-    public static function failure($code, $message, $description = '', $shift = 0) {
-        if (self::$failureDisplayed) {
-            return;
-        }
-
-        self::$failureDisplayed = TRUE;
-        self::removeErrorHandler();
-        self::__discardBuffer();
-
-        if (!headers_sent()) {
-            header("HTTP/1.0 $code $message");
-
-            self::sendContentHeader('text/html; charset=UTF-8');
-        }
-
-        echo("<html><head><title></title></head><body><h1>$message</h1>");
-        if (strlen($description) > 0) {
-            if (strpos($description, '<') === 0) {
-                echo($description);
-            } else {
-                echo("<p>".htmlentities($description)."</p>");
-            }
-        }
-        if (self::$verboseErrorReporting && $code >= 500 && $code < 600) {
-            if ($shift >= 0) {
-                echo("<p>Stacktrace:</p>");
-                self::printStackTrace($shift);
-            }
-            self::printErrors();
-        }
-        echo('</body></html>');
-        flush();
-
-        exit(1);
-    }
-
-
     /**
      * Setup error handler
      *
      * @param $threshold maximum logs (0 to disable)
      */
-    public static function setupErrorHandler($threshold = 0) {
+    public static function setupErrorHandler($threshold = 0)
+    {
         if ($threshold > self::$logsThreshold) {
             self::removeErrorHandler();
 
@@ -146,7 +145,8 @@ class Utils {
      * Remove error handler
      *
      */
-    public static function removeErrorHandler() {
+    public static function removeErrorHandler()
+    {
         if (self::$logsThreshold >= 0) {
             self::$logsThreshold = -1;
 
@@ -154,13 +154,13 @@ class Utils {
         }
     }
 
-
     /**
      * Get current log file
      *
      * @return log file (or NULL if none)
      */
-    public static function getErrorFile() {
+    public static function getErrorFile()
+    {
         return self::$errorFile;
     }
 
@@ -169,17 +169,18 @@ class Utils {
      *
      * @param $file log file (or NULL if none)
      */
-    public static function setErrorFile($file) {
+    public static function setErrorFile($file)
+    {
         self::$errorFile = $file;
     }
-
 
     /**
      * Get active error reporting levels
      *
      * @return error reporting levels
      */
-    public static function getErrorLevel() {
+    public static function getErrorLevel()
+    {
         return self::$errorReporting;
     }
 
@@ -188,18 +189,43 @@ class Utils {
      *
      * @param $errorReporting error reporting levels
      */
-    public static function setErrorLevel($errorReporting) {
+    public static function setErrorLevel($errorReporting)
+    {
         self::$errorReporting = $errorReporting;
     }
 
+    /**
+     * Log an exception
+     *
+     * @param $e exception
+     * @param $errno error type
+     */
+    public static function logException($e, $errno = 0)
+    {
+        $message = array(get_class($e) . ': ' . $e->getMessage());
+        while ($e->getPrevious() != NULL) {
+            $e = $e->getPrevious();
+            $message[] = get_class($e) . ': ' . $e->getMessage();
+        }
+        Utils::logError(implode(', caused by: ', $message) . ' in ' . $e->getFile() . ':' . $e->getLine(), $errno);
+    }
 
     /**
-     * Check if there are any error logs
+     * Log an error
      *
-     * @return TRUE if error(s) FALSE otherwise
+     * @param $message error message or variable
+     * @param $errno error type
      */
-    public static function hasErrors() {
-        return (self::$logsCounter > 0);
+    public static function logError($message, $errno = 0)
+    {
+        if (!is_string($message)) {
+            $message = var_export($message, TRUE);
+        }
+        if (strlen(self::$errorFile) > 0) {
+            @file_put_contents(self::$errorFile, gmstrftime('%F:%T') . ' [' . self::getErrorType($errno) . '] ' . str_replace("\n", "\\n", $message) . "\n", FILE_APPEND | LOCK_EX);
+        } else {
+            @error_log('[' . self::getErrorType($errno) . '] ' . $message . ', referrer: ' . $_SERVER['HTTP_REFERER']);
+        }
     }
 
     /**
@@ -208,7 +234,8 @@ class Utils {
      * @param $errno error type
      * @return error "human" type
      */
-    public static function getErrorType($errno) {
+    public static function getErrorType($errno)
+    {
         switch ($errno) {
             case E_PARSE:
             case E_ERROR:
@@ -237,131 +264,34 @@ class Utils {
     }
 
     /**
-     * Log an error
-     *
-     * @param $message error message or variable
-     * @param $errno error type
-     */
-    public static function logError($message, $errno = 0) {
-        if(!is_string($message)) {
-            $message = var_export($message, TRUE);
-        }
-        if (strlen(self::$errorFile) > 0) {
-            @file_put_contents(self::$errorFile, gmstrftime('%F:%T').' ['.self::getErrorType($errno).'] '.str_replace("\n", "\\n", $message)."\n", FILE_APPEND | LOCK_EX);
-        } else {
-            @error_log('['.self::getErrorType($errno).'] '.$message.', referrer: '.$_SERVER['HTTP_REFERER']);
-        }
-    }
-
-    /**
-     * Log an exception
-     *
-     * @param $e exception
-     * @param $errno error type
-     */
-    public static function logException($e, $errno = 0) {
-        $message = array(get_class($e).': '.$e->getMessage());
-        while ($e->getPrevious() != NULL) {
-            $e = $e->getPrevious();
-            $message[] = get_class($e).': '.$e->getMessage();
-        }
-        Utils::logError(implode(', caused by: ', $message).' in '.$e->getFile().':'.$e->getLine(), $errno);
-    }
-
-    /**
-     * Print stack trace
-     *
-     * @param $shift ignore top n traces
-     */
-    public static function printStackTrace($shift = 0) {
-        if (!self::$failureDisplayed) {
-            self::__discardBuffer();
-            if (!headers_sent()) {
-                header("HTTP/1.0 500 Internal Server Error");
-
-                self::sendContentHeader('text/html; charset=UTF-8');
-            }
-
-            echo("<html><head><title></title></head><body><h1>Stack trace</h1>");
-        }
-        $trace = debug_backtrace();
-        for ($i = 0; $i <= $shift; $i++) {
-            array_shift($trace);
-        }
-        if (sizeof($trace) > 0) {
-            echo('<pre>');
-            foreach ($trace as $entry) {
-                if (!isset($entry['class']) || !isset($entry['file'])) {
-                    continue;
-                }
-                echo('  '.$entry['class'].$entry['type'].$entry['function'].'(');
-                foreach ($entry['args'] as $i => $arg) {
-                    if ($i > 0) {
-                        echo(', ');
-                    }
-                    if (is_bool($arg)) {
-                        echo($arg ? 'TRUE' : 'FALSE');
-                    } else if (is_numeric($arg)) {
-                        echo($arg);
-                    } else if (is_string($arg)) {
-                        echo('"'.addslashes($arg).'"');
-                    } else if (is_object($arg)) {
-                        echo('{'.get_class($arg).'}');
-                    } else if (is_array($arg)) {
-                        echo('[array]');
-                    } else {
-                        echo($arg);
-                    }
-                }
-                echo(")\n");
-                echo('    called from '.substr($entry['file'], strlen(__DIR__) - 3).':'.$entry['line']."\n");
-            }
-            echo('</pre>');
-        }
-        if (!self::$failureDisplayed) {
-            echo('</body></html>');
-            flush();
-
-            exit(1);
-        }
-    }
-
-    /**
-     * Print error logs if any
-     *
-     */
-    public static function printErrors() {
-        if (self::$logsCounter > 0) {
-            echo("<pre>PHP errors (".self::$logsCounter."): \n");
-            foreach (self::$logs as $log) {
-                echo('  '.$log[1]."\n");
-                echo('    in '.substr($log[2], strlen(__DIR__) - 3).':'.$log[3]."\n");
-            }
-            if (sizeof(self::$logs) < self::$logsCounter) {
-                echo("\n".(self::$logsCounter - sizeof(self::$logs))." more...\n");
-            }
-            echo('</pre>');
-        }
-    }
-
-    /**
      * Flush current errors and content
      *
      */
-    public static function resetErrors() {
+    public static function resetErrors()
+    {
         self::$logs = array();
         self::$logsCounter = 0;
         self::__discardBuffer();
     }
 
-
     /**
-     * Enable profiler
+     * Flush output buffering
      *
-     * @param $enabled enabled state
+     * @param $complete TRUE to disable completely output buffering
+     * @return TRUE on success, FALSE otherwise
      */
-    public static function enableProfiler($enabled) {
-        self::$profilerEnabled = $enabled;
+    private static function __discardBuffer($complete = FALSE)
+    {
+        $level = $complete ? 0 : Utils::$obBaseLevel;
+        while (@ob_get_level() > $level) {
+            if (!@ob_end_clean()) {
+                return FALSE;
+            }
+        }
+        if ($complete) {
+            ob_implicit_flush(TRUE);
+        }
+        return TRUE;
     }
 
     /**
@@ -370,32 +300,9 @@ class Utils {
      * @param $depth lookup depth (1..n)
      * @param $forced force tracking
      */
-    public static function profileEvent($depth = 1, $forced = FALSE) {
+    public static function profileEvent($depth = 1, $forced = FALSE)
+    {
         self::profileEventLabel('-', FALSE, $depth + 1, $forced);
-    }
-
-    /**
-     * Track profiler step (begin)
-     *
-     * @param $label profiler label
-     * @param $depth lookup depth (1..n)
-     * @param $forced force tracking
-     */
-    public static function profileEventBegin($label, $depth = 1, $forced = FALSE) {
-        self::$profilerDepth++;
-        self::profileEventLabel($label, TRUE, $depth + 1, $forced);
-    }
-
-    /**
-     * Track profiler step (end)
-     *
-     * @param $label profiler label
-     * @param $depth lookup depth (1..n)
-     * @param $forced force tracking
-     */
-    public static function profileEventEnd($label, $depth = 1, $forced = FALSE) {
-        self::profileEventLabel($label, FALSE, $depth + 1, $forced);
-        self::$profilerDepth--;
     }
 
     /**
@@ -406,7 +313,8 @@ class Utils {
      * @param $depth lookup depth (1..n)
      * @param $forced force tracking
      */
-    public static function profileEventLabel($label, $block, $depth = 1, $forced = FALSE) {
+    public static function profileEventLabel($label, $block, $depth = 1, $forced = FALSE)
+    {
         if ($forced || self::$profilerEnabled) {
             if (!is_numeric($depth)) {
                 $depth = 1;
@@ -437,10 +345,37 @@ class Utils {
     }
 
     /**
+     * Track profiler step (begin)
+     *
+     * @param $label profiler label
+     * @param $depth lookup depth (1..n)
+     * @param $forced force tracking
+     */
+    public static function profileEventBegin($label, $depth = 1, $forced = FALSE)
+    {
+        self::$profilerDepth++;
+        self::profileEventLabel($label, TRUE, $depth + 1, $forced);
+    }
+
+    /**
+     * Track profiler step (end)
+     *
+     * @param $label profiler label
+     * @param $depth lookup depth (1..n)
+     * @param $forced force tracking
+     */
+    public static function profileEventEnd($label, $depth = 1, $forced = FALSE)
+    {
+        self::profileEventLabel($label, FALSE, $depth + 1, $forced);
+        self::$profilerDepth--;
+    }
+
+    /**
      * Print profiler statistics
      *
      */
-    public static function printProfilerInfos() {
+    public static function printProfilerInfos()
+    {
         if (self::$profilerEnabled) {
             echo("\n\n");
 
@@ -506,12 +441,12 @@ class Utils {
         }
     }
 
-
     /**
      * Called to print account list
      *
      */
-    public static function printAccountList() {
+    public static function printAccountList()
+    {
         self::enableProfiler(FALSE);
 
         if (!headers_sent()) {
@@ -533,13 +468,86 @@ class Utils {
         return TRUE;
     }
 
+    /**
+     * Enable profiler
+     *
+     * @param $enabled enabled state
+     */
+    public static function enableProfiler($enabled)
+    {
+        self::$profilerEnabled = $enabled;
+    }
+
+    /**
+     * Send http mime/size/cache headers to browser
+     *
+     * @param $mimeType mime-type (NULL if none)
+     * @param $allowCache allow browser to cache (in seconds, 0 to disable)
+     * @param $lastModification last modification time
+     * @param $length content length (NULL if none)
+     */
+    public static function sendContentHeader($mimeType = NULL, $allowCache = 0, $lastModification = 0, $length = NULL)
+    {
+        if (!self::__discardBuffer(TRUE)) {
+            throw new Exception('Cannot flush buffer');
+        }
+        if (headers_sent()) {
+            throw new Exception('Headers already sent');
+        }
+
+        if ($mimeType !== NULL) {
+            header('Content-Type: ' . strval($mimeType));
+        }
+        if ($length !== NULL) {
+            header('Content-Length: ' . intval($length));
+        }
+        header('X-Robots-Tag: noindex, nofollow');
+        if ($allowCache > 0) {
+            header('Pragma: ');
+            $since = self::httpIfModifiedSince();
+            if ($since !== FALSE && $lastModification === $since) {
+                header("HTTP/1.0 304 Not Modified");
+                header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModification) . ' GMT');
+                header('Cache-Control: ');
+                return FALSE;
+            }
+            header('Expires: ' . gmdate("D, d M Y H:i:s", time() + $allowCache) . ' GMT');
+            if ($lastModification > 0) {
+                header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModification) . ' GMT');
+            } else {
+                header('Last-Modified: ' . gmdate("D, d M Y H:i:s", time()) . ' GMT');
+            }
+            header('Cache-Control: public, max-age=' . $allowCache);
+        } else {
+            header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
+            header('Pragma: no-cache');
+        }
+    }
+
+    /**
+     * Get if-modified-since header
+     *
+     * @return timestamp or default value if none
+     */
+    public static function httpIfModifiedSince($defaultValue = FALSE)
+    {
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            $since = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
+            if (strpos($since, ';') > 0) {
+                $since = substr($since, 0, strpos($since, ';'));
+            }
+            return strtotime($since);
+        }
+        return $defaultValue;
+    }
 
     /**
      * Get peer remote address
      *
      * @return remote address
      */
-    public static function getRemoteAddress() {
+    public static function getRemoteAddress()
+    {
         if (Utils::requestExists('clientAddress')) {
             return Utils::requestString('clientAddress');
         }
@@ -549,15 +557,48 @@ class Utils {
         return $_SERVER['REMOTE_ADDR'];
     }
 
-
     /**
      * Check if request parameter exists
      *
      * @param $key parameter key
      * @return TRUE if exists FALSE otherwise
      */
-    public static function requestExists($key) {
+    public static function requestExists($key)
+    {
         return isset($_REQUEST[$key]);
+    }
+
+    /**
+     * Get request parameter as string
+     *
+     * @param $key parameter key
+     * @param $default default value
+     * @return parameter value or default value if doesn't exist
+     */
+    public static function requestString($key, $default = "")
+    {
+        if (isset($_REQUEST[$key])) {
+            return self::filterRawString($_REQUEST[$key]);
+        }
+        return strval($default);
+    }
+
+    /**
+     * Convert raw string
+     *
+     * @param $value raw string value
+     * @return formatted string value
+     */
+    private static function filterRawString($value)
+    {
+        $value = strval($value);
+        if (mb_detect_encoding($value) != 'UTF-8') {
+            $value = mb_convert_encoding($value, 'UTF-8');
+        }
+        if (get_magic_quotes_gpc()) {
+            return stripslashes($value);
+        }
+        return $value;
     }
 
     /**
@@ -567,7 +608,8 @@ class Utils {
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function requestBoolean($key, $default = FALSE) {
+    public static function requestBoolean($key, $default = FALSE)
+    {
         if (isset($_REQUEST[$key])) {
             $value = strtolower(self::requestString($key));
             return ($value == 'true' || $value == 'on' || floatval($value) > 0);
@@ -582,7 +624,8 @@ class Utils {
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function requestNumber($key, $default = 0) {
+    public static function requestNumber($key, $default = 0)
+    {
         if (isset($_REQUEST[$key])) {
             $value = self::requestString($key);
             if (is_numeric($value)) {
@@ -594,27 +637,14 @@ class Utils {
     }
 
     /**
-     * Get request parameter as string
-     *
-     * @param $key parameter key
-     * @param $default default value
-     * @return parameter value or default value if doesn't exist
-     */
-    public static function requestString($key, $default = "") {
-        if (isset($_REQUEST[$key])) {
-            return self::filterRawString($_REQUEST[$key]);
-        }
-        return strval($default);
-    }
-
-    /**
      * Get request parameter as string array
      *
      * @param $key parameter key
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function requestStringArray($key, $default = array()) {
+    public static function requestStringArray($key, $default = array())
+    {
         if (isset($_REQUEST[$key])) {
             $value = $_REQUEST[$key];
             if (is_array($value)) {
@@ -640,15 +670,28 @@ class Utils {
         return $array;
     }
 
-
     /**
-     * Check if context parameter exists
+     * Convert array
      *
-     * @param $key parameter key
-     * @return TRUE if exists FALSE otherwise
+     * @param $value raw array
+     * @return formatted array
      */
-    public static function contextExists($key) {
-        return (self::requestExists($key) || isset($_COOKIE[$key]));
+    private static function filterArray($value)
+    {
+        if (is_array($value)) {
+            $numeric = FALSE;
+            $array = array();
+            foreach ($value as $key => $item) {
+                $key = self::filterRawString($key);
+                $numeric = $numeric || is_numeric($key);
+                $array[$key] = self::filterArray($item);
+            }
+            if ($numeric) {
+                ksort($array);
+            }
+            return $array;
+        }
+        return self::filterRawString($value);
     }
 
     /**
@@ -658,12 +701,41 @@ class Utils {
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function contextBoolean($key, $default = FALSE) {
+    public static function contextBoolean($key, $default = FALSE)
+    {
         if (self::contextExists($key)) {
             $value = strtolower(self::contextString($key));
             return ($value == 'true' || $value == 'on' || floatval($value) > 0);
         }
         return $default;
+    }
+
+    /**
+     * Check if context parameter exists
+     *
+     * @param $key parameter key
+     * @return TRUE if exists FALSE otherwise
+     */
+    public static function contextExists($key)
+    {
+        return (self::requestExists($key) || isset($_COOKIE[$key]));
+    }
+
+    /**
+     * Get context parameter as string
+     *
+     * @param $key parameter key
+     * @param $default default value
+     * @return parameter value or default value if doesn't exist
+     */
+    public static function contextString($key, $default = "")
+    {
+        if (isset($_REQUEST[$key])) {
+            return self::filterRawString($_REQUEST[$key]);
+        } else if (isset($_COOKIE[$key])) {
+            return self::filterRawString($_COOKIE[$key]);
+        }
+        return strval($default);
     }
 
     /**
@@ -673,7 +745,8 @@ class Utils {
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function contextNumber($key, $default = 0) {
+    public static function contextNumber($key, $default = 0)
+    {
         if (self::contextExists($key)) {
             $value = self::contextString($key);
             if (is_numeric($value)) {
@@ -685,29 +758,14 @@ class Utils {
     }
 
     /**
-     * Get context parameter as string
-     *
-     * @param $key parameter key
-     * @param $default default value
-     * @return parameter value or default value if doesn't exist
-     */
-    public static function contextString($key, $default = "") {
-        if (isset($_REQUEST[$key])) {
-            return self::filterRawString($_REQUEST[$key]);
-        } else if (isset($_COOKIE[$key])) {
-            return self::filterRawString($_COOKIE[$key]);
-        }
-        return strval($default);
-    }
-
-    /**
      * Get context parameter as string array
      *
      * @param $key parameter key
      * @param $default default value
      * @return parameter value or default value if doesn't exist
      */
-    public static function contextStringArray($key, $default = array()) {
+    public static function contextStringArray($key, $default = array())
+    {
         $array = array();
         if (self::contextExists($key)) {
             if (isset($_REQUEST[$key])) {
@@ -730,7 +788,6 @@ class Utils {
         return $array;
     }
 
-
     /**
      * Check if the source string starts with value.
      *
@@ -738,7 +795,8 @@ class Utils {
      * @param $value value to find
      * @return TRUE if source starts with value, FALSE otherwise
      */
-    public static function startsWith($source, $value) {
+    public static function startsWith($source, $value)
+    {
         return (strpos($source, $value) === 0);
     }
 
@@ -749,7 +807,8 @@ class Utils {
      * @param $value value to find
      * @return TRUE if source ends with value, FALSE otherwise
      */
-    public static function endsWith($source, $value) {
+    public static function endsWith($source, $value)
+    {
         $index = strrpos($source, $value);
         return ($index !== FALSE && $index == (strlen($source) - strlen($value)));
     }
@@ -761,7 +820,8 @@ class Utils {
      * @param $value value to find
      * @return trimmed source
      */
-    public static function stripEnding($source, $value) {
+    public static function stripEnding($source, $value)
+    {
         $index = strrpos($source, $value);
         $index2 = strlen($source) - strlen($value);
         if ($index !== FALSE && $index == $index2) {
@@ -776,7 +836,8 @@ class Utils {
      * @param $value input value
      * @return cleaned up value
      */
-    public static function asLogChunk($value) {
+    public static function asLogChunk($value)
+    {
         $value = strtr(
             $value,
             array(
@@ -790,7 +851,6 @@ class Utils {
         return $value;
     }
 
-
     /**
      * Build url with parameters
      *
@@ -799,10 +859,10 @@ class Utils {
      * @param $fragment url fragment
      * @return full uri
      */
-    public static function buildUrl($uri, $parameters = array(), $fragment = NULL) {
+    public static function buildUrl($uri, $parameters = array(), $fragment = NULL)
+    {
         return CEM_HttpClient::buildUrl($uri, $parameters, $fragment);
     }
-
 
     /**
      * Build alpha-numeric identifier (a-zA-Z0-9_)
@@ -810,10 +870,10 @@ class Utils {
      * @param $value raw value
      * @return identifier value
      */
-    public static function buildIdentifier($value) {
+    public static function buildIdentifier($value)
+    {
         return preg_replace('/[^a-zA-Z0-9_]/', '_', $value);
     }
-
 
     /**
      * Build ISO8601 date format (YYYY-mm-dd'T'HH:ii:ss.sss+0000)
@@ -821,7 +881,8 @@ class Utils {
      * @param $value gmt timestamp
      * @return data string
      */
-    public static function buildDateISO8601($value = NULL) {
+    public static function buildDateISO8601($value = NULL)
+    {
         return gmdate('Y-m-d\TH:i:s.000O', $value !== NULL ? $value : time());
     }
 
@@ -831,7 +892,8 @@ class Utils {
      * @param $value date string
      * @return gmt timestamp
      */
-    public static function parseDateISO8601($value) {
+    public static function parseDateISO8601($value)
+    {
         if (preg_match('/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).(\d{3})([+\-])(\d{2})(\d{2})$/', $value, $matches)) {
             $delta = intval($matches[9]) * 60 * 60 + intval($matches[10]) * 60;
             if ($matches[8] == '-') {
@@ -848,47 +910,11 @@ class Utils {
      * @param $value date string
      * @return gmt timestamp
      */
-    public static function parseSQLDate($value) {
+    public static function parseSQLDate($value)
+    {
         $time = strptime($value, '%Y-%m-%d %H:%M:%S');
         return gmmktime($time['tm_hour'], $time['tm_min'], $time['tm_sec'], $time['tm_mon'] + 1, $time['tm_mday'], $time['tm_year'] + 1900);
     }
-
-
-    /**
-     * List of valid organic parameters
-     */
-    private static $organicReferrers = array(
-        "q" => array(
-            'alltheweb.com', 'altavista.com', 'aol.com', 'ask.com', 'bing.com', 'google', 'kvasir.no', 'msn.com', 'mynet.com', 'ozu.es', 'search.com'
-        ),
-        "query" => array(
-            'aol.com', 'lycos.com', 'mamma.com', 'netscape.com', 'terra.com'
-        ),
-        "encquery" => array(
-            'aol.com'
-        ),
-        "search_word" => array(
-            'eniro.se'
-        ),
-        "terms" => array(
-            'about.com'
-        ),
-        "p" => array(
-            'yahoo'
-        ),
-        "qs" => array(
-            'alice.com', 'virgilio.it'
-        ),
-        "rdata/" => array(
-            'voila.fr'
-        ),
-        "wd" => array(
-            'baidu.com'
-        ),
-        "words" => array(
-            'rambler.ru'
-        )
-    );
 
     /**
      * Extract organic query from referrer.
@@ -896,7 +922,8 @@ class Utils {
      * @param $referrer http referrer url
      * @return list(recognizedOrganicQuery, organicQuery)
      */
-    public static function extractOrganicQuery($referrer) {
+    public static function extractOrganicQuery($referrer)
+    {
         if (!preg_match('/^([a-zA-Z]+):\/\/([a-zA-Z0-9.:_-]+)(\/[^?]+)?(.+)?$/i', $referrer, $matches)) {
             return array(FALSE, FALSE);
         }
@@ -928,6 +955,25 @@ class Utils {
         return array(FALSE, $query);
     }
 
+    /**
+     * Send given file to browser
+     *
+     * @param $path file path with extension
+     * @param $allowCache allow browser to cache (in seconds)
+     * @param $mimeType mime type
+     * @return TRUE on success, FALSE on failure
+     */
+    public static function sendFile($path, $allowCache = 60, $mimeType = NULL)
+    {
+        if ($mimeType === NULL) {
+            $mimeType = self::findMimeType($path);
+            if (strpos($mimeType, 'text/') === 0) {
+                $mimeType .= '; charset=UTF-8';
+            }
+        }
+        self::sendContentHeader($mimeType, $allowCache, filemtime($path), filesize($path));
+        return (readfile($path) !== FALSE);
+    }
 
     /**
      * Find file mime type based on file extension
@@ -935,7 +981,8 @@ class Utils {
      * @param $path file path with extension
      * @return mime type
      */
-    public static function findMimeType($path) {
+    public static function findMimeType($path)
+    {
         $length = strlen($path);
         $slash = strrpos($path, '/');
         $extension = strrpos($path, '.');
@@ -970,87 +1017,6 @@ class Utils {
     }
 
     /**
-     * Get if-modified-since header
-     *
-     * @return timestamp or default value if none
-     */
-    public static function httpIfModifiedSince($defaultValue = FALSE) {
-        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-            $since = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
-            if (strpos($since, ';') > 0) {
-                $since = substr($since, 0, strpos($since, ';'));
-            }
-            return strtotime($since);
-        }
-        return $defaultValue;
-    }
-
-    /**
-     * Send http mime/size/cache headers to browser
-     *
-     * @param $mimeType mime-type (NULL if none)
-     * @param $allowCache allow browser to cache (in seconds, 0 to disable)
-     * @param $lastModification last modification time
-     * @param $length content length (NULL if none)
-     */
-    public static function sendContentHeader($mimeType = NULL, $allowCache = 0, $lastModification = 0, $length = NULL) {
-        if (!self::__discardBuffer(TRUE)) {
-            throw new Exception('Cannot flush buffer');
-        }
-        if (headers_sent()) {
-            throw new Exception('Headers already sent');
-        }
-
-        if ($mimeType !== NULL) {
-            header('Content-Type: '.strval($mimeType));
-        }
-        if ($length !== NULL) {
-            header('Content-Length: '.intval($length));
-        }
-        header('X-Robots-Tag: noindex, nofollow');
-        if ($allowCache > 0) {
-            header('Pragma: ');
-            $since = self::httpIfModifiedSince();
-            if ($since !== FALSE && $lastModification === $since) {
-                header("HTTP/1.0 304 Not Modified");
-                header('Last-Modified: '.gmdate('D, d M Y H:i:s', $lastModification).' GMT');
-                header('Cache-Control: ');
-                return FALSE;
-            }
-            header('Expires: '.gmdate("D, d M Y H:i:s", time() + $allowCache).' GMT');
-            if ($lastModification > 0) {
-                header('Last-Modified: '.gmdate('D, d M Y H:i:s', $lastModification).' GMT');
-            } else {
-                header('Last-Modified: '.gmdate("D, d M Y H:i:s", time()).' GMT');
-            }
-            header('Cache-Control: public, max-age='.$allowCache);
-        } else {
-            header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
-            header('Pragma: no-cache');
-        }
-    }
-
-    /**
-     * Send given file to browser
-     *
-     * @param $path file path with extension
-     * @param $allowCache allow browser to cache (in seconds)
-     * @param $mimeType mime type
-     * @return TRUE on success, FALSE on failure
-     */
-    public static function sendFile($path, $allowCache = 60, $mimeType = NULL) {
-        if ($mimeType === NULL) {
-            $mimeType = self::findMimeType($path);
-            if (strpos($mimeType, 'text/') === 0) {
-                $mimeType .= '; charset=UTF-8';
-            }
-        }
-        self::sendContentHeader($mimeType, $allowCache, filemtime($path), filesize($path));
-        return (readfile($path) !== FALSE);
-    }
-
-
-    /**
      * Authenticate user (http-auth)
      *
      * @param $callback authentication callback (receive user and password and returns TRUE when matched)
@@ -1058,14 +1024,16 @@ class Utils {
      * @param $realm authentication realm
      * @return TRUE if authentication succeeded, FALSE otherwise
      */
-    public static function httpAuthenticate($callback, $advertise = TRUE, $realm = 'Protected Resource Access') {
+    public static function httpAuthenticate($callback, $advertise = TRUE, $realm = 'Protected Resource Access')
+    {
         if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']) &&
-            call_user_func($callback, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+            call_user_func($callback, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])
+        ) {
             return TRUE;
         }
         if ($advertise) {
             header('HTTP/1.0 401 Unauthorized');
-            header('WWW-Authenticate: Basic realm="'.$realm.'"');
+            header('WWW-Authenticate: Basic realm="' . $realm . '"');
             exit(0);
         }
         return FALSE;
@@ -1078,20 +1046,21 @@ class Utils {
      * @param $rootPath root path (must exists)
      * @param $path path to check
      */
-    public static function assertPathSandbox($rootPath, $path) {
+    public static function assertPathSandbox($rootPath, $path)
+    {
         if (!file_exists($rootPath) || !is_dir($rootPath)) {
-            throw new Exception("Invalid root path: ".$rootPath);
+            throw new Exception("Invalid root path: " . $rootPath);
         }
         $realPath = realpath($path);
         while ($realPath === FALSE) {
-            $path = dirname($path.'name');
+            $path = dirname($path . 'name');
             if (strlen($path) <= 1) {
-                throw new Exception("Invalid path: ".$path);
+                throw new Exception("Invalid path: " . $path);
             }
             $realPath = realpath($path);
         }
         if (strpos($realPath, realpath($rootPath)) !== 0) {
-            throw new Exception("Invalid path: ".$path);
+            throw new Exception("Invalid path: " . $path);
         }
     }
 
@@ -1102,24 +1071,27 @@ class Utils {
      * @param $files directory content
      * @return TRUE on success, FALSE on failure
      */
-    public static function checkTree($path, $files) {
+    public static function checkTree($path, $files)
+    {
         foreach ($files as $itemPath => $info) {
             switch ($info['type']) {
                 case 'directory':
-                    if (!is_dir($path.$itemPath)) {
+                    if (!is_dir($path . $itemPath)) {
                         return FALSE;
                     }
                     break;
                 case 'file':
-                    if (!is_file($path.$itemPath) ||
-                        filesize($path.$itemPath) != $info['size'] ||
-                        strcasecmp(sha1_file($path.$itemPath), $info['checksum']) != 0) {
+                    if (!is_file($path . $itemPath) ||
+                        filesize($path . $itemPath) != $info['size'] ||
+                        strcasecmp(sha1_file($path . $itemPath), $info['checksum']) != 0
+                    ) {
                         return FALSE;
                     }
                     break;
                 case 'link':
-                    if (!is_link($path.$itemPath) ||
-                        strcmp(readlink($path.$itemPath), $path.$info['target']) != 0) {
+                    if (!is_link($path . $itemPath) ||
+                        strcmp(readlink($path . $itemPath), $path . $info['target']) != 0
+                    ) {
                         return FALSE;
                     }
                     break;
@@ -1135,25 +1107,28 @@ class Utils {
      * @param $files directory content
      * @return TRUE on success, FALSE on failure
      */
-    public static function applyTree($path, $files) {
+    public static function applyTree($path, $files)
+    {
         foreach ($files as $itemPath => $info) {
             switch ($info['type']) {
                 case 'directory':
-                    if (!is_dir($path.$itemPath)) {
+                    if (!is_dir($path . $itemPath)) {
                         return FALSE;
                     }
                     break;
                 case 'file':
-                    if (!is_file($path.$itemPath) ||
-                        !touch($path.$itemPath, $info['mtime']) ||
-                        filesize($path.$itemPath) != $info['size'] ||
-                        strcasecmp(sha1_file($path.$itemPath), $info['checksum']) != 0) {
+                    if (!is_file($path . $itemPath) ||
+                        !touch($path . $itemPath, $info['mtime']) ||
+                        filesize($path . $itemPath) != $info['size'] ||
+                        strcasecmp(sha1_file($path . $itemPath), $info['checksum']) != 0
+                    ) {
                         return FALSE;
                     }
                     break;
                 case 'link':
-                    if (!is_link($path.$itemPath) ||
-                        strcmp(readlink($path.$itemPath), $path.$info['target']) != 0) {
+                    if (!is_link($path . $itemPath) ||
+                        strcmp(readlink($path . $itemPath), $path . $info['target']) != 0
+                    ) {
                         return FALSE;
                     }
                     break;
@@ -1170,7 +1145,8 @@ class Utils {
      * @param $previous previous content
      * @return directory content
      */
-    public static function listTree($path, $pathPrefix = FALSE, $previous = array()) {
+    public static function listTree($path, $pathPrefix = FALSE, $previous = array())
+    {
         $list = array();
         if (is_dir($path)) {
             $dh = opendir($path);
@@ -1179,7 +1155,7 @@ class Utils {
                     if ($item == '.' || $item == '..') {
                         continue;
                     }
-                    $itemPath = $path.'/'.$item;
+                    $itemPath = $path . '/' . $item;
                     if ($pathPrefix && strpos($itemPath, $pathPrefix) === 0) {
                         $keyPath = substr($itemPath, strlen($pathPrefix));
                     } else {
@@ -1199,7 +1175,8 @@ class Utils {
                     } else if (is_file($itemPath)) {
                         if (isset($previous[$keyPath]) && $previous[$keyPath]['type'] == 'file' &&
                             $previous[$keyPath]['mtime'] == filemtime($itemPath) &&
-                            $previous[$keyPath]['size'] == filesize($itemPath)) {
+                            $previous[$keyPath]['size'] == filesize($itemPath)
+                        ) {
                             $checksum = $previous[$keyPath]['checksum'];
                         } else {
                             $checksum = sha1_file($itemPath);
@@ -1228,7 +1205,8 @@ class Utils {
      * @param $override override flag
      * @return TRUE on success, FALSE on failure
      */
-    public static function copyTree($src, $dst, $dirMode = 02777, $fileMode = 0666, $override = TRUE) {
+    public static function copyTree($src, $dst, $dirMode = 02777, $fileMode = 0666, $override = TRUE)
+    {
         if (!is_dir($src) || !is_dir($dst)) {
             return FALSE;
         }
@@ -1241,8 +1219,8 @@ class Utils {
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            $srcPath = $src.'/'.$item;
-            $dstPath = $dst.'/'.$item;
+            $srcPath = $src . '/' . $item;
+            $dstPath = $dst . '/' . $item;
             if (is_dir($srcPath)) {
                 if (file_exists($dstPath) && !is_dir($dstPath)) {
                     return FALSE;
@@ -1285,7 +1263,8 @@ class Utils {
      * @param $self delete also source path itself
      * @return TRUE on success, FALSE on failure
      */
-    public static function deleteTree($src, $self = TRUE) {
+    public static function deleteTree($src, $self = TRUE)
+    {
         if (!is_dir($src)) {
             return FALSE;
         }
@@ -1298,7 +1277,7 @@ class Utils {
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            $srcPath = $src.'/'.$item;
+            $srcPath = $src . '/' . $item;
             if (is_dir($srcPath)) {
                 if (!self::deleteTree($srcPath, TRUE)) {
                     return FALSE;
@@ -1327,7 +1306,8 @@ class Utils {
      * @param $dst destination zip file
      * @return TRUE on success, FALSE on failure
      */
-    public static function packTree($src, $dst) {
+    public static function packTree($src, $dst)
+    {
         $zip = new ZipArchive();
         if (!$zip->open($dst, ZipArchive::CREATE)) {
             return FALSE;
@@ -1350,7 +1330,8 @@ class Utils {
      * @param $dstPrefix destination path prefix
      * @return TRUE on success, FALSE on failure
      */
-    private static function packTreeNode($src, $zip, $dstPrefix) {
+    private static function packTreeNode($src, $zip, $dstPrefix)
+    {
         if (!is_dir($src)) {
             return FALSE;
         }
@@ -1363,16 +1344,16 @@ class Utils {
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            $srcPath = $src.'/'.$item;
+            $srcPath = $src . '/' . $item;
             if (is_dir($srcPath)) {
-                if (!$zip->addEmptyDir($dstPrefix.$item)) {
+                if (!$zip->addEmptyDir($dstPrefix . $item)) {
                     return FALSE;
                 }
-                if (!self::packTreeNode($srcPath, $zip, $dstPrefix.$item.'/')) {
+                if (!self::packTreeNode($srcPath, $zip, $dstPrefix . $item . '/')) {
                     return FALSE;
                 }
             } else if (is_file($srcPath)) {
-                if (!$zip->addFile($srcPath, $dstPrefix.$item)) {
+                if (!$zip->addFile($srcPath, $dstPrefix . $item)) {
                     return FALSE;
                 }
             } else {
@@ -1391,7 +1372,8 @@ class Utils {
      * @param $dst destination path
      * @return TRUE on success, FALSE on failure
      */
-    public static function unpackTree($src, $dst) {
+    public static function unpackTree($src, $dst)
+    {
         if (!is_dir($dst)) {
             return FALSE;
         }
@@ -1419,7 +1401,8 @@ class Utils {
      * @param $merge replace element in table if TRUE or just append new element if FALSE
      * @return TRUE on success, FALSE on failure
      */
-    public static function loadCSVIntoTable($path, $table, $merge = FALSE) {
+    public static function loadCSVIntoTable($path, $table, $merge = FALSE)
+    {
         $sql = SQLConnection::create();
 
         $f = @fopen($path, 'r');
@@ -1438,11 +1421,11 @@ class Utils {
                 $parameters[] = '?';
             }
             if ($merge) {
-                if (!$sql->update('REPLACE INTO `'.$table.'` VALUES ( '.implode(', ', $parameters). ' )', $line)) {
+                if (!$sql->update('REPLACE INTO `' . $table . '` VALUES ( ' . implode(', ', $parameters) . ' )', $line)) {
                     $success = FALSE;
                 }
             } else {
-                if (!$sql->update('INSERT IGNORE INTO `'.$table.'` VALUES ( '.implode(', ', $parameters). ' )', $line)) {
+                if (!$sql->update('INSERT IGNORE INTO `' . $table . '` VALUES ( ' . implode(', ', $parameters) . ' )', $line)) {
                     $success = FALSE;
                 }
             }
@@ -1459,7 +1442,8 @@ class Utils {
      * @param $path CSV file path
      * @return TRUE on success, FALSE on failure
      */
-    public static function saveTableIntoCSV($table, $orderBy, $path) {
+    public static function saveTableIntoCSV($table, $orderBy, $path)
+    {
         $sql = SQLConnection::create();
 
         $f = @fopen($path, 'w');
@@ -1467,7 +1451,7 @@ class Utils {
             return FALSE;
         }
         $success = TRUE;
-        if ($sql->query('SELECT * FROM `'.$table.'` ORDER BY `'.$orderBy.'` ASC')) {
+        if ($sql->query('SELECT * FROM `' . $table . '` ORDER BY `' . $orderBy . '` ASC')) {
             while ($row = $sql->next()) {
                 $list = array();
                 foreach ($row as $cell) {
@@ -1496,31 +1480,32 @@ class Utils {
      * @param $path target file path or NULL
      * @return TRUE on success, FALSE on failure
      */
-    public static function storeCSV($db, $table, $fields, $primaryKey = array(), $path = NULL) {
+    public static function storeCSV($db, $table, $fields, $primaryKey = array(), $path = NULL)
+    {
         if (!$db->beginTransaction()) {
             return FALSE;
         }
-        $db->exec('DROP TABLE IF EXISTS `'.$table.'`');
+        $db->exec('DROP TABLE IF EXISTS `' . $table . '`');
         $sql = array();
         foreach ($fields as $field => $definition) {
-            $sql[] = '`'.$field.'` '.$definition;
+            $sql[] = '`' . $field . '` ' . $definition;
         }
         if (sizeof($primaryKey) > 0) {
             $sql2 = array();
             foreach ($primaryKey as $field => $definition) {
-                $sql2[] = '`'.$field.'` '.$definition;
+                $sql2[] = '`' . $field . '` ' . $definition;
             }
-            $sql[] = 'PRIMARY KEY ( '.implode(', ', $sql2).' )';
+            $sql[] = 'PRIMARY KEY ( ' . implode(', ', $sql2) . ' )';
         }
-        if ($db->exec('CREATE TABLE `'.$table.'` ( '.implode(', ', $sql).' )') === FALSE) {
+        if ($db->exec('CREATE TABLE `' . $table . '` ( ' . implode(', ', $sql) . ' )') === FALSE) {
             $db->rollBack();
             return FALSE;
         }
-        if ($db->exec('DELETE FROM `'.$table.'`') === FALSE) {
+        if ($db->exec('DELETE FROM `' . $table . '`') === FALSE) {
             $db->rollBack();
             return FALSE;
         }
-        if (!($st = $db->prepare('INSERT INTO `'.$table.'` VALUES ( '.implode(', ', array_fill(0, sizeof($fields), '?')).' )'))) {
+        if (!($st = $db->prepare('INSERT INTO `' . $table . '` VALUES ( ' . implode(', ', array_fill(0, sizeof($fields), '?')) . ' )'))) {
             $db->rollBack();
             return FALSE;
         }
@@ -1570,11 +1555,12 @@ class Utils {
      * @param $value input string
      * @return filtered string
      */
-    public static function filterXmlString($value) {
+    public static function filterXmlString($value)
+    {
         return strtr(
             $value,
             array(
-                "\0"   => '',
+                "\0" => '',
                 "\x01" => '&#x01;',
                 "\x02" => '&#x02;',
                 "\x03" => '&#x03;',
@@ -1611,57 +1597,17 @@ class Utils {
     }
 
     /**
-     * Convert array
-     *
-     * @param $value raw array
-     * @return formatted array
-     */
-    private static function filterArray($value) {
-        if (is_array($value)) {
-            $numeric = FALSE;
-            $array = array();
-            foreach ($value as $key => $item) {
-                $key = self::filterRawString($key);
-                $numeric = $numeric || is_numeric($key);
-                $array[$key] = self::filterArray($item);
-            }
-            if ($numeric) {
-                ksort($array);
-            }
-            return $array;
-        }
-        return self::filterRawString($value);
-    }
-
-    /**
-     * Convert raw string
-     *
-     * @param $value raw string value
-     * @return formatted string value
-     */
-    private static function filterRawString($value) {
-        $value = strval($value);
-        if (mb_detect_encoding($value) != 'UTF-8') {
-            $value = mb_convert_encoding($value, 'UTF-8');
-        }
-        if (get_magic_quotes_gpc()) {
-            return stripslashes($value);
-        }
-        return $value;
-    }
-
-
-    /**
      * Load a file from given url (overrides local file only on success).
      *
      * @param $path target path (local storage)
      * @param $url source url (remote)
      * @return TRUE on success, FALSE on failure
      */
-    public static function loadFileFromUrl($path, $url) {
+    public static function loadFileFromUrl($path, $url)
+    {
         $client = new CEM_HttpClient(FALSE, FALSE, 5000, 15000);
         if ($client->getAndSave($url) != 200) {
-            Utils::logError('cannot load file: '.$url);
+            Utils::logError('cannot load file: ' . $url);
             $client->removeFile();
             return FALSE;
         }
@@ -1675,7 +1621,6 @@ class Utils {
         return TRUE;
     }
 
-
     /**
      * Proxy current request to remote server
      *
@@ -1684,18 +1629,19 @@ class Utils {
      * @param $password destination password for authentication (optional)
      * @return TRUE on success, FALSE on failure
      */
-    public static function proxyRequest($url, $username = FALSE, $password = FALSE) {
+    public static function proxyRequest($url, $username = FALSE, $password = FALSE)
+    {
         $proxy = new CEM_SimpleProxy($username, $password);
         $proxy->sendRequest($url);
         return $proxy->writeResponse();
     }
 
-
     /**
      * Called at the bottom of the file (internal)
      *
      */
-    public static function __init() {
+    public static function __init()
+    {
         self::$errorReporting = error_reporting();
         self::$startTime = microtime(TRUE);
         self::$obBaseLevel = ob_get_level();
@@ -1711,7 +1657,8 @@ class Utils {
      * Called by php when the script ends
      *
      */
-    public static function __trackShutdown() {
+    public static function __trackShutdown()
+    {
         /*	 $error = error_get_last();
         if ($error && (self::$errorReporting & $error['type'] & (E_ERROR | E_CORE_ERROR | E_USER_ERROR)) !== 0) {
         self::logError($error['message'].' in '.$error['file'].':'.$error['line'], $error['type']);
@@ -1727,23 +1674,157 @@ class Utils {
     }
 
     /**
+     * Check if there are any error logs
+     *
+     * @return TRUE if error(s) FALSE otherwise
+     */
+    public static function hasErrors()
+    {
+        return (self::$logsCounter > 0);
+    }
+
+    /**
+     * Report generic failure and abort processing
+     *
+     * @param $code error code
+     * @param $message error message
+     * @param $description error description (optional)
+     * @param $shift stack trace shift (optional)
+     */
+    public static function failure($code, $message, $description = '', $shift = 0)
+    {
+        if (self::$failureDisplayed) {
+            return;
+        }
+
+        self::$failureDisplayed = TRUE;
+        self::removeErrorHandler();
+        self::__discardBuffer();
+
+        if (!headers_sent()) {
+            header("HTTP/1.0 $code $message");
+
+            self::sendContentHeader('text/html; charset=UTF-8');
+        }
+
+        echo("<html><head><title></title></head><body><h1>$message</h1>");
+        if (strlen($description) > 0) {
+            if (strpos($description, '<') === 0) {
+                echo($description);
+            } else {
+                echo("<p>" . htmlentities($description) . "</p>");
+            }
+        }
+        if (self::$verboseErrorReporting && $code >= 500 && $code < 600) {
+            if ($shift >= 0) {
+                echo("<p>Stacktrace:</p>");
+                self::printStackTrace($shift);
+            }
+            self::printErrors();
+        }
+        echo('</body></html>');
+        flush();
+
+        exit(1);
+    }
+
+    /**
+     * Print stack trace
+     *
+     * @param $shift ignore top n traces
+     */
+    public static function printStackTrace($shift = 0)
+    {
+        if (!self::$failureDisplayed) {
+            self::__discardBuffer();
+            if (!headers_sent()) {
+                header("HTTP/1.0 500 Internal Server Error");
+
+                self::sendContentHeader('text/html; charset=UTF-8');
+            }
+
+            echo("<html><head><title></title></head><body><h1>Stack trace</h1>");
+        }
+        $trace = debug_backtrace();
+        for ($i = 0; $i <= $shift; $i++) {
+            array_shift($trace);
+        }
+        if (sizeof($trace) > 0) {
+            echo('<pre>');
+            foreach ($trace as $entry) {
+                if (!isset($entry['class']) || !isset($entry['file'])) {
+                    continue;
+                }
+                echo('  ' . $entry['class'] . $entry['type'] . $entry['function'] . '(');
+                foreach ($entry['args'] as $i => $arg) {
+                    if ($i > 0) {
+                        echo(', ');
+                    }
+                    if (is_bool($arg)) {
+                        echo($arg ? 'TRUE' : 'FALSE');
+                    } else if (is_numeric($arg)) {
+                        echo($arg);
+                    } else if (is_string($arg)) {
+                        echo('"' . addslashes($arg) . '"');
+                    } else if (is_object($arg)) {
+                        echo('{' . get_class($arg) . '}');
+                    } else if (is_array($arg)) {
+                        echo('[array]');
+                    } else {
+                        echo($arg);
+                    }
+                }
+                echo(")\n");
+                echo('    called from ' . substr($entry['file'], strlen(__DIR__) - 3) . ':' . $entry['line'] . "\n");
+            }
+            echo('</pre>');
+        }
+        if (!self::$failureDisplayed) {
+            echo('</body></html>');
+            flush();
+
+            exit(1);
+        }
+    }
+
+    /**
+     * Print error logs if any
+     *
+     */
+    public static function printErrors()
+    {
+        if (self::$logsCounter > 0) {
+            echo("<pre>PHP errors (" . self::$logsCounter . "): \n");
+            foreach (self::$logs as $log) {
+                echo('  ' . $log[1] . "\n");
+                echo('    in ' . substr($log[2], strlen(__DIR__) - 3) . ':' . $log[3] . "\n");
+            }
+            if (sizeof(self::$logs) < self::$logsCounter) {
+                echo("\n" . (self::$logsCounter - sizeof(self::$logs)) . " more...\n");
+            }
+            echo('</pre>');
+        }
+    }
+
+    /**
      * Called by php when an exception occurs
      *
      * @param $exception exception
      */
-    public static function __trackException($exception) {
+    public static function __trackException($exception)
+    {
         while ($exception->getPrevious() != NULL) {
             $exception = $exception->getPrevious();
         }
 
         if ((self::$errorReporting & E_ERROR) === E_ERROR) {
-            self::logError(get_class($exception).': '.$exception->getMessage().' in '.$exception->getFile().':'.$exception->getLine().' ('.$exception->getTraceAsString().')', E_USER_ERROR);
+            self::logError(get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ':' . $exception->getLine() . ' (' . $exception->getTraceAsString() . ')', E_USER_ERROR);
             self::$logsCounter++;
 
             if (self::$logsThreshold > 0 && sizeof(self::$logs) < self::$logsThreshold) {
                 self::$logs[] = array(
                     E_USER_ERROR,
-                    '<p>'.htmlentities(get_class($exception).': '.$exception->getMessage()).'</p><pre>'.$exception->getFile().':'.$exception->getLine().'</pre><pre>'.htmlentities($exception->getTraceAsString()).'</pre>',
+                    '<p>' . htmlentities(get_class($exception) . ': ' . $exception->getMessage()) . '</p><pre>' . $exception->getFile() . ':' . $exception->getLine() . '</pre><pre>' . htmlentities($exception->getTraceAsString()) . '</pre>',
                     $exception->getFile(),
                     $exception->getLine()
                 );
@@ -1761,9 +1842,10 @@ class Utils {
      * @param $file error location
      * @param $line error location
      */
-    public static function __trackError($errno, $message, $file, $line) {
+    public static function __trackError($errno, $message, $file, $line)
+    {
         if (error_reporting() !== 0 && (self::$errorReporting & $errno) === $errno) {
-            self::logError($message.' in '.$file.':'.$line, $errno);
+            self::logError($message . ' in ' . $file . ':' . $line, $errno);
             self::$logsCounter++;
 
             if (self::$logsThreshold > 0 && sizeof(self::$logs) < self::$logsThreshold) {
@@ -1772,34 +1854,8 @@ class Utils {
         }
         return TRUE;
     }
-
-    /**
-     * Flush output buffering
-     *
-     * @param $complete TRUE to disable completely output buffering
-     * @return TRUE on success, FALSE otherwise
-     */
-    private static function __discardBuffer($complete = FALSE) {
-        $level = $complete ? 0 : Utils::$obBaseLevel;
-        while (@ob_get_level() > $level) {
-            if (!@ob_end_clean()) {
-                return FALSE;
-            }
-        }
-        if ($complete) {
-            ob_implicit_flush(TRUE);
-        }
-        return TRUE;
-    }
-
-
-    /**
-     * Constructor.
-     *
-     */
-    private function __construct() {
-    }
 }
+
 Utils::__init();
 
 /**

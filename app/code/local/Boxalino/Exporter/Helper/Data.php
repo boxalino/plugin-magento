@@ -1,23 +1,11 @@
 <?php
+
 class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 {
-    protected $_attributesWithIds = array();
-    protected $_allTags = array();
-
     const URL_XML = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/source/update';
     const URL_XML_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/source/update';
-
     const URL_ZIP = "http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push";
     const URL_ZIP_DEV = "http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push";
-
-    public  $XML_DELIMITER = ',';
-    public  $XML_ENCLOSURE = '"';
-    public  $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
-    public  $XML_NEWLINE = '\n';
-    public  $XML_ESCAPE = '\\\\';
-    public  $XML_ENCODE = 'UTF-8';
-    public  $XML_FORMAT = 'CSV';
-
     /**
      * Array of parent_id for specified products.
      * IMPORTANT: We assume that every simple product has at most one configurable parent.
@@ -25,13 +13,21 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      * @var null
      */
     static private $parentId = null;
-
     /**
      * Array of variants ids for specified products.
      *
      * @var null
      */
     static private $simpleIds = null;
+    public $XML_DELIMITER = ',';
+    public $XML_ENCLOSURE = '"';
+    public $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
+    public $XML_NEWLINE = '\n';
+    public $XML_ESCAPE = '\\\\';
+    public $XML_ENCODE = 'UTF-8';
+    public $XML_FORMAT = 'CSV';
+    protected $_attributesWithIds = array();
+    protected $_allTags = array();
 
     public function defaultAttributes()
     {
@@ -67,7 +63,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             'ru',
         );
 
-        if(array_search($language, $languages) !== false) {
+        if (array_search($language, $languages) !== false) {
             return true;
         }
 
@@ -79,7 +75,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function attributesWithIds()
     {
-        if(empty($this->_attributesWithIds)) {
+        if (empty($this->_attributesWithIds)) {
             $attributes = Mage::getResourceModel('eav/entity_attribute_collection')->getData();
             foreach ($attributes as $attribute) {
                 if ($attribute['frontend_input'] == 'select' || $attribute['frontend_input'] == 'multiselect') {
@@ -112,9 +108,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getZIPSyncUrl($dev = false)
     {
-        if($dev){
+        if ($dev) {
             return self::URL_ZIP_DEV;
-        } else{
+        } else {
             return self::URL_ZIP;
         }
     }
@@ -125,12 +121,37 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getXMLSyncUrl($dev = false)
     {
-        if($dev){
+        if ($dev) {
             return self::URL_XML_DEV;
-        } else{
+        } else {
             return self::URL_XML;
         }
 
+    }
+
+    /**
+     * Return parent id.
+     *
+     * @param null $productId
+     * @return null|int|array
+     */
+    public function getParentId($productId = null)
+    {
+        // Load connections if necessary.
+        $this->loadProductLinks();
+
+        // If no product is specified - return whole array.
+        if (!isset($productId)) {
+            return $this->parentId;
+        }
+
+        // If we have parent id for specified product - return it.
+        if (isset($this->parentId[$productId])) {
+            return $this->parentId[$productId];
+        }
+
+        // No parent - return null.
+        return null;
     }
 
     /**
@@ -174,31 +195,6 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     }
 
     /**
-     * Return parent id.
-     *
-     * @param null $productId
-     * @return null|int|array
-     */
-    public function getParentId($productId = null)
-    {
-        // Load connections if necessary.
-        $this->loadProductLinks();
-
-        // If no product is specified - return whole array.
-        if (!isset($productId)) {
-            return $this->parentId;
-        }
-
-        // If we have parent id for specified product - return it.
-        if (isset($this->parentId[$productId])) {
-            return $this->parentId[$productId];
-        }
-
-        // No parent - return null.
-        return null;
-    }
-
-    /**
      * Return simple ids.
      *
      * @param null $productId
@@ -227,10 +223,10 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     {
         $htmlTagsToReplace = array('body', 'p', 'br');
         $startPosition = strpos($responseBody, '<p>');
-        $endPosition = strpos($responseBody, '&lt;br&gt;')+3;
+        $endPosition = strpos($responseBody, '&lt;br&gt;') + 3;
         $error = html_entity_decode(substr($responseBody, $startPosition, $endPosition));
-        foreach($htmlTagsToReplace as $tag) {
-            $error = str_replace('<'.$tag.'>', PHP_EOL, $error);
+        foreach ($htmlTagsToReplace as $tag) {
+            $error = str_replace('<' . $tag . '>', PHP_EOL, $error);
         }
         return $error;
     }

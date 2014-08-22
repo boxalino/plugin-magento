@@ -1,36 +1,36 @@
 <?xml version="1.0"?>
 <config>
-	<modules>
-		<Boxalino_CemSearch>
-			<version>1.0.0</version>
-		</Boxalino_CemSearch>
-	</modules>
-	<frontend>
-		<routers>
-			<catalogsearch>
-				<args>
-					<modules>
-						<Boxalino_CemSearch before="Mage_CatalogSearch">Boxalino_CemSearch</Boxalino_CemSearch>
-					</modules>
-				</args>
-			</catalogsearch>
-			<routeurfrontend>
-				<use>standard</use>
-				<args>
-					<module>Boxalino_CemSearch</module>
-					<frontName>cemsearch</frontName>
-				</args>
-			</routeurfrontend>
-			<routers>
-				<boxalinocem>
-					<use>standard</use>
-					<args>
-						<module>Boxalino_Cem</module>
-						<frontName>cem</frontName>
-					</args>
-				</boxalinocem>
-			</routers>
-		</routers>
+    <modules>
+        <Boxalino_CemSearch>
+            <version>1.0.0</version>
+        </Boxalino_CemSearch>
+    </modules>
+    <frontend>
+        <routers>
+            <catalogsearch>
+                <args>
+                    <modules>
+                        <Boxalino_CemSearch before="Mage_CatalogSearch">Boxalino_CemSearch</Boxalino_CemSearch>
+                    </modules>
+                </args>
+            </catalogsearch>
+            <routeurfrontend>
+                <use>standard</use>
+                <args>
+                    <module>Boxalino_CemSearch</module>
+                    <frontName>cemsearch</frontName>
+                </args>
+            </routeurfrontend>
+            <routers>
+                <boxalinocem>
+                    <use>standard</use>
+                    <args>
+                        <module>Boxalino_Cem</module>
+                        <frontName>cem</frontName>
+                    </args>
+                </boxalinocem>
+            </routers>
+        </routers>
         <layout>
             <updates>
                 <boxalino>
@@ -38,100 +38,100 @@
                 </boxalino>
             </updates>
         </layout>
-		<events>
-			<checkout_cart_product_add_after>
-				<observers>
-					<boxalinocem_cart_add>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onProductAddedToCart</method>
-					</boxalinocem_cart_add>
-				</observers>
-			</checkout_cart_product_add_after>
-			<checkout_onepage_controller_success_action>
-				<observers>
-					<boxalinocem_order_success>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onOrderSuccessPageView</method>
-					</boxalinocem_order_success>
-				</observers>
-			</checkout_onepage_controller_success_action>
-			<checkout_multishipping_controller_success_action>
-				<observers>
-					<boxalinocem_order_success>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onOrderSuccessPageView</method>
-					</boxalinocem_order_success>
-				</observers>
-			</checkout_multishipping_controller_success_action>
-			<catalog_controller_product_view >
-				<observers>
-					<boxalinocem_product_view>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onProductPageView</method>
-					</boxalinocem_product_view>
-				</observers>
-			</catalog_controller_product_view>
-			<catalog_controller_category_init_after>
-				<observers>
-					<boxalinocem_category_view>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onCategoryPageView</method>
-					</boxalinocem_category_view>
-				</observers>
-			</catalog_controller_category_init_after>
-			<customer_login>
-				<observers>
-					<boxalinocem_login>
-						<class>Boxalino_CemSearch_Model_Observer</class>
-						<method>onLogin</method>
-					</boxalinocem_login>
-				</observers>
-			</customer_login>
-		</events>
-	</frontend>
-	<global>
-		<helpers>
-			<Boxalino_CemSearch>
-				<class>Boxalino_CemSearch_Helper</class>
-			</Boxalino_CemSearch>
-		</helpers>
-		<models>
-			<catalogsearch_resource>
-				<rewrite>
-					<fulltext>Boxalino_CemSearch_Model_Resource_Fulltext</fulltext>
-				</rewrite>
-				<rewrite>
-					<advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
-				</rewrite>
-			</catalogsearch_resource>
+        <events>
+            <checkout_cart_product_add_after>
+                <observers>
+                    <boxalinocem_cart_add>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onProductAddedToCart</method>
+                    </boxalinocem_cart_add>
+                </observers>
+            </checkout_cart_product_add_after>
+            <checkout_onepage_controller_success_action>
+                <observers>
+                    <boxalinocem_order_success>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onOrderSuccessPageView</method>
+                    </boxalinocem_order_success>
+                </observers>
+            </checkout_onepage_controller_success_action>
+            <checkout_multishipping_controller_success_action>
+                <observers>
+                    <boxalinocem_order_success>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onOrderSuccessPageView</method>
+                    </boxalinocem_order_success>
+                </observers>
+            </checkout_multishipping_controller_success_action>
+            <catalog_controller_product_view>
+                <observers>
+                    <boxalinocem_product_view>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onProductPageView</method>
+                    </boxalinocem_product_view>
+                </observers>
+            </catalog_controller_product_view>
+            <catalog_controller_category_init_after>
+                <observers>
+                    <boxalinocem_category_view>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onCategoryPageView</method>
+                    </boxalinocem_category_view>
+                </observers>
+            </catalog_controller_category_init_after>
+            <customer_login>
+                <observers>
+                    <boxalinocem_login>
+                        <class>Boxalino_CemSearch_Model_Observer</class>
+                        <method>onLogin</method>
+                    </boxalinocem_login>
+                </observers>
+            </customer_login>
+        </events>
+    </frontend>
+    <global>
+        <helpers>
+            <Boxalino_CemSearch>
+                <class>Boxalino_CemSearch_Helper</class>
+            </Boxalino_CemSearch>
+        </helpers>
+        <models>
+            <catalogsearch_resource>
+                <rewrite>
+                    <fulltext>Boxalino_CemSearch_Model_Resource_Fulltext</fulltext>
+                </rewrite>
+                <rewrite>
+                    <advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
+                </rewrite>
+            </catalogsearch_resource>
 
-			<catalogsearch>
-				<rewrite>
-					<advanced>Boxalino_CemSearch_Model_Advanced</advanced>
-				</rewrite>
-			</catalogsearch>
-		</models>
-		<resources>
-			<test_write>
-				<connection>
-					<use>core_write</use>
-				</connection>
-			</test_write>
-			<test_read>
-				<connection>
-					<use>core_read</use>
-				</connection>
-			</test_read>
-		</resources>
-		<blocks>
-			<boxalino>
-				<class>Boxalino_CemSearch_Block</class>
-			</boxalino>
-			<catalogsearch>
-				<rewrite>
-					<autocomplete>Boxalino_CemSearch_Block_Autocomplete</autocomplete>
-				</rewrite>
-			</catalogsearch>
+            <catalogsearch>
+                <rewrite>
+                    <advanced>Boxalino_CemSearch_Model_Advanced</advanced>
+                </rewrite>
+            </catalogsearch>
+        </models>
+        <resources>
+            <test_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </test_write>
+            <test_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </test_read>
+        </resources>
+        <blocks>
+            <boxalino>
+                <class>Boxalino_CemSearch_Block</class>
+            </boxalino>
+            <catalogsearch>
+                <rewrite>
+                    <autocomplete>Boxalino_CemSearch_Block_Autocomplete</autocomplete>
+                </rewrite>
+            </catalogsearch>
             <checkout>
                 <rewrite>
                     <cart_crosssell>Boxalino_CemSearch_Block_Cart_Crosssell</cart_crosssell>
@@ -143,8 +143,8 @@
                     <product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</product_list_upsell>
                 </rewrite>
             </catalog>
-		</blocks>
-	</global>
+        </blocks>
+    </global>
     <default>
         <Boxalino_General>
             <general>
@@ -162,13 +162,13 @@
                 <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>id</entity_id>
             </search>
-	        <tracker>
-		        <charset>UTF-8</charset>
-		        <enabled>1</enabled>
-		        <debug>1</debug>
-		        <analytics>1</analytics>
-		        <track_sales>1</track_sales>
-	        </tracker>
+            <tracker>
+                <charset>UTF-8</charset>
+                <enabled>1</enabled>
+                <debug>1</debug>
+                <analytics>1</analytics>
+                <track_sales>1</track_sales>
+            </tracker>
         </Boxalino_General>
 
         <Boxalino_Recommendation>

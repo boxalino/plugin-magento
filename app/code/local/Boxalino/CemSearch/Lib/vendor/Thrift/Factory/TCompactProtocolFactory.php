@@ -22,18 +22,20 @@
 
 namespace Thrift\Factory;
 
-use Thrift\Factory\TProtocolFactory;
 use Thrift\Protocol\TCompactProtocol;
 
 /**
  * Compact Protocol Factory
  */
-class TCompactProtocolFactory implements TProtocolFactory {
+class TCompactProtocolFactory implements TProtocolFactory
+{
 
-  public function __construct() {
-  }
+    public function __construct()
+    {
+    }
 
-  public function getProtocol($trans) {
-	return new TCompactProtocol($trans);
-  }
+    public function getProtocol($trans)
+    {
+        return new TCompactProtocol($trans);
+    }
 }

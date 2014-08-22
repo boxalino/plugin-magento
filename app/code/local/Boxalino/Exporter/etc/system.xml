@@ -29,7 +29,8 @@
                         <language translate="label">
                             <label>Language</label>
                             <frontend_type>text</frontend_type>
-                            <comment>Set language of your store view <![CDATA[<br />Available: en, fr, de, it, es, zh, cz, ru]]></comment>
+                            <comment>Set language of your store view
+                                <![CDATA[<br />Available: en, fr, de, it, es, zh, cz, ru]]></comment>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

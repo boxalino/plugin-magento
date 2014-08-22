@@ -1,5 +1,7 @@
 <?php
-class Boxalino_Manager_Model_Boxalino_TaskProcesses extends Boxalino_Manager_Model_Boxalino {
+
+class Boxalino_Manager_Model_Boxalino_TaskProcesses extends Boxalino_Manager_Model_Boxalino
+{
     protected function getProcessTasks()
     {
 

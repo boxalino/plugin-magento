@@ -19,49 +19,51 @@
  *
  * @author nitro@boxalino.com
  */
-class CEM_ApiTransactionItem {
-	/**
-	 * Item identifier
-	 */
-	public $id = '';
+class CEM_ApiTransactionItem
+{
+    /**
+     * Item identifier
+     */
+    public $id = '';
 
-	/**
-	 * Item price
-	 */
-	public $price = 0;
+    /**
+     * Item price
+     */
+    public $price = 0;
 
-	/**
-	 * Item quantity
-	 */
-	public $quantity = 1;
+    /**
+     * Item quantity
+     */
+    public $quantity = 1;
 
-	/**
-	 * Item name
-	 */
-	public $name = '';
+    /**
+     * Item name
+     */
+    public $name = '';
 
-	/**
-	 * Item widget
-	 */
-	public $widget = '';
+    /**
+     * Item widget
+     */
+    public $widget = '';
 
 
-	/**
-	 * Constructor
-	 *
-	 * @param $id item identifier (required)
-	 * @param $price item price (required)
-	 * @param $quantity item quantity, defaults to 1 (optional)
-	 * @param $name item name (optional)
-	 * @param $widget facilitator widget (optional)
-	 */
-	public function __construct($id, $price, $quantity = 1, $name = FALSE, $widget = FALSE) {
-		$this->id = $id;
-		$this->price = $price;
-		$this->quantity = $quantity;
-		$this->name = $name;
-		$this->widget = $widget;
-	}
+    /**
+     * Constructor
+     *
+     * @param $id item identifier (required)
+     * @param $price item price (required)
+     * @param $quantity item quantity, defaults to 1 (optional)
+     * @param $name item name (optional)
+     * @param $widget facilitator widget (optional)
+     */
+    public function __construct($id, $price, $quantity = 1, $name = FALSE, $widget = FALSE)
+    {
+        $this->id = $id;
+        $this->price = $price;
+        $this->quantity = $quantity;
+        $this->name = $name;
+        $this->widget = $widget;
+    }
 }
 
 /**

@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Created by: Szymon Nosal <szymon.nosal@codete.com>
  * Created at: 16.06.14 12:29
  */
-
 class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_Product_List_Related
 {
     /**
@@ -18,7 +18,7 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
     protected function _prepareData()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0 ){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0) {
             return parent::_prepareData();
         }
 
@@ -35,12 +35,12 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
         $response = $p13nRecommendation->getRecommendation('related');
         $entityIds = array();
 
-        if($response === null){
+        if ($response === null) {
             $this->_itemCollection = new Varien_Data_Collection();
             return $this;
         }
 
-        foreach($response as $item){
+        foreach ($response as $item) {
             $entityIds[] = $item[Mage::getStoreConfig('Boxalino_General/search/entity_id')];
         }
 

@@ -1,15 +1,17 @@
 <?php
+
 /**
  * Created by: Szymon Nosal <szymon.nosal@codete.com>
  * Created at: 12.06.14 16:36
  */
+class P13nRecommendation
+{
 
-class P13nRecommendation {
-
-    public function getRecommendation($widget){
+    public function getRecommendation($widget)
+    {
 
         $account = Mage::helper('Boxalino_CemSearch')->getAccount();
-        $language = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+        $language = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
         $returnFields = array(
             'id',
             'entity_id',
@@ -30,30 +32,30 @@ class P13nRecommendation {
         $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
         $entityIdFieldName = 'entity_id';
 
-        if(isset($entity_id) && $entity_id !== ''){
+        if (isset($entity_id) && $entity_id !== '') {
             $entityIdFieldName = $entity_id;
         }
         $recommendation = Mage::getStoreConfig('Boxalino_Recommendation/' . $widget);
 
         $status = $this->getParamFromConfig($recommendation, 'status');
-        if($status == 0 || $status === null){
+        if ($status == 0 || $status === null) {
             return null;
         }
 
         $name = $this->getParamFromConfig($recommendation, 'widget');
 
-        if($name == "" || $name == null){
+        if ($name == "" || $name == null) {
             return null;
         }
 
         $min = $this->getParamFromConfig($recommendation, 'min');
         $max = $this->getParamFromConfig($recommendation, 'max');
 
-        if($max == null || $min > $max || $max == 0){
+        if ($max == null || $min > $max || $max == 0) {
             return null;
         }
 
-        $scenario =  $this->getParamFromConfig($recommendation, 'scenario');
+        $scenario = $this->getParamFromConfig($recommendation, 'scenario');
 
         $p13nClient = new BoxalinoP13nClient($account, $language, $entityIdFieldName, true);
 
@@ -62,8 +64,9 @@ class P13nRecommendation {
         return $p13nClient->getPersonalRecommendations($name, $returnFields, $min, $max, $scenario);
     }
 
-    private function getParamFromConfig($config, $param){
-        return isset($config[$param])?$config[$param]:null;
+    private function getParamFromConfig($config, $param)
+    {
+        return isset($config[$param]) ? $config[$param] : null;
     }
 
 }

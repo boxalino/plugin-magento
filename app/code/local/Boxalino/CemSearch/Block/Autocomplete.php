@@ -39,7 +39,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return null;
         }
 
@@ -66,31 +66,31 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li data-word="'.$item['id'].'" title="' . $this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
-                . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
+            $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
+                . '<span class="amount">' . $item['num_of_results'] . '</span>' . $this->escapeHtml($item['title']) . '</li>';
         }
-	    $html.= '</ul><ul>';
+        $html .= '</ul><ul>';
 
-	    $first_word = true;
-	    foreach ($this->_suggestDataProducts as $key => $word) {
-		    foreach ($word as $product) {
-			    $product = Mage::getModel('catalog/product')->load($product['id']);
-			    $class = '';
-			    if( ! $first_word){
-					$class = 'hide';
-			    }
-			    $html .=  '<li data-word="'.$key.'" class="product-autocomplete '. $class .'" title="' . $this->escapeHtml($product->getName()).'">';
-			    $html .= '<a href="'.$product->getProductUrl().'" ><table><tr><td>';
-			    $html .= '<img src="'.$product->getThumbnailUrl().'" alt="'.$product->getName().'" />';
-			    $html .= '</td><td>';
-			    $html .= '<span>' . $product->getName() . '</span>';
-				$html .= '</td></tr></table></a>';
-				$html .= '</li>';
-		    }
-		    $first_word = false;
-	    }
+        $first_word = true;
+        foreach ($this->_suggestDataProducts as $key => $word) {
+            foreach ($word as $product) {
+                $product = Mage::getModel('catalog/product')->load($product['id']);
+                $class = '';
+                if (!$first_word) {
+                    $class = 'hide';
+                }
+                $html .= '<li data-word="' . $key . '" class="product-autocomplete ' . $class . '" title="' . $this->escapeHtml($product->getName()) . '">';
+                $html .= '<a href="' . $product->getProductUrl() . '" ><table><tr><td>';
+                $html .= '<img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" />';
+                $html .= '</td><td>';
+                $html .= '<span>' . $product->getName() . '</span>';
+                $html .= '</td></tr></table></a>';
+                $html .= '</li>';
+            }
+            $first_word = false;
+        }
 
-	    $html.= '</ul>';
+        $html .= '</ul>';
 
         return $html;
     }
@@ -98,7 +98,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     public function getSuggestData()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::getSuggestData();
         }
 
@@ -107,56 +107,55 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $counter = 0;
             $data = array();
 
-	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
-	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
-	        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
+            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
+            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
+            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
 
-	        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+            $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
-	        $p13nConfig = new P13nConfig(
-		        $storeConfig['host'],
-		        Mage::helper('Boxalino_CemSearch')->getAccount(),
-		        $storeConfig['p13n_username'],
-		        $storeConfig['p13n_password'],
-		        $storeConfig['domain']
-	        );
-	        $p13n = new P13nAdapter($p13nConfig);
+            $p13nConfig = new P13nConfig(
+                $storeConfig['host'],
+                Mage::helper('Boxalino_CemSearch')->getAccount(),
+                $storeConfig['p13n_username'],
+                $storeConfig['p13n_password'],
+                $storeConfig['domain']
+            );
+            $p13n = new P13nAdapter($p13nConfig);
 
-	        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
+            $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
-	        if($query){
-		        $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);
-		        $collection = $p13n->getAutocompleteEntities();
-	        }else{
-		        $collection = array();
-	        }
+            if ($query) {
+                $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);
+                $collection = $p13n->getAutocompleteEntities();
+            } else {
+                $collection = array();
+            }
 
             foreach ($collection as $item) {
 
-                if($item['hits'] <= 0){
+                if ($item['hits'] <= 0) {
                     continue;
                 }
 
-	            $_data = array(
+                $_data = array(
                     'id' => substr(md5($item['text']), 0, 10),
                     'title' => $item['text'],
-                    'row_class' => (++$counter)%2?'odd':'even',
-                    'num_of_results' =>  $item['hits']
+                    'row_class' => (++$counter) % 2 ? 'odd' : 'even',
+                    'num_of_results' => $item['hits']
                 );
 
                 if ($item['text'] == $query) {
                     array_unshift($data, $_data);
-                }
-                else {
+                } else {
                     $data[] = $_data;
                 }
             }
             $this->_suggestData = $data;
-	        $this->_suggestDataProducts = $p13n->getAutocompleteProducts();
+            $this->_suggestDataProducts = $p13n->getAutocompleteProducts();
         }
         return $this->_suggestData;
     }
-/*
- *
-*/
+    /*
+     *
+    */
 }

@@ -1,7 +1,9 @@
 <?php
+
 class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_Model_Mysql4_Indexer
 {
     const INDEX_TYPE = 'full';
+
     /**
      * @description Declare where Indexer should start
      * @return void
@@ -16,9 +18,9 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
     }
 
     /**
-    * @description Get all transactions from Magento
-    * @return object All transactions for store
-    */
+     * @description Get all transactions from Magento
+     * @return object All transactions for store
+     */
     protected function _getTransactions()
     {
         $transaction = Mage::getModel('sales/order')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect('*');

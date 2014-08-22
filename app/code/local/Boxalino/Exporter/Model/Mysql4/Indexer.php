@@ -16,7 +16,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /** @var array List of attributes which module export to our server */
     protected $_listOfAttributes = array();
 
-    /** @var array All tags of products*/
+    /** @var array All tags of products */
     protected $_allProductTags = array();
 
     protected $_transformedCategories = array();
@@ -42,16 +42,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /** @var int Actually used storeId */
     protected $_storeId = 0;
 
-    abstract protected function _getIndexType();
-
-    abstract protected function _getStoreProducts();
-
-    abstract protected function _getCustomers();
-
-    abstract protected function _getTransactions();
-
-    abstract protected function _getCategories();
-
     /**
      * @description Start of apocalypse
      */
@@ -60,15 +50,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $this->_websiteExport();
         $this->_closeExport();
         return $this;
-    }
-
-    function getmicrotime($mt, $string = true){
-        list($usec, $sec) = explode(" ", $mt);
-
-        if($string)
-            return date('Y-m-d H:i:s', (float)$usec + (float)$sec) . '.' . $usec;
-        else
-            return ((float)$usec + (float)$sec);
     }
 
     /**
@@ -81,10 +62,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $t1 = microtime();
             $data = $this->_storeExport($website);
 
-            if(!$this->_isEnabled()){
+            if (!$this->_isEnabled()) {
                 continue;
             }
-            if($this->_getIndexType() == 'delta' && count($data['products'] == 0 && count($data['customers'] == 0 && count($data['transactions'] == 0)))){
+            if ($this->_getIndexType() == 'delta' && count($data['products'] == 0 && count($data['customers'] == 0 && count($data['transactions'] == 0)))) {
                 continue;
             }
 
@@ -159,7 +140,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _prepareStoreConfig($storeId)
     {
         $this->_storeId = $storeId;
-        $this->_storeConfig = array_merge(Mage::app()->getStore($this->_storeId)->getConfig('boxalinoexporter/export_data'),Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_General/general'));
+        $this->_storeConfig = array_merge(Mage::app()->getStore($this->_storeId)->getConfig('boxalinoexporter/export_data'), Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_General/general'));
 
         $tmp = Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_CemSearch/backend');
         $this->_storeConfig['username'] = $tmp['username'];
@@ -194,26 +175,29 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _getAllAttributesValues()
     {
         $attributesWithId = Mage::helper('boxalinoexporter')->attributesWithIds();
-        foreach($this->_listOfAttributes as $attribute) {
-            if(array_search($attribute, $attributesWithId) == true) {
+        foreach ($this->_listOfAttributes as $attribute) {
+            if (array_search($attribute, $attributesWithId) == true) {
                 $options = Mage::getModel('eav/config')->getAttribute('catalog_product', $attribute)->setStoreId($this->_storeId)->getSource()->getAllOptions();
-                foreach($options as $option) {
-                    if(!empty($option['value'])) {
+                foreach ($options as $option) {
+                    if (!empty($option['value'])) {
                         $this->_attributesValues[$this->_storeId][$attribute][$option['value']] = $option['label'];
 
                         $value = intval($option['value']);
                         $name = 'value_' . $this->_storeConfig['language'];
 
-                        if(isset($this->_attributesValuesByName[$attribute])){
+                        if (isset($this->_attributesValuesByName[$attribute])) {
 
-                            if(isset($this->_attributesValuesByName[$attribute][$value])){
-                                $this->_attributesValuesByName[$attribute][$value][$name] = /*strtolower*/($option['label']);
-                            } else{
-                                $this->_attributesValuesByName[$attribute][$value] = array($attribute . '_id' => $value, $name => /*strtolower*/($option['label']));
+                            if (isset($this->_attributesValuesByName[$attribute][$value])) {
+                                $this->_attributesValuesByName[$attribute][$value][$name] = /*strtolower*/
+                                    ($option['label']);
+                            } else {
+                                $this->_attributesValuesByName[$attribute][$value] = array($attribute . '_id' => $value, $name => /*strtolower*/
+                                    ($option['label']));
                             }
 
-                        } else{
-                            $this->_attributesValuesByName[$attribute] = array($value => array($attribute . '_id' => $value, $name => /*strtolower*/($option['label'])));
+                        } else {
+                            $this->_attributesValuesByName[$attribute] = array($value => array($attribute . '_id' => $value, $name => /*strtolower*/
+                                ($option['label'])));
                         }
 
                     }
@@ -238,37 +222,66 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     }
 
     /**
-     * @description Get stock of all products
-     * @return array List of stocks qty for products
+     * @description Preparing categories to export
+     * @return array Cateroies
      */
-    protected function _getProductsStockQty()
+    protected function _exportCategories()
     {
-        if(empty($this->_productsStockQty)) {
-            $products = Mage::getModel('cataloginventory/stock_item')->getCollection();
-            foreach ($products as $product) {
-                $this->_productsStockQty[$product->getProductId()] = $product->getQty();
+        if ($this->_storeConfig['export_categories']) {
+            $categories = $this->_getCategories();
+            foreach ($categories as $category) {
+
+                if ($category->getParentId() == null) {
+                    continue;
+                }
+
+                if (isset($this->_transformedCategories[$category->getId()])) {
+                    $this->_transformedCategories[$category->getId()]['value_' . $this->_storeConfig['language']] = $category->getName();
+                } else {
+                    $parentId = null;
+                    if ($category->getParentId() != 0) {
+                        $parentId = $category->getParentId();
+                    }
+                    $this->_transformedCategories[$category->getId()] = array('category_id' => $category->getId(), 'parent_id' => $parentId, 'value_' . $this->_storeConfig['language'] => $category->getName());
+                }
             }
-            unset($products);
+            unset($categories);
+            return $this->_transformedCategories;
         }
 
-        return $this->_productsStockQty;
+
+        return null;
+
     }
 
+    abstract protected function _getCategories();
+
     /**
-     * @description Get list of products with their tags
-     * @return object List of products with their tags array('product_id' => 'tag_id');
+     * @description Preparing tags to export
+     * @return array Tags
+     *
+     * @TODO: Here you should preparing Tags to send
      */
-    protected function _getProductTags()
+    protected function _exportTags()
     {
-        if(empty($this->_allProductTags)) {
-            $tags = Mage::getResourceModel('tag/product_collection')->getData();
-            foreach ($tags as $tag) {
-                $this->_allProductTags[$tag['entity_id']] = $tag['tag_id'];
+
+        if ($this->_storeConfig['export_tags']) {
+
+            $tags = Mage::helper('boxalinoexporter')->getAllTags();
+
+            foreach ($tags as $id => $tag) {
+                if (isset($this->_transformedTags[$id])) {
+                    $this->_transformedTags[$id]['value_' . $this->_storeConfig['language']] = $tag;
+                } else {
+                    $this->_transformedTags[$id] = array('tag_id' => $id, 'value_' . $this->_storeConfig['language'] => $tag);
+                }
             }
+
             unset($tags);
+            return $this->_transformedTags;
         }
 
-        return $this->_allProductTags;
+        return null;
     }
 
     /**
@@ -285,10 +298,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $countMax = $this->_storeConfig['maximum_population'];
         $localeCount = 0;
 
-        foreach($products as $product) {
+        foreach ($products as $product) {
 
 
-            if(count($product->getWebsiteIds()) == 0 ){
+            if (count($product->getWebsiteIds()) == 0) {
                 unset($product);
                 continue;
             }
@@ -302,45 +315,51 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 //                var_dump(array($helper->getParentId($id), $id, $product->getData()));
 //            }
 
-            if($helper->getParentId($id) != null && $product->getTypeId() == 'simple'){
+            if ($helper->getParentId($id) != null && $product->getTypeId() == 'simple') {
                 $id = $helper->getParentId($id);
                 $haveParent = true;
-            } else if($product->getVisibility() == 1 && $helper->getParentId($id) == null){
+            } else if ($product->getVisibility() == 1 && $helper->getParentId($id) == null) {
                 unset($product);
                 continue;
             }
 
-            foreach($attrs as $attr){
-                if(isset($this->_attributesValuesByName[$attr])){
+            foreach ($attrs as $attr) {
+                if (isset($this->_attributesValuesByName[$attr])) {
                     $val = $product->$attr;
 
-                    if($val == null){
+                    if ($val == null) {
                         continue;
                     }
 
-                    if(isset($this->_tmp[$attr][$id]) && in_array($val, $this->_tmp[$attr][$id])){
+                    if (isset($this->_tmp[$attr][$id]) && in_array($val, $this->_tmp[$attr][$id])) {
                         continue;
                     }
 
-                    if(isset($this->_transformedProducts['productsMtM'][$attr])){
+                    if (isset($this->_transformedProducts['productsMtM'][$attr])) {
                         // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                         if ($attr == 'visibility' && $val == '4') {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => '2');
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => '3');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
+                                'entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
+                                'entity_id' => $id, $attr . '_id' => '3');
                             $this->_tmp[$attr][$id][] = $val;
                         } else {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
+                                'entity_id' => $id, $attr . '_id' => $val);
                             $this->_tmp[$attr][$id][] = $val;
                         }
-                    } else{
+                    } else {
                         $this->_transformedProducts['productsMtM'][$attr] = array();
                         // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                         if ($attr == 'visibility' && $val == '4') {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/ 'entity_id' => $id, $attr . '_id' => '2');
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 2,*/ 'entity_id' => $id, $attr . '_id' => '3');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/
+                                'entity_id' => $id, $attr . '_id' => '2');
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 2,*/
+                                'entity_id' => $id, $attr . '_id' => '3');
                             $this->_tmp[$attr][$id] = array($val);
                         } else {
-                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/ 'entity_id' => $id, $attr . '_id' => $val);
+                            $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/
+                                'entity_id' => $id, $attr . '_id' => $val);
                             $this->_tmp[$attr][$id] = array($val);
                         }
                     }
@@ -349,7 +368,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
 
 
-                switch($attr){
+                switch ($attr) {
                     case 'description':
                     case 'short_description':
                     case 'name':
@@ -364,12 +383,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             }
 
-            if($haveParent){
+            if ($haveParent) {
                 continue;
             }
 
-            if(!isset($this->_transformedProducts['products'][$id])){
-                if($countMax > 0 && $this->_count >= $countMax ){
+            if (!isset($this->_transformedProducts['products'][$id])) {
+                if ($countMax > 0 && $this->_count >= $countMax) {
                     break;
                 }
                 $productParam['entity_id'] = $id;
@@ -377,20 +396,20 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $this->_transformedProducts['products'][$id] = $productParam;
 
                 //Add categories
-                foreach($product->getCategoryIds() as $cat){
-                    while($cat != null){
+                foreach ($product->getCategoryIds() as $cat) {
+                    while ($cat != null) {
                         $this->_transformedProducts['productsMtM']['categories'][] = array('entity_id' => $id, 'category_id' => $cat);
-                        if(isset($this->_transformedCategories[$cat]['parent_id'])) {
+                        if (isset($this->_transformedCategories[$cat]['parent_id'])) {
                             $cat = $this->_transformedCategories[$cat]['parent_id'];
-                        } else{
+                        } else {
                             $cat = null;
                         }
                     }
                 }
                 $this->_count++;
 
-            } elseif(isset($this->_transformedProducts['products'][$id])){
-                if($countMax > 0 && $localeCount >= $countMax ){
+            } elseif (isset($this->_transformedProducts['products'][$id])) {
+                if ($countMax > 0 && $localeCount >= $countMax) {
                     break;
                 }
                 $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
@@ -403,41 +422,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             unset($product);
         }
         unset($products);
-        return  $this->_transformedProducts;
+        return $this->_transformedProducts;
     }
 
-    /**
-     * @description Preparing categories to export
-     * @return array Cateroies
-     */
-    protected function _exportCategories()
-    {
-        if ($this->_storeConfig['export_categories']) {
-            $categories = $this->_getCategories();
-            foreach ($categories as $category) {
-
-                if($category->getParentId() == null){
-                    continue;
-                }
-
-                if(isset($this->_transformedCategories[$category->getId()])) {
-                    $this->_transformedCategories[$category->getId()]['value_'.$this->_storeConfig['language']] = $category->getName();
-                } else {
-                    $parentId = null;
-                    if($category->getParentId() != 0){
-                        $parentId = $category->getParentId();
-                    }
-                    $this->_transformedCategories[$category->getId()] = array('category_id' => $category->getId(), 'parent_id' => $parentId, 'value_'.$this->_storeConfig['language'] => $category->getName());
-                }
-            }
-            unset($categories);
-            return $this->_transformedCategories;
-        }
-
-
-        return null;
-
-    }
+    abstract protected function _getStoreProducts();
 
     /**
      * @description Preparing customers to export
@@ -453,20 +441,19 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $return = array();
             $collection = Mage::getModel('directory/country')->getCollection();
 
-            if($this->_countries == null){
-                foreach ($collection as $country)
-                {
+            if ($this->_countries == null) {
+                foreach ($collection as $country) {
                     $this->_countries[$country->getId()] = $country->getName();
                 }
             }
 
             $customers = $this->_getCustomers();
 
-            foreach($customers as $customer){
+            foreach ($customers as $customer) {
 
                 $billing = $customer->getPrimaryBillingAddress();
 
-                switch($customer->getGender()){
+                switch ($customer->getGender()) {
                     case 1:
                         $gender = 'male';
                         break;
@@ -494,33 +481,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         return null;
     }
 
-    /**
-     * @description Preparing tags to export
-     * @return array Tags
-     *
-     * @TODO: Here you should preparing Tags to send
-     */
-    protected function _exportTags()
-    {
-
-        if ($this->_storeConfig['export_tags']) {
-
-            $tags = Mage::helper('boxalinoexporter')->getAllTags();
-
-            foreach($tags as $id => $tag){
-                if(isset($this->_transformedTags[$id])){
-                    $this->_transformedTags[$id]['value_' . $this->_storeConfig['language']] = $tag;
-                } else{
-                    $this->_transformedTags[$id] = array('tag_id' => $id, 'value_' . $this->_storeConfig['language'] => $tag);
-                }
-            }
-
-            unset($tags);
-            return $this->_transformedTags;
-        }
-
-        return null;
-    }
+    abstract protected function _getCustomers();
 
     /**
      * @description Preparing transactions to export
@@ -535,22 +496,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $transactions = $this->_getTransactions();
 
-            foreach($transactions as $transaction){
+            foreach ($transactions as $transaction) {
 
                 $configurable = array();
 
                 $products = ($transaction->getAllItems());
 
-                foreach($products as $product){
+                foreach ($products as $product) {
 
                     //is configurable
-                    if($product->getParentItemId() == null && $product->getProductType() != 'simple' ){
+                    if ($product->getParentItemId() == null && $product->getProductType() != 'simple') {
                         $configurable[$product->getId()] = $product;
                         continue;
                     }
 
                     //is configurable - simple product
-                    if(intval($product->getPrice()) == 0){
+                    if (intval($product->getPrice()) == 0) {
                         $pid = $configurable[$product->getParentItemId()];
                         $product->setOriginalPrice($pid->getOriginalPrice());
                         $product->setPrice($pid->getPrice());
@@ -558,13 +519,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     $status = 0; // 0 - pending, 1 - confirmed, 2 - shipping
 
-                    if($transaction->getStatus() == 'canceled'){
+                    if ($transaction->getStatus() == 'canceled') {
                         continue;
                     }
 
-                    if($transaction->getUpdatedAt() != $transaction->getCreatedAt()){
+                    if ($transaction->getUpdatedAt() != $transaction->getCreatedAt()) {
 
-                        switch($transaction->getStatus()){
+                        switch ($transaction->getStatus()) {
                             case 'canceled':
                                 continue;
                                 break;
@@ -587,8 +548,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'total_order_value' => ($transaction->getBaseSubtotal() + $transaction->getShippingAmount()),
                         'shipping_costs' => $transaction->getShippingAmount(),
                         'order_date' => $transaction->getCreatedAt(),
-                        'confirmation_date' => $status==1?$transaction->getUpdatedAt():null,
-                        'shipping_date' => $status==2?$transaction->getUpdatedAt():null,
+                        'confirmation_date' => $status == 1 ? $transaction->getUpdatedAt() : null,
+                        'shipping_date' => $status == 2 ? $transaction->getUpdatedAt() : null,
                         'status' => $transaction->getStatus()
                     );
 
@@ -602,6 +563,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         return null;
     }
 
+    abstract protected function _getTransactions();
+
+    abstract protected function _getIndexType();
+
     /**
      * @description Preparing files to send
      */
@@ -610,7 +575,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //Prepare attributes
         $csvFiles = array();
-        if(!file_exists("/tmp/boxalino")) {
+        if (!file_exists("/tmp/boxalino")) {
             mkdir("/tmp/boxalino");
         }
         $csv = new Varien_File_Csv();
@@ -621,23 +586,23 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //create csv
         //save attributes
-        foreach($this->_attributesValuesByName as $attrName => $attrValues){
+        foreach ($this->_attributesValuesByName as $attrName => $attrValues) {
             $csvFiles[] = $this->createCsv($attrName, $attrValues, $csv);
 
         }
 
         //save categories
-        if($categories != null){
+        if ($categories != null) {
             $csvFiles[] = $this->createCsv('categories', $categories, $csv);
             unset($categories);
         }
 
         //save tags
-        if($tags != null){
+        if ($tags != null) {
             $csvFiles[] = $this->createCsv('tag', $tags, $csv);
 
             $loop = 1;
-            foreach( $this->_getProductTags() as $product_id => $tag_id){
+            foreach ($this->_getProductTags() as $product_id => $tag_id) {
                 $csvdata[] = array('id' => $loop++, 'entity_id' => $product_id, 'tag_id' => $tag_id);
             }
 
@@ -646,12 +611,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         //save transactions
-        if($transactions != null && count($transactions) > 0){
+        if ($transactions != null && count($transactions) > 0) {
             $csvFiles[] = $this->createCsv('transactions', $transactions, $csv);
         }
 
         //save customers
-        if($customers != null){
+        if ($customers != null) {
             $csvFiles[] = $this->createCsv('customers', $customers, $csv);
         }
 
@@ -659,7 +624,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $csvFiles[] = $this->createCsv('products', $products['products'], $csv);
 
         //products & attributes
-        foreach($products['productsMtM'] as $key => $val){
+        foreach ($products['productsMtM'] as $key => $val) {
             $csvFiles[] = $this->createCsv("product_$key", $val, $csv);
         }
         //csv done
@@ -679,6 +644,40 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     }
 
+    /**
+     * @param $name
+     * @param $data
+     * @param $csv
+     * @return string
+     */
+    protected function createCsv($name, $data, $csv)
+    {
+        $file = $name . '.csv';
+        $csvdata = array_merge(array(array_keys(end($data))), $data);
+        $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
+
+        $this->_files[] = '/tmp/boxalino/' . $file;
+
+        return $file;
+    }
+
+    /**
+     * @description Get list of products with their tags
+     * @return object List of products with their tags array('product_id' => 'tag_id');
+     */
+    protected function _getProductTags()
+    {
+        if (empty($this->_allProductTags)) {
+            $tags = Mage::getResourceModel('tag/product_collection')->getData();
+            foreach ($tags as $tag) {
+                $this->_allProductTags[$tag['entity_id']] = $tag['tag_id'];
+            }
+            unset($tags);
+        }
+
+        return $this->_allProductTags;
+    }
+
     protected function createXML($name)
     {
 
@@ -690,7 +689,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $containers = $xml->addChild('containers');
 
         //languages
-        foreach($this->_availableLanguages as $lang){
+        foreach ($this->_availableLanguages as $lang) {
             $language = $languages->addChild('language');
             $language->addAttribute('id', $lang);
         }
@@ -811,11 +810,11 @@ XML;
         #########################################################################
 
         $attr = array_keys($this->_attributesValuesByName);
-        if($this->_storeConfig['export_tags']){
+        if ($this->_storeConfig['export_tags']) {
             $attr[] = 'tag';
         }
 
-        foreach($attr as $attr) {
+        foreach ($attr as $attr) {
 
             //attribute
             $source = $sources->addChild('source');
@@ -827,10 +826,10 @@ XML;
             $source->addChild('itemIdColumn')->addAttribute('value', $attr . '_id');
 
             $labelColumns = $source->addChild('labelColumns');
-            foreach($this->_availableLanguages as $lang) {
+            foreach ($this->_availableLanguages as $lang) {
                 $label = $labelColumns->addChild('language');
                 $label->addAttribute('name', $lang);
-                $label->addAttribute('value', 'value_'. $lang);
+                $label->addAttribute('value', 'value_' . $lang);
             }
 
             $this->sxml_append_options($source);
@@ -848,7 +847,7 @@ XML;
         }
 
         #########################################################################
-        if($this->_storeConfig['export_categories']){
+        if ($this->_storeConfig['export_categories']) {
             //categories
             $sourceCategory = $sources->addChild('source');
             $sourceCategory->addAttribute('type', 'hierarchical');
@@ -860,10 +859,10 @@ XML;
             $sourceCategory->addChild('parentIdColumn')->addAttribute('value', 'parent_id');
 
             $labelColumns = $sourceCategory->addChild('labelColumns');
-            foreach($this->_availableLanguages as $lang) {
+            foreach ($this->_availableLanguages as $lang) {
                 $label = $labelColumns->addChild('language');
                 $label->addAttribute('name', $lang);
-                $label->addAttribute('value', 'value_'. $lang);
+                $label->addAttribute('value', 'value_' . $lang);
             }
 
             $this->sxml_append_options($sourceCategory);
@@ -885,8 +884,8 @@ XML;
         $properties = $products->addChild('properties');
         $props = $this->prepareProperties();
 
-        foreach($props as $prop){
-            if($prop['id'] == 'entity_id') {
+        foreach ($props as $prop) {
+            if ($prop['id'] == 'entity_id') {
 
             }
             $property = $properties->addChild('property');
@@ -895,31 +894,31 @@ XML;
 
             $transform = $property->addChild('transform');
             $logic = $transform->addChild('logic');
-            $ls = $prop['name']==null?'item_vals':'item_'.$prop['name'];
+            $ls = $prop['name'] == null ? 'item_vals' : 'item_' . $prop['name'];
             $logic->addAttribute('source', $ls);
             $logic->addAttribute('type', $prop['type']);
-            if($prop['has_lang'] == true){
-                foreach($this->_availableLanguages as $lang) {
+            if ($prop['has_lang'] == true) {
+                foreach ($this->_availableLanguages as $lang) {
                     $field = $logic->addChild('field');
                     $field->addAttribute('column', $prop['field'] . '_' . $lang);
                     $field->addAttribute('language', $lang);
                 }
-            } else{
+            } else {
                 $logic->addChild('field')->addAttribute('column', $prop['field']);
             }
 
             $params = $property->addChild('params');
-            if($prop['type'] != 'direct'){
+            if ($prop['type'] != 'direct') {
                 $params->addChild('referenceSource')->addAttribute('value', 'resource_' . $prop['reference']);
             }
 
         }
-        if ($this->_storeConfig['export_customers']){
+        if ($this->_storeConfig['export_customers']) {
             $customer = simplexml_load_string($customerString);
             $this->sxml_append($containers, $customer);
         }
 
-        if ($this->_storeConfig['export_transactions']){
+        if ($this->_storeConfig['export_transactions']) {
             $transaction = simplexml_load_string($transactionString);
             $this->sxml_append($containers, $transaction);
         }
@@ -939,19 +938,6 @@ XML;
     }
 
     /**
-     *
-     * description: add xmlElement to other xmlElement
-     * @param SimpleXMLElement $to
-     * @param SimpleXMLElement $from
-     */
-    function sxml_append(SimpleXMLElement $to, SimpleXMLElement $from)
-    {
-        $toDom = dom_import_simplexml($to);
-        $fromDom = dom_import_simplexml($from);
-        $toDom->appendChild($toDom->ownerDocument->importNode($fromDom, true));
-    }
-
-    /**
      * desciption: add default xmlElements
      * @param SimpleXMLElement $xml
      */
@@ -961,11 +947,11 @@ XML;
         $helper = Mage::helper('boxalinoexporter');
 
         $xml->addChild('format')->addAttribute('value', $helper->XML_FORMAT);
-        $xml->addChild('encoding')->addAttribute('value',$helper->XML_ENCODE);
-        $xml->addChild('delimiter')->addAttribute('value',$helper->XML_DELIMITER);
-        $xml->addChild('enclosure')->addAttribute('value',$helper->XML_ENCLOSURE);
-        $xml->addChild('escape')->addAttribute('value',$helper->XML_ESCAPE);
-        $xml->addChild('lineSeparator')->addAttribute('value',$helper->XML_NEWLINE);
+        $xml->addChild('encoding')->addAttribute('value', $helper->XML_ENCODE);
+        $xml->addChild('delimiter')->addAttribute('value', $helper->XML_DELIMITER);
+        $xml->addChild('enclosure')->addAttribute('value', $helper->XML_ENCLOSURE);
+        $xml->addChild('escape')->addAttribute('value', $helper->XML_ESCAPE);
+        $xml->addChild('lineSeparator')->addAttribute('value', $helper->XML_NEWLINE);
     }
 
     /**
@@ -979,12 +965,12 @@ XML;
         $attrs = $this->_listOfAttributes;
 //        $attrs[] = 'parent_id';
 
-        foreach($attrs as $attr){
+        foreach ($attrs as $attr) {
 
             $ptype = 'string';
 
             // set property type
-            switch($attr){
+            switch ($attr) {
                 case 'name':
                     $ptype = 'title';
                     break;
@@ -1012,7 +998,7 @@ XML;
 
             }
 
-            if(isset($this->_attributesValuesByName[$attr])){
+            if (isset($this->_attributesValuesByName[$attr])) {
                 $properties[] = array(
                     'id' => $attr,
                     'name' => $attr,
@@ -1022,13 +1008,13 @@ XML;
                     'has_lang' => false,
                     'reference' => $attr
                 );
-            } elseif($attr == 'category_ids'){
+            } elseif ($attr == 'category_ids') {
                 continue;
-            } else{
+            } else {
                 $ref = null;
                 $type = 'direct';
                 $field = $attr;
-                switch($attr){
+                switch ($attr) {
                     case 'description':
                     case 'short_description':
                     case 'name':
@@ -1050,7 +1036,7 @@ XML;
             }
         }
         //tag
-        if($this->_storeConfig['export_tags']){
+        if ($this->_storeConfig['export_tags']) {
             $properties[] = array(
                 'id' => 'tag',
                 'name' => 'tag',
@@ -1063,7 +1049,7 @@ XML;
         }
 
         //categories
-        if($this->_storeConfig['export_categories']){
+        if ($this->_storeConfig['export_categories']) {
             $properties[] = array(
                 'id' => 'category',
                 'name' => 'categories', //property id
@@ -1081,20 +1067,16 @@ XML;
     }
 
     /**
-     * @param $name
-     * @param $data
-     * @param $csv
-     * @return string
+     *
+     * description: add xmlElement to other xmlElement
+     * @param SimpleXMLElement $to
+     * @param SimpleXMLElement $from
      */
-    protected function createCsv($name, $data, $csv)
+    function sxml_append(SimpleXMLElement $to, SimpleXMLElement $from)
     {
-        $file = $name . '.csv';
-        $csvdata = array_merge(array(array_keys(end($data))), $data);
-        $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
-
-        $this->_files[] = '/tmp/boxalino/' . $file;
-
-        return $file;
+        $toDom = dom_import_simplexml($to);
+        $fromDom = dom_import_simplexml($from);
+        $toDom->appendChild($toDom->ownerDocument->importNode($fromDom, true));
     }
 
     /**
@@ -1103,61 +1085,42 @@ XML;
      */
     protected function createZip($name, $csvFiles, $xml)
     {
-        if(file_exists($name)) {
+        if (file_exists($name)) {
             @unlink($name);
         }
 
         $this->_files[] = $name;
 
         $zip = new ZipArchive();
-        if ($zip->open($name, ZIPARCHIVE::CREATE) ){
+        if ($zip->open($name, ZIPARCHIVE::CREATE)) {
 
-            foreach($csvFiles as $f){
-                if(!$zip->addFile('/tmp/boxalino/' . $f, $f)){
+            foreach ($csvFiles as $f) {
+                if (!$zip->addFile('/tmp/boxalino/' . $f, $f)) {
                     throw new Exception('Synchronization failure. Please try again.');
                 }
             }
 
-            if(!$zip->addFile($xml, 'properties.xml')){
+            if (!$zip->addFile($xml, 'properties.xml')) {
                 throw new Exception('Synchronization failure. Please try again.');
             }
 
-            if(!$zip->close()){
+            if (!$zip->close()) {
                 throw new Exception('Synchronization failure. Please try again.');
             }
 
-        } else{
+        } else {
             throw new Exception('Synchronization failure. Please try again.');
         }
-    }
-
-    /**
-     * @param $zip
-     */
-    protected function pushZip($file)
-    {
-        $fields = array(
-            "username"  => $this->_storeConfig['di_username'],
-            "password"  => $this->_storeConfig['di_password'],
-            "account"   => $this->_storeConfig['di_account'],
-            "dev"       => $this->_storeConfig['account_dev']==0?'false':'true',
-            "delta"     => $this->_getIndexType()=='delta' ? "true" : "false", // I know...
-            "data"       => '@' . $file . '.zip;type=application/zip'
-        );
-
-        $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['account_dev']);
-
-        return $this->pushFile($fields, $url, 'zip');
     }
 
     protected function pushXML($file)
     {
         $fields = array(
-            "username"  => $this->_storeConfig['di_username'],
-            "password"  => $this->_storeConfig['di_password'],
-            "account"   => $this->_storeConfig['di_account'],
+            "username" => $this->_storeConfig['di_username'],
+            "password" => $this->_storeConfig['di_password'],
+            "account" => $this->_storeConfig['di_account'],
             "template" => 'standard_source',
-            "xml"      => file_get_contents($file . '.xml')
+            "xml" => file_get_contents($file . '.xml')
         );
 
         $url = Mage::helper('boxalinoexporter')->getXMLSyncUrl($this->_storeConfig['account_dev']);
@@ -1180,10 +1143,29 @@ XML;
 
         $responseBody = curl_exec($s);
         curl_close($s);
-        if(strpos($responseBody, 'Internal Server Error')) {
+        if (strpos($responseBody, 'Internal Server Error')) {
             Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));
         }
         return $responseBody;
+    }
+
+    /**
+     * @param $zip
+     */
+    protected function pushZip($file)
+    {
+        $fields = array(
+            "username" => $this->_storeConfig['di_username'],
+            "password" => $this->_storeConfig['di_password'],
+            "account" => $this->_storeConfig['di_account'],
+            "dev" => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
+            "delta" => $this->_getIndexType() == 'delta' ? "true" : "false", // I know...
+            "data" => '@' . $file . '.zip;type=application/zip'
+        );
+
+        $url = Mage::helper('boxalinoexporter')->getZIPSyncUrl($this->_storeConfig['account_dev']);
+
+        return $this->pushFile($fields, $url, 'zip');
     }
 
     /**
@@ -1191,9 +1173,36 @@ XML;
      */
     protected function _closeExport()
     {
-        foreach($this->_files as $f){
+        foreach ($this->_files as $f) {
             @unlink($f);
         }
+    }
+
+    function getmicrotime($mt, $string = true)
+    {
+        list($usec, $sec) = explode(" ", $mt);
+
+        if ($string)
+            return date('Y-m-d H:i:s', (float)$usec + (float)$sec) . '.' . $usec;
+        else
+            return ((float)$usec + (float)$sec);
+    }
+
+    /**
+     * @description Get stock of all products
+     * @return array List of stocks qty for products
+     */
+    protected function _getProductsStockQty()
+    {
+        if (empty($this->_productsStockQty)) {
+            $products = Mage::getModel('cataloginventory/stock_item')->getCollection();
+            foreach ($products as $product) {
+                $this->_productsStockQty[$product->getProductId()] = $product->getQty();
+            }
+            unset($products);
+        }
+
+        return $this->_productsStockQty;
     }
 
 }

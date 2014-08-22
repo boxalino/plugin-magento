@@ -13,7 +13,6 @@ require_once "Mage/CatalogSearch/controllers/AdvancedController.php";
  * @package    Mage_CatalogSearch
  * @module     Catalog
  */
-//class Boxalino_CemSearch_AdvancedController extends Mage_Core_Controller_Front_Action
 class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedController
 {
 
@@ -27,7 +26,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
     public function resultAction()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::resultAction();
         }
 
@@ -49,7 +48,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         $criteria = $tmp->getSearchCriterias();
         unset($tmp);
-        $lang = substr(Mage::app()->getLocale()->getLocaleCode(),0,2);
+        $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
         //setUp Boxalino
         $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
@@ -71,7 +70,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         $p13n = new P13nAdapter($p13nConfig);
 
-        $limit = $generalConfig['advanced_search_limit']==0?1000:$generalConfig['advanced_search_limit'];
+        $limit = $generalConfig['advanced_search_limit'] == 0 ? 1000 : $generalConfig['advanced_search_limit'];
 
         //setup search
         $p13n->setupInquiry(
@@ -82,32 +81,30 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
             $p13nSort,
             0, $limit
         );
-//        var_dump($params);
-//        var_dump($criteria);
         ## ADD FILTERS
 
         $skip = array('name');
 
-        foreach($params as $key => $value){
+        foreach ($params as $key => $value) {
 
-            if(isset($value['from']) || isset($value['to'])){
+            if (isset($value['from']) || isset($value['to'])) {
                 $from = null;
                 $to = null;
 
-                if(isset($params[$key]['from']) && $params[$key]['from'] != '' /* && $params['price']['from'] >= 0*/){
+                if (isset($params[$key]['from']) && $params[$key]['from'] != '' /* && $params['price']['from'] >= 0*/) {
                     $from = $params[$key]['from'];
                 }
-                if(isset($params[$key]['to']) && $params[$key]['to'] != '' /*&& $params['price']['to'] >= 0*/){
+                if (isset($params[$key]['to']) && $params[$key]['to'] != '' /*&& $params['price']['to'] >= 0*/) {
                     $to = $params[$key]['to'];
                 }
 
                 $skip[] = $key;
 
-                if($key == 'price'){
+                if ($key == 'price') {
                     $key = 'discountedPrice';
                 }
 
-                if($from == null && $to == null){
+                if ($from == null && $to == null) {
                     continue;
                 }
                 $p13n->addFilterFromTo($key, $from, $to);
@@ -115,23 +112,22 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
             }
         }
 
-        foreach($criteria as $criterium){
+        foreach ($criteria as $criterium) {
 
             $name = strtolower($criterium['name']);
 
-            if(in_array($name, $skip)){
+            if (in_array($name, $skip)) {
                 continue;
             }
 
             $values = explode(", ", $criterium['value']);
 
-            if($name == 'description'){
+            if ($name == 'description') {
                 $name = 'body';
-            } else{
+            } else {
                 $name = 'products_' . $name;
             }
 
-//            $p13n->addFilter($name, $values, $lang);
             $p13n->addFilter($name, $values, null);
         }
 

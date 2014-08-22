@@ -37,78 +37,6 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
     protected $_productCollection;
 
     /**
-     * Initialize resource model
-     *
-     */
-    protected function _construct()
-    {
-        $this->_getEngine();
-        $this->_init('catalogsearch/advanced');
-    }
-
-    protected function _getEngine()
-    {
-        if ($this->_engine == null) {
-            $this->_engine = Mage::helper('catalogsearch')->getEngine();
-        }
-
-        return $this->_engine;
-    }
-
-    /**
-     * Retrieve resource instance wrapper
-     *
-     * @return Mage_CatalogSearch_Model_Resource_Advanced
-     */
-    protected function _getResource()
-    {
-        $resourceName = $this->_engine->getResourceName();
-        if ($resourceName) {
-            $this->_resourceName = $resourceName;
-        }
-        return parent::_getResource();
-    }
-
-    /**
-     * Retrieve array of attributes used in advanced search
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        /* @var $attributes Mage_Catalog_Model_Resource_Eav_Resource_Product_Attribute_Collection */
-        $attributes = $this->getData('attributes');
-        if (is_null($attributes)) {
-            $product = Mage::getModel('catalog/product');
-            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addHasOptionsFilter()
-                ->addDisplayInAdvancedSearchFilter()
-                ->addStoreLabel(Mage::app()->getStore()->getId())
-                ->setOrder('main_table.attribute_id', 'asc')
-                ->load();
-            foreach ($attributes as $attribute) {
-                $attribute->setEntity($product->getResource());
-            }
-            $this->setData('attributes', $attributes);
-        }
-        return $attributes;
-    }
-
-    /**
-     * Prepare search condition for attribute
-     *
-     * @deprecated after 1.4.1.0 - use Mage_CatalogSearch_Model_Resource_Advanced->_prepareCondition()
-     *
-     * @param Mage_Catalog_Model_Resource_Eav_Attribute $attribute
-     * @param string|array $value
-     * @return mixed
-     */
-    protected function _prepareCondition($attribute, $value)
-    {
-        return $this->_getResource()->prepareCondition($attribute, $value, $this->getProductCollection());
-    }
-
-    /**
      * Add advanced search filters to product collection
      *
      * @param   array $values
@@ -117,13 +45,13 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
     public function addFilters($values, $ids = null)
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::addFilters($values, $ids);
         }
 
-        $attributes     = $this->getAttributes();
-        $hasConditions  = true;
-        $allConditions  = array();
+        $attributes = $this->getAttributes();
+        $hasConditions = true;
+        $allConditions = array();
 
         foreach ($attributes as $attribute) {
             /* @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
@@ -191,6 +119,31 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
     }
 
     /**
+     * Retrieve array of attributes used in advanced search
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        /* @var $attributes Mage_Catalog_Model_Resource_Eav_Resource_Product_Attribute_Collection */
+        $attributes = $this->getData('attributes');
+        if (is_null($attributes)) {
+            $product = Mage::getModel('catalog/product');
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addHasOptionsFilter()
+                ->addDisplayInAdvancedSearchFilter()
+                ->addStoreLabel(Mage::app()->getStore()->getId())
+                ->setOrder('main_table.attribute_id', 'asc')
+                ->load();
+            foreach ($attributes as $attribute) {
+                $attribute->setEntity($product->getResource());
+            }
+            $this->setData('attributes', $attributes);
+        }
+        return $attributes;
+    }
+
+    /**
      * Add data about search criteria to object state
      *
      * @param   Mage_Eav_Model_Entity_Attribute $attribute
@@ -232,7 +185,7 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
         if (($attribute->getFrontendInput() == 'select' || $attribute->getFrontendInput() == 'multiselect')
             && is_array($value)
         ) {
-            foreach ($value as $key => $val){
+            foreach ($value as $key => $val) {
                 $value[$key] = $attribute->getSource()->getOptionText($val);
 
                 if (is_array($value[$key])) {
@@ -255,13 +208,31 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
     }
 
     /**
-     * Returns prepared search criterias in text
+     * Prepare search condition for attribute
      *
-     * @return array
+     * @deprecated after 1.4.1.0 - use Mage_CatalogSearch_Model_Resource_Advanced->_prepareCondition()
+     *
+     * @param Mage_Catalog_Model_Resource_Eav_Attribute $attribute
+     * @param string|array $value
+     * @return mixed
      */
-    public function getSearchCriterias()
+    protected function _prepareCondition($attribute, $value)
     {
-        return $this->_searchCriterias;
+        return $this->_getResource()->prepareCondition($attribute, $value, $this->getProductCollection());
+    }
+
+    /**
+     * Retrieve resource instance wrapper
+     *
+     * @return Mage_CatalogSearch_Model_Resource_Advanced
+     */
+    protected function _getResource()
+    {
+        $resourceName = $this->_engine->getResourceName();
+        if ($resourceName) {
+            $this->_resourceName = $resourceName;
+        }
+        return parent::_getResource();
     }
 
     /**
@@ -269,7 +240,8 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
      *
      * @return Mage_CatalogSearch_Model_Resource_Advanced_Collection
      */
-    public function getProductCollection(){
+    public function getProductCollection()
+    {
 
         if (is_null($this->_productCollection)) {
             $collection = $this->_engine->getAdvancedResultCollection();
@@ -300,5 +272,34 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
         Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($collection);
         Mage::getSingleton('catalog/product_visibility')->addVisibleInSearchFilterToCollection($collection);
         return $this;
+    }
+
+    /**
+     * Returns prepared search criterias in text
+     *
+     * @return array
+     */
+    public function getSearchCriterias()
+    {
+        return $this->_searchCriterias;
+    }
+
+    /**
+     * Initialize resource model
+     *
+     */
+    protected function _construct()
+    {
+        $this->_getEngine();
+        $this->_init('catalogsearch/advanced');
+    }
+
+    protected function _getEngine()
+    {
+        if ($this->_engine == null) {
+            $this->_engine = Mage::helper('catalogsearch')->getEngine();
+        }
+
+        return $this->_engine;
     }
 }

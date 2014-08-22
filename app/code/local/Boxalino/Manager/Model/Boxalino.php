@@ -58,7 +58,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
     protected function getConfigurationVersion()
     {
         $config = Mage::helper('boxalino_manager')->getConfig();
-        if($config['account_dev']) {
+        if ($config['account_dev']) {
             $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_DEVELOPMENT_VERSION);
         } else {
             $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_PRODUCTION_VERSION);

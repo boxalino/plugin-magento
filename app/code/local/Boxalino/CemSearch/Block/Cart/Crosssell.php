@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Created by: Szymon Nosal <szymon.nosal@codete.com>
  * Created at: 13.06.14 12:25
  */
-
 class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_Crosssell
 {
 
@@ -22,7 +22,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
     public function getItems()
     {
 
-        if(Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0){
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::getItems();
         }
 
@@ -33,7 +33,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
             $productPrice = $item->getProduct()->getPrice();
             $productId = $item->getProductId();
 
-            if($item->getProductType() === 'configurable'){
+            if ($item->getProductType() === 'configurable') {
                 continue;
             }
 
@@ -49,15 +49,15 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
         $response = $p13nRecommendation->getRecommendation('cart');
         $entityIds = array();
 
-        if($response === null){
+        if ($response === null) {
             return null;
         }
 
-        foreach($response as $item){
+        foreach ($response as $item) {
             $entityIds[] = $item[Mage::getStoreConfig('Boxalino_General/search/entity_id')];
         }
 
-        if(empty($entityIds)){
+        if (empty($entityIds)) {
             return parent::getItems();
         }
 
@@ -82,7 +82,6 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
             $product->setDoNotUseCategoryId(true);
             $items[] = $product;
         }
-
 
 
         return $items;
