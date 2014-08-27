@@ -20,10 +20,17 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
 
     public function getClient($clientId = '')
     {
-        $THttpClient = new \Thrift\Transport\THttpClient('di1.bx-cloud.com', 80, '/frontend/dbmind/_/en/dbmind/thrift', 'http');
-        $client = new \com\boxalino\dataintelligence\api\thrift\BoxalinoDataIntelligenceClient(new \Thrift\Protocol\TBinaryProtocol($THttpClient));
-        $THttpClient->open();
-        return $client;
+        try {
+            $THttpClient = new \Thrift\Transport\THttpClient('di1.bx-cloud.com', 80, '/frontend/dbmind/_/en/dbmind/thrift', 'http');
+            $client = new \com\boxalino\dataintelligence\api\thrift\BoxalinoDataIntelligenceClient(new \Thrift\Protocol\TBinaryProtocol($THttpClient));
+            $THttpClient->open();
+            return $client;
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('boxalino_manager/password'));
+            Mage::app()->getResponse()->sendResponse();
+            exit;
+        }
     }
 
     protected function _createToken()
@@ -34,15 +41,18 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
                 $authenticationRequest = new com\boxalino\dataintelligence\api\thrift\AuthenticationRequest($this->getAccountCredentials());
                 $this->_authentication = $this->_client->GetAuthentication($authenticationRequest);
                 $this->_authenticationCreateTimestamp = $date->getTimestamp();
-            } catch (\com\boxalino\dataintelligence\api\thrift\DataIntelligenceServiceException $e) {
-                return $e->getMessage();
+            } catch (Exception $e) {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('boxalino_manager/password'));
+                Mage::app()->getResponse()->sendResponse();
+                exit;
             }
         }
     }
 
     protected function getAccountCredentials()
     {
-        $config = Mage::helper('boxalino_manager')->getConfig();
+        $config = Mage::helper('boxalino_manager')->getGeneralConfig();
         if ((isset($config['di_account']) && $config['di_account'] != '') && (isset($config['di_username']) && $config['di_username'] != '') && (isset($config['di_password']) && $config['di_password'] != '')) {
             $credentials = array(
                 'account' => $config['di_account'],
@@ -51,17 +61,22 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
             );
             return $credentials;
         } else {
-            throw new Exception('You must set our Data Intelligence Credentials in configuration!');
+            Mage::getSingleton('adminhtml/session')->addError('You must set our Data Intelligence Credentials in configuration!');
         }
     }
 
     protected function getConfigurationVersion()
     {
-        $config = Mage::helper('boxalino_manager')->getConfig();
-        if ($config['account_dev']) {
-            $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_DEVELOPMENT_VERSION);
-        } else {
-            $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_PRODUCTION_VERSION);
+        try {
+            $config = Mage::helper('boxalino_manager')->getGeneralConfig();
+            if ($config['account_dev']) {
+                $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_DEVELOPMENT_VERSION);
+            } else {
+                $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_PRODUCTION_VERSION);
+            }
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
         }
+
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_Manager_FieldController extends Mage_Adminhtml_Controller_Action
+class Boxalino_Manager_Adminhtml_ConfigurationController extends Mage_Adminhtml_Controller_Action
 {
     public function indexAction()
     {

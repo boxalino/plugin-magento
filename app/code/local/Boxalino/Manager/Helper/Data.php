@@ -2,8 +2,14 @@
 
 class Boxalino_Manager_Helper_Data extends Mage_Admin_Helper_Data
 {
-    public function getConfig()
+    public $generalConfig = null;
+
+    public function getGeneralConfig()
     {
-        return Mage::getStoreConfig('Boxalino_General/general');
+        if ($this->generalConfig == null) {
+            $this->generalConfig = Mage::getStoreConfig('Boxalino_General/general');
+        }
+
+        return $this->generalConfig;
     }
 }

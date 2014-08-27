@@ -10,7 +10,7 @@
             <boxalino_manager>
                 <use>admin</use>
                 <args>
-                    <module>Boxalino_Manager</module>
+                    <module>Boxalino_Manager_Adminhtml</module>
                     <frontName>boxalino_manager</frontName>
                 </args>
             </boxalino_manager>
@@ -27,5 +27,10 @@
                 <class>Boxalino_Manager_Model</class>
             </boxalino_manager>
         </models>
+        <blocks>
+            <boxalino_manager>
+                <class>Boxalino_Manager_Block</class>
+            </boxalino_manager>
+        </blocks>
     </global>
 </config>

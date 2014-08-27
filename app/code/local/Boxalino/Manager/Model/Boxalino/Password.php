@@ -2,18 +2,18 @@
 
 class Boxalino_Manager_Model_Boxalino_Password extends Boxalino_Manager_Model_Boxalino
 {
-    protected function updatePassword($oldPassword, $newPassword)
+    public function updatePassword($oldPassword, $newPassword)
     {
         $credentials = $this->getAccountCredentials();
         if ($credentials['password'] == $oldPassword) {
             try {
                 $this->_client->UpdatePassword($this->_authentication, $newPassword);
-                return 'Password changed';
+                Mage::getSingleton('adminhtml/session')->addSuccess('Password changed');
             } catch (\com\boxalino\dataintelligence\api\thrift\DataIntelligenceServiceException $e) {
-                return $e->getMessage();
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         } else {
-            return 'Your old password is incorrect';
+            Mage::getSingleton('adminhtml/session')->addError('Your old password is incorrect');
         }
     }
 }
