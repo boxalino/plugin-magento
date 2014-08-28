@@ -2,32 +2,32 @@
 
 class Boxalino_Manager_Model_Boxalino_TaskProcesses extends Boxalino_Manager_Model_Boxalino
 {
-    protected function getProcessTasks()
+    public function getProcessTasks()
     {
 
     }
 
-    protected function createProcessTask()
+    public function createProcessTask()
     {
 
     }
 
-    protected function updateProcessTask()
+    public function updateProcessTask()
     {
 
     }
 
-    protected function deleteProcessTask()
+    public function deleteProcessTask()
     {
 
     }
 
-    protected function runProcessTask()
+    public function runProcessTask()
     {
 
     }
 
-    protected function getProcessStatus()
+    public function getProcessStatus()
     {
 
     }

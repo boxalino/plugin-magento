@@ -2,22 +2,22 @@
 
 class Boxalino_Manager_Model_Boxalino_Field extends Boxalino_Manager_Model_Boxalino
 {
-    protected function getFields()
+    public function getFields()
     {
 
     }
 
-    protected function createField()
+    public function createField()
     {
 
     }
 
-    protected function updateField()
+    public function updateField()
     {
 
     }
 
-    protected function deleteField()
+    public function deleteField()
     {
 
     }

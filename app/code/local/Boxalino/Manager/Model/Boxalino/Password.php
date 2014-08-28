@@ -4,7 +4,7 @@ class Boxalino_Manager_Model_Boxalino_Password extends Boxalino_Manager_Model_Bo
 {
     public function updatePassword($oldPassword, $newPassword)
     {
-        $credentials = $this->getAccountCredentials();
+        $credentials = Mage::helper('boxalino_manager')->getAccountCredentials();
         if ($credentials['password'] == $oldPassword) {
             try {
                 $this->_client->UpdatePassword($this->_authentication, $newPassword);

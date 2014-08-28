@@ -2,22 +2,22 @@
 
 class Boxalino_Manager_Model_Boxalino_ChoiceVariant extends Boxalino_Manager_Model_Boxalino
 {
-    protected function getChoiceVariants()
+    public function getChoiceVariants()
     {
         var_dump($this->_authentication);
     }
 
-    protected function createChoiceVariant()
+    public function createChoiceVariant()
     {
 
     }
 
-    protected function updateChoiceVariant()
+    public function updateChoiceVariant()
     {
 
     }
 
-    protected function deleteChoiceVariant()
+    public function deleteChoiceVariant()
     {
 
     }

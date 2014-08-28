@@ -38,7 +38,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         $date = new DateTime('now');
         if ($this->_authentication == null || $this->_authenticationCreateTimestamp == null || $this->_authenticationCreateTimestamp + 3000 < $date->getTimestamp()) {
             try {
-                $authenticationRequest = new com\boxalino\dataintelligence\api\thrift\AuthenticationRequest($this->getAccountCredentials());
+                $authenticationRequest = new com\boxalino\dataintelligence\api\thrift\AuthenticationRequest(Mage::helper('boxalino_manager')->getAccountCredentials());
                 $this->_authentication = $this->_client->GetAuthentication($authenticationRequest);
                 $this->_authenticationCreateTimestamp = $date->getTimestamp();
             } catch (Exception $e) {
@@ -47,21 +47,6 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
                 Mage::app()->getResponse()->sendResponse();
                 exit;
             }
-        }
-    }
-
-    protected function getAccountCredentials()
-    {
-        $config = Mage::helper('boxalino_manager')->getGeneralConfig();
-        if ((isset($config['di_account']) && $config['di_account'] != '') && (isset($config['di_username']) && $config['di_username'] != '') && (isset($config['di_password']) && $config['di_password'] != '')) {
-            $credentials = array(
-                'account' => $config['di_account'],
-                'username' => $config['di_username'],
-                'password' => $config['di_password'],
-            );
-            return $credentials;
-        } else {
-            Mage::getSingleton('adminhtml/session')->addError('You must set our Data Intelligence Credentials in configuration!');
         }
     }
 

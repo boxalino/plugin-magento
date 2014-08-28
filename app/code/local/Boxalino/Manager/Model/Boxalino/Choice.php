@@ -2,22 +2,22 @@
 
 class Boxalino_Manager_Model_Boxalino_Choice extends Boxalino_Manager_Model_Boxalino
 {
-    protected function getChoices()
+    public function getChoices()
     {
 
     }
 
-    protected function createChoice()
+    public function createChoice()
     {
 
     }
 
-    protected function updateChoice()
+    public function updateChoice()
     {
 
     }
 
-    protected function deleteChoice()
+    public function deleteChoice()
     {
 
     }

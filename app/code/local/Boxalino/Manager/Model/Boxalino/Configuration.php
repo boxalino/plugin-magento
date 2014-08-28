@@ -2,17 +2,17 @@
 
 class Boxalino_Manager_Model_Boxalino_Configuration extends Boxalino_Manager_Model_Boxalino
 {
-    protected function getConfigurationDifferences()
+    public function getConfigurationDifferences()
     {
 
     }
 
-    protected function publishConfiguration()
+    public function publishConfiguration()
     {
 
     }
 
-    protected function cloneConfiguration()
+    public function cloneConfiguration()
     {
 
     }
