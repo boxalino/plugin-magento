@@ -28,6 +28,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     public $XML_FORMAT = 'CSV';
     protected $_attributesWithIds = array();
     protected $_allTags = array();
+    protected $_countries = array();
 
     public function defaultAttributes()
     {
@@ -229,5 +230,14 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             $error = str_replace('<' . $tag . '>', PHP_EOL, $error);
         }
         return $error;
+    }
+
+    public function getCountry($countryCode)
+    {
+        if(!isset($this->_countries[$countryCode])) {
+            $this->_countries[$countryCode] = Mage::getModel('directory/country')->loadByCode($countryCode);
+        }
+
+        return $this->_countries[$countryCode];
     }
 }

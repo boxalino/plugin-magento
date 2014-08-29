@@ -452,6 +452,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($customers as $customer) {
 
                 $billing = $customer->getPrimaryBillingAddress();
+                if(!empty($billing)) {
+                    $countryCode = $billing->getCountry();
+                }
 
                 switch ($customer->getGender()) {
                     case 1:
@@ -469,8 +472,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'customer_id' => $customer->getId(),
                     'gender' => $gender,
                     'dob' => $customer->getDob(),
-                    'country' => $this->_countries[$billing->getCountryId()],
-                    'zip' => $billing->getPostcode()
+                    'country' => !empty($countryCode) ? Mage::helper('boxalinoexporter')->getCountry($countryCode)->getName() : '',
+                    'zip' => !empty($billing) ? $billing->getPostcode() : ''
                 );
 
             }
