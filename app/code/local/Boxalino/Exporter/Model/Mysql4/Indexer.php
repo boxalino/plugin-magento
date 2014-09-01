@@ -59,20 +59,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _websiteExport()
     {
         foreach (Mage::app()->getWebsites() as $website) {
-            $t1 = microtime();
             $data = $this->_storeExport($website);
 
             if (!$this->_isEnabled()) {
                 continue;
             }
-            if ($this->_getIndexType() == 'delta' && count($data['products'] == 0 && count($data['customers'] == 0 && count($data['transactions'] == 0)))) {
+            if ($this->_getIndexType() == 'delta' && count($data['products']) == 0 && count($data['customers']) == 0 && count($data['transactions']) == 0) {
                 continue;
             }
-
-            $t2 = microtime();
             $file = $this->prepareFiles($website, $data['products'], $data['categories'], $data['customers'], $data['tags'], $data['transactions']);
 
-            $t3 = microtime();
             $this->pushXML($file);
             $this->pushZip($file);
 
@@ -84,12 +80,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_tmp = array();
             $this->_count = 0;
 
-//            echo "<br><br>Start: " . $this->getmicrotime($t1) . " <br><br>";
-//            echo "Export: " . $this->getmicrotime($t2) . " <br>";
-//            echo "Delta: " . ($this->getmicrotime($t2, false) - $this->getmicrotime($t1, false)) . " <br><br>";
-//            echo "Files: " . $this->getmicrotime($t3) . " <br>";
-//            echo "Delta: " . ($this->getmicrotime($t3, false) - $this->getmicrotime($t2, false)) . " <br><br>";
-//            echo "All:   " . ($this->getmicrotime($t3, false) - $this->getmicrotime($t1, false)) . " <br><br>";
         }
     }
 
@@ -120,8 +110,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $transactions = $this->_exportTransactions();
             }
         }
-
-//        $this->_getAllAttributesValues();
 
         return array(
             'products' => $products,
@@ -299,10 +287,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $localeCount = 0;
 
         foreach ($products as $product) {
-
-
             if (count($product->getWebsiteIds()) == 0) {
-                unset($product);
                 continue;
             }
 
@@ -310,10 +295,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $productParam = array();
             $haveParent = false;
-
-//            if($id == 234 || $id == 235 || $id == 236 || $id == 403){
-//                var_dump(array($helper->getParentId($id), $id, $product->getData()));
-//            }
 
             if ($helper->getParentId($id) != null && $product->getTypeId() == 'simple') {
                 $id = $helper->getParentId($id);
