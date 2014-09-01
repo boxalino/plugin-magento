@@ -18,7 +18,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         $this->getConfigurationVersion();
     }
 
-    public function getClient($clientId = '')
+    protected function getClient($clientId = '')
     {
         try {
             $THttpClient = new \Thrift\Transport\THttpClient('di1.bx-cloud.com', 80, '/frontend/dbmind/_/en/dbmind/thrift', 'http');
@@ -33,7 +33,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         }
     }
 
-    protected function _createToken()
+    private function _createToken()
     {
         $date = new DateTime('now');
         if ($this->_authentication == null || $this->_authenticationCreateTimestamp == null || $this->_authenticationCreateTimestamp + 3000 < $date->getTimestamp()) {
@@ -50,7 +50,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         }
     }
 
-    protected function getConfigurationVersion()
+    private function getConfigurationVersion()
     {
         try {
             $config = Mage::helper('boxalino_manager')->getGeneralConfig();
