@@ -27,7 +27,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
             return $client;
         } catch (Exception $e) {
             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-            Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('boxalino_manager/password'));
+            Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('adminhtml/system_config/edit', array('section' => 'Boxalino_General')));
             Mage::app()->getResponse()->sendResponse();
             exit;
         }
@@ -43,7 +43,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
                 $this->_authenticationCreateTimestamp = $date->getTimestamp();
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('boxalino_manager/password'));
+                Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::helper('adminhtml')->getUrl('adminhtml/system_config/edit', array('section' => 'Boxalino_General')));
                 Mage::app()->getResponse()->sendResponse();
                 exit;
             }

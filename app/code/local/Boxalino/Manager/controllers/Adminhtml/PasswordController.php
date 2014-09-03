@@ -21,6 +21,6 @@ class Boxalino_Manager_Adminhtml_PasswordController extends Mage_Adminhtml_Contr
                 Mage::getSingleton('adminhtml/session')->addError('Your old password is incorrect, your new password are not matching or your old password is not different than old.');
             }
         }
-        $this->_forward('index');
+        $this->_redirect('*/*/index');
     }
 }

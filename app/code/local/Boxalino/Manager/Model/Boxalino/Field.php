@@ -4,38 +4,36 @@ class Boxalino_Manager_Model_Boxalino_Field extends Boxalino_Manager_Model_Boxal
 {
     public function getFields()
     {
-        try {
-            $fields = $this->_client->GetFields($this->_authentication, $this->_configVersion);
-            if(empty($fields)) {
-                Mage::getSingleton('adminhtml/session')->addError('Fields loading is impossible');
-            } else {
-                $collection = new Varien_Data_Collection();
-                foreach ($fields as $field) {
-                    $rawObj = new Varien_Object();
-                    $rawObj->setId($field->fieldId);
-                    $collection->addItem($rawObj);
-                }
-                return $collection;
+        $fields = $this->_client->GetFields($this->_authentication, $this->_configVersion);
+        if(empty($fields)) {
+            Mage::getSingleton('adminhtml/session')->addError('Fields loading is impossible');
+        } else {
+            $collection = new Varien_Data_Collection();
+            foreach ($fields as $field) {
+                $rawObj = new Varien_Object();
+                $rawObj->setId($field->fieldId);
+                $collection->addItem($rawObj);
             }
-
-        } catch (Exception $e) {
-            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            return $collection;
         }
     }
 
-    public function createField()
+    public function createField($fieldId)
     {
-
+        $this->_client->createField($this->_authentication, $this->_configVersion, $fieldId);
     }
 
     public function updateField()
     {
-
+        $t = new \com\boxalino\dataintelligence\api\thrift\Field;
+        $t->fieldId = 'test';
+        return($this->_client->updateField($this->_authentication, $this->_configVersion, $t));
+        var_dump($this->_configVersion);
     }
 
-    public function deleteField()
+    public function deleteField($fieldId)
     {
-
+        $this->_client->deleteField($this->_authentication, $this->_configVersion, $fieldId);
     }
 
 }

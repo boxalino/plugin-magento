@@ -5,7 +5,7 @@ class Boxalino_Manager_Block_Adminhtml_Field_Create_View_Grid extends Mage_Admin
     public function __construct()
     {
         parent::__construct();
-        $this->setId('employeeGrid');
+        $this->setId('fieldsGrid');
         $this->setDefaultSort('id');
         $this->setDefaultDir('ASC');
         $this->setSaveParametersInSession(true);
@@ -23,7 +23,7 @@ class Boxalino_Manager_Block_Adminhtml_Field_Create_View_Grid extends Mage_Admin
         $this->addColumn('id', array(
             'header' => Mage::helper('boxalino_manager')->__('ID'),
             'align' => 'left',
-            'width' => '10px',
+            'width' => '100%',
             'index' => 'id',
         ));
 
@@ -39,7 +39,7 @@ class Boxalino_Manager_Block_Adminhtml_Field_Create_View_Grid extends Mage_Admin
                         'url'     => array(
                             'base'=>'*/*/edit',
                         ),
-                        'field'   => 'id'
+                        'field'   => 'fieldId'
                     )
                 ),
                 'filter'    => false,
@@ -58,7 +58,7 @@ class Boxalino_Manager_Block_Adminhtml_Field_Create_View_Grid extends Mage_Admin
                         'url'     => array(
                             'base'=>'*/*/delete',
                         ),
-                        'field'   => 'id'
+                        'field'   => 'fieldId'
                     )
                 ),
                 'filter'    => false,
@@ -66,5 +66,21 @@ class Boxalino_Manager_Block_Adminhtml_Field_Create_View_Grid extends Mage_Admin
                 'index'     => 'stores',
             ));
         return parent::_prepareColumns();
+    }
+
+    protected function _prepareMassaction()
+    {
+        parent::_prepareMassaction();
+        $this->setMassactionIdField('entity_id');
+        $this->getMassactionBlock()->setFormFieldName('fieldsToDelete');
+        // Append new mass action option
+        $this->getMassactionBlock()->addItem(
+            'fieldsGrid',
+            array('label' => $this->__('Delete all fields'),
+                'url'   => $this->getUrl('*/*/massdelete')
+            )
+        );
+
+        return $this;
     }
 }
