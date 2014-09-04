@@ -27,4 +27,24 @@ class Boxalino_Manager_Helper_Data extends Mage_Admin_Helper_Data
             Mage::getSingleton('adminhtml/session')->addError('You must set our Data Intelligence Credentials in configuration!');
         }
     }
+
+    public function prepareConfigVersions($prodVersion, $devVersion)
+    {
+        if(is_int($prodVersion) && is_int($devVersion)) {
+            $versions = array();
+            $max = max($devVersion, $prodVersion);
+            for ($i = $max; $i > 0; $i--) {
+                if($i == $devVersion) {
+                    $versions[$i] = 'Dev: ' . $i;
+                } elseif ($i == $prodVersion) {
+                    $versions[$i] = 'Prod: ' . $i;
+                } else {
+                    $versions[$i] = 'Archive: ' . $i;
+                }
+            }
+            return $versions;
+        } else {
+            Mage::getSingleton('adminhtml/session')->addError('Versions must be integer!');
+        }
+    }
 }

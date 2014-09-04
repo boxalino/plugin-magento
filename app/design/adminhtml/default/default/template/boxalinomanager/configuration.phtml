@@ -1,0 +1,46 @@
+<div class="grid">
+<?php
+$differences = $this->getDifferences();
+if(is_array($differences)) {
+    $versions = $this->getVersions();
+    $i = 0;
+    foreach ($differences as $diffType => $diffTypeValues) {
+        $diffType = ucfirst(str_replace('_', ' ',str_replace('dbmind_', '', $diffType)));
+        echo '
+            <div class="content-header"><h3 class="icon-head head-adminhtml-field-index">' . $diffType . '</h3></div>';
+        echo '
+            <table>
+                <thead>
+                    <tr class="headings">
+                        <td>Name</td>
+                        <td>Parameter</td>
+                        <td>Version: '.$versions['old'].'</td>
+                        <td>Version: '.$versions['new'].'</td>
+                    </tr>
+                </thead>
+                <tbody>';
+        foreach ($diffTypeValues as $values) {
+            if($i == 0) {
+                echo '<tr class="pointer">';
+                $i = 1;
+            } else {
+                echo '<tr class="even pointer">';
+                $i = 0;
+            }
+            if($values['name'] == 'none') {
+                $values['name'] = '';
+            }
+            echo '
+                        <td> ' . $values['name'] . ' </td>
+                        <td> ' . $values['parameter'] . ' </td>
+                        <td> ' . $values['old'] . ' </td>
+                        <td> ' . $values['new'] . ' </td>
+                    </tr>';
+        }
+        echo '
+                </tbody>
+            </table>';
+    }
+}
+?>
+</div>

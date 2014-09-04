@@ -6,7 +6,7 @@ class Boxalino_Manager_Adminhtml_PasswordController extends Mage_Adminhtml_Contr
     {
         $this->loadLayout();
 
-        $this->_addContent($this->getLayout()->createBlock('boxalino_manager/adminhtml_password_form'));
+        $this->_addContent($this->getLayout()->createBlock('boxalino_manager/adminhtml_password_index_form'));
 
         $this->renderLayout();
     }

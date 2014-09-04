@@ -6,9 +6,10 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
     protected $_client = null;
     protected $_authentication = null;
     protected $_authenticationCreateTimestamp = null;
-    protected $_configVersion = null;
+    protected $_configProd = null;
+    protected $_configDev = null;
 
-    public function __construct()
+    final public function __construct()
     {
         parent::__construct();
         require_once Mage::getModuleDir('', 'Boxalino_Manager') . DS . 'Lib' . DS . 'BoxalinoDataIntelligence.php';
@@ -18,7 +19,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         $this->getConfigurationVersion();
     }
 
-    protected function getClient($clientId = '')
+    final protected function getClient($clientId = '')
     {
         try {
             $THttpClient = new \Thrift\Transport\THttpClient('di1.bx-cloud.com', 80, '/frontend/dbmind/_/en/dbmind/thrift', 'http');
@@ -33,7 +34,7 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         }
     }
 
-    private function _createToken()
+    final private function _createToken()
     {
         $date = new DateTime('now');
         if ($this->_authentication == null || $this->_authenticationCreateTimestamp == null || $this->_authenticationCreateTimestamp + 3000 < $date->getTimestamp()) {
@@ -50,15 +51,11 @@ class Boxalino_Manager_Model_Boxalino extends AbstractThrift
         }
     }
 
-    private function getConfigurationVersion()
+    final private function getConfigurationVersion($configVersion = null)
     {
         try {
-            $config = Mage::helper('boxalino_manager')->getGeneralConfig();
-            if ($config['account_dev']) {
-                $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_DEVELOPMENT_VERSION);
-            } else {
-                $this->_configVersion = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_PRODUCTION_VERSION);
-            }
+            $this->_configDev = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_DEVELOPMENT_VERSION);
+            $this->_configProd = $this->_client->GetConfigurationVersion($this->_authentication, \com\boxalino\dataintelligence\api\thrift\ConfigurationVersionType::CURRENT_PRODUCTION_VERSION);
         } catch (Exception $e) {
             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
         }
