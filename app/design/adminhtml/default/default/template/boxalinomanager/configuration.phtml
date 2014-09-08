@@ -7,7 +7,9 @@ if(is_array($differences)) {
     foreach ($differences as $diffType => $diffTypeValues) {
         $diffType = ucfirst(str_replace('_', ' ',str_replace('dbmind_', '', $diffType)));
         echo '
-            <div class="content-header"><h3 class="icon-head head-adminhtml-field-index">' . $diffType . '</h3></div>';
+            <div class="content-header"><h3 class="icon-head head-adminhtml-field-index">' . $diffType . '</h3>
+            <p class="form-buttons"><button class="scalable back" onclick="setLocation(\''.Mage::helper("adminhtml")->getUrl("boxalino_manager/configuration/index/").'\')">Back</button></p>
+            </div>';
         echo '
             <table>
                 <thead>
@@ -21,10 +23,10 @@ if(is_array($differences)) {
                 <tbody>';
         foreach ($diffTypeValues as $values) {
             if($i == 0) {
-                echo '<tr class="pointer">';
+                echo '<tr>';
                 $i = 1;
             } else {
-                echo '<tr class="even pointer">';
+                echo '<tr class="even">';
                 $i = 0;
             }
             if($values['name'] == 'none') {
@@ -39,7 +41,9 @@ if(is_array($differences)) {
         }
         echo '
                 </tbody>
-            </table>';
+            </table>
+        <br />
+        <br />';
     }
 }
 ?>

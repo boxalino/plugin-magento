@@ -8,7 +8,7 @@ class Boxalino_Manager_Block_Adminhtml_Configuration_Index_Differences extends M
         $this->_blockGroup = 'boxalino_manager';
         $this->_controller = 'adminhtml_configuration_index';
         $this->_mode = 'view';
-        $this->_headerText = 'Show configuration differences';
+        $this->_headerText = 'Choose configuration versions';
 
         $this->_removeButton('save');
         $this->_removeButton('reset');

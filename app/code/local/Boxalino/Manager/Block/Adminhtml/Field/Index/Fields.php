@@ -7,7 +7,7 @@ class Boxalino_Manager_Block_Adminhtml_Field_Index_Fields extends Mage_Adminhtml
         parent::__construct();
         $this->_controller = 'adminhtml_field_index_view';
         $this->_blockGroup = 'boxalino_manager';
-        $this->_headerText = '';
+        $this->_headerText = 'Fields list';
         $this->_removeButton('add');
     }
 }

@@ -31,7 +31,7 @@
                     <action>boxalino_manager/choice_variant/index</action>
                 </choice_variant>
                 <configuration>
-                    <title>Configuration</title>
+                    <title>Configuration Differences</title>
                     <sort_order>60</sort_order>
                     <action>boxalino_manager/configuration/index</action>
                 </configuration>

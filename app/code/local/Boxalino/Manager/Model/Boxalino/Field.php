@@ -2,7 +2,7 @@
 
 class Boxalino_Manager_Model_Boxalino_Field extends Boxalino_Manager_Model_Boxalino
 {
-    public function getFields()
+    public function getFields($filterId = null)
     {
         $fields = $this->_client->GetFields($this->_authentication, $this->_configDev);
         if(empty($fields)) {
@@ -10,24 +10,14 @@ class Boxalino_Manager_Model_Boxalino_Field extends Boxalino_Manager_Model_Boxal
         } else {
             $collection = new Varien_Data_Collection();
             foreach ($fields as $field) {
-                $rawObj = new Varien_Object();
-                $rawObj->setId($field->fieldId);
-                $collection->addItem($rawObj);
+                if(is_null($filterId) || (!is_null($filterId) && strpos($field->fieldId, $filterId) !== false)) {
+                    $rawObj = new Varien_Object();
+                    $rawObj->setId($field->fieldId);
+                    $collection->addItem($rawObj);
+                }
             }
             return $collection;
         }
-    }
-
-    public function createField($fieldId)
-    {
-        $this->_client->createField($this->_authentication, $this->_configDev, $fieldId);
-    }
-
-    public function updateField()
-    {
-        $t = new \com\boxalino\dataintelligence\api\thrift\Field;
-        $t->fieldId = 'test';
-        return($this->_client->updateField($this->_authentication, $this->_configDev, $t));
     }
 
     public function deleteField($fieldId)

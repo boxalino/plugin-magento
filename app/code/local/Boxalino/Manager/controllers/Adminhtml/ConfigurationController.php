@@ -6,7 +6,6 @@ class Boxalino_Manager_Adminhtml_ConfigurationController extends Mage_Adminhtml_
     {
         $this->loadLayout();
         $this->_addContent($this->getLayout()->createBlock('boxalino_manager/adminhtml_configuration_index_differences'));
-        $this->_addContent($this->getLayout()->createBlock('boxalino_manager/adminhtml_configuration_index_actions'));
         $this->renderLayout();
     }
 
@@ -21,6 +20,7 @@ class Boxalino_Manager_Adminhtml_ConfigurationController extends Mage_Adminhtml_
                         ->setData(array('differences' => $configDiff, 'versions' => array($data['sourceVersion'], $data['destinationVersion'])))
                         ->setTemplate('boxalinomanager/configuration.phtml')
                 );
+
                 $this->renderLayout();
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
