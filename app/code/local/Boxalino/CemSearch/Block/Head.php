@@ -20,7 +20,7 @@ class Boxalino_CemSearch_Block_Head extends Boxalino_CemSearch_Block_Abstract
             $route = Mage::app()->getFrontController()->getRequest()->getRouteName();
             $controller = Mage::app()->getFrontController()->getRequest()->getControllerName();
             if ($route == 'catalogsearch' && $controller == 'result') {
-                echo Mage::helper('Boxalino_CemSearch')->reportSearch($_GET['q']);
+                echo Mage::helper('Boxalino_CemSearch')->reportSearch($_GET['q'], Mage::helper('Boxalino_CemSearch')->getFiltersValues($_GET));
             }
 
 

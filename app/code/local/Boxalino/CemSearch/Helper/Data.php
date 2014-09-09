@@ -94,11 +94,11 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         return ($trackSales == 1);
     }
 
-    public function reportSearch($term)
+    public function reportSearch($term, $filters = null)
     {
         if ($this->isAnalyticsEnabled()) {
             $logTerm = addslashes($term);
-            $script = "_bxq.push(['trackSearch', '" . $logTerm . "']);" . PHP_EOL;
+            $script = "_bxq.push(['trackSearch', '" . $logTerm . "', " . json_encode($filters) . "]);" . PHP_EOL;
             return $script;
         } else {
             return '';
@@ -222,4 +222,52 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
         echo $script;
     }
+
+    public function getFiltersValues($params)
+    {
+        $filters = new stdClass();
+        unset($params['q']);
+        if(isset($params['cat'])) {
+            $filters->filter_hc_category = '';
+            $category = Mage::getModel('catalog/category')->load($params['cat']);
+            $categories = explode('/', $category->getPath());
+            foreach ($categories as $cat) {
+                $name = $category = Mage::getModel('catalog/category')->load($cat)->getName();
+                if(strpos($name, '/') !== false) {
+                    $name = str_replace('/', '\/', $name);
+                }
+                $filters->filter_hc_category .= '/'.$name;
+
+            }
+            unset($params['cat']);
+        }
+
+        if(isset($params['price'])) {
+            $prices = explode('-', $params['price']);
+            if(!empty($prices[0])) {
+                $filters->filter_from_incl_price = $prices[0];
+            }
+            if(!empty($prices[1])) {
+                $filters->filter_to_incl_price = $prices[1];
+            }
+            unset($params['price']);
+        }
+        if(isset($params)) {
+            foreach ($params as $param => $values) {
+                $values = html_entity_decode($values);
+                preg_match_all('!\d+!', $values, $matches);
+                if(is_array($matches[0])) {
+                    $attrValues = array();
+                    foreach ($matches[0] as $id) {
+                        $paramName = 'filter_' . $param;
+                        $attribute = $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($param)->getSource()->getOptionText($id);
+                        $attrValues[] = $attribute;
+                    }
+                    $filters->$paramName = $attrValues;
+                }
+            }
+        }
+        return $filters;
+    }
+
 }
