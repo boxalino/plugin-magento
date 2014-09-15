@@ -305,8 +305,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             foreach ($attrs as $attr) {
+
                 if (isset($this->_attributesValuesByName[$attr])) {
+
                     $val = $product->$attr;
+
+                    $attr = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($attr);
 
                     if ($val == null) {
                         continue;
@@ -571,8 +575,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //create csv
         //save attributes
         foreach ($this->_attributesValuesByName as $attrName => $attrValues) {
-            $csvFiles[] = $this->createCsv($attrName, $attrValues, $csv);
-
+            $csvFiles[] = $this->createCsv(Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($attrName), $attrValues, $csv);
         }
 
         //save categories
@@ -609,7 +612,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //products & attributes
         foreach ($products['productsMtM'] as $key => $val) {
-            $csvFiles[] = $this->createCsv("product_$key", $val, $csv);
+            $csvFiles[] = $this->createCsv("product_" . Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($key) , $val, $csv);
         }
         //csv done
 
