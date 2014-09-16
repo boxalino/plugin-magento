@@ -641,6 +641,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $file = $name . '.csv';
         $csvdata = array_merge(array(array_keys(end($data))), $data);
+        $csvdata[0][0] = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($csvdata[0][0]);
         $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
 
         $this->_files[] = '/tmp/boxalino/' . $file;
@@ -803,6 +804,8 @@ XML;
 
         foreach ($attr as $attr) {
 
+            $attr = Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($attr);
+
             //attribute
             $source = $sources->addChild('source');
             $source->addAttribute('type', 'resource');
@@ -876,27 +879,27 @@ XML;
 
             }
             $property = $properties->addChild('property');
-            $property->addAttribute('id', $prop['id']);
+            $property->addAttribute('id', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($prop['id']));
             $property->addAttribute('type', $prop['ptype']);
 
             $transform = $property->addChild('transform');
             $logic = $transform->addChild('logic');
             $ls = $prop['name'] == null ? 'item_vals' : 'item_' . $prop['name'];
-            $logic->addAttribute('source', $ls);
+            $logic->addAttribute('source', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($ls));
             $logic->addAttribute('type', $prop['type']);
             if ($prop['has_lang'] == true) {
                 foreach ($this->_availableLanguages as $lang) {
                     $field = $logic->addChild('field');
-                    $field->addAttribute('column', $prop['field'] . '_' . $lang);
+                    $field->addAttribute('column', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($prop['field']) . '_' . $lang);
                     $field->addAttribute('language', $lang);
                 }
             } else {
-                $logic->addChild('field')->addAttribute('column', $prop['field']);
+                $logic->addChild('field')->addAttribute('column', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($prop['field']));
             }
 
             $params = $property->addChild('params');
             if ($prop['type'] != 'direct') {
-                $params->addChild('referenceSource')->addAttribute('value', 'resource_' . $prop['reference']);
+                $params->addChild('referenceSource')->addAttribute('value', 'resource_' . Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($prop['reference']));
             }
 
         }
