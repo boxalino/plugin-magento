@@ -21,18 +21,15 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/upsell/status', 0) == 0) {
             return parent::_prepareData();
         }
+        $name = Mage::getStoreConfig('Boxalino_Recommendation/upsell/widget');
 
         $product = Mage::registry('product');
-        /* @var $product Mage_Catalog_Model_Product */
-
-##################################################################################
-
         $_REQUEST['productId'] = $product->getId();
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nRecommendation');
-        $p13nRecommendation = new P13nRecommendation();
+        $p13nRecommendation = Boxalino_CemSearch_Helper_P13n_Recommendation::Instance();
 
-        $response = $p13nRecommendation->getRecommendation('upsell');
+        $response = $p13nRecommendation->getRecommendation('product', $name);
         $entityIds = array();
 
         if ($response === null) {
@@ -43,8 +40,6 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         foreach ($response as $item) {
             $entityIds[] = $item[Mage::getStoreConfig('Boxalino_General/search/entity_id')];
         }
-
-###############################################################
 
         $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
             ->addFieldToFilter('entity_id', $entityIds)
@@ -64,21 +59,10 @@ class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Pr
         }
 
         $this->_itemCollection->load();
-
-        /**
-         * Updating collection with desired items
-         */
-        Mage::dispatchEvent('catalog_product_upsell', array(
-            'product' => $product,
-            'collection' => $this->_itemCollection,
-            'limit' => $this->getItemLimit()
-        ));
-
         foreach ($this->_itemCollection as $product) {
             $product->setDoNotUseCategoryId(true);
         }
 
         return $this;
     }
-
 }

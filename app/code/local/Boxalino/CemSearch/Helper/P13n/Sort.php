@@ -5,7 +5,7 @@
  * Mail: michal.sordyl@codete.co
  * Date: 02.06.14
  */
-class P13nSort
+class Boxalino_CemSearch_Helper_P13n_Sort
 {
     private $sorts = array();
 

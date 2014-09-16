@@ -54,21 +54,17 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
         $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
-
-        $p13nConfig = new P13nConfig(
+        $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Sort(
             $storeConfig['host'],
             Mage::helper('Boxalino_CemSearch')->getAccount(),
             $storeConfig['p13n_username'],
             $storeConfig['p13n_password'],
             $storeConfig['domain']
         );
-        $p13nSort = new P13nSort();
+        $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
         $p13nSort->push('score', true);
 
-        $p13n = new P13nAdapter($p13nConfig);
+        $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
         $limit = $generalConfig['advanced_search_limit'] == 0 ? 1000 : $generalConfig['advanced_search_limit'];
 

@@ -5,17 +5,18 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
     public function __construct()
     {
+        include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/Thrift/HttpP13n.php');
         spl_autoload_register(array('Boxalino_CemSearch_Helper_Data', '__loadClass'), TRUE, TRUE);
     }
 
-    public static function __loadClass($name, $isCem = false, $ext = '.class')
+    public static function __loadClass($name, $isCem = false)
     {
-        $files = array('P13nAdapter', 'P13nConfig', 'P13nSort', 'P13nRecommendation');
-        if (in_array($name, $files)) {
-            include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Helper/' . $name . '.class.php');
-
-        } elseif (strpos($name, 'CEM_') !== false || strpos($name, 'P13n') !== false || $isCem) {
-            include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/' . $name . $ext . '.php');
+        if (strpos($name, 'P13n') !== false || $isCem) {
+            try {
+                include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/' . $name . '.php');
+            } catch (Exception $e) {
+                Mage::throwException($e->getMessage());
+            }
         }
     }
 
@@ -62,14 +63,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             }
         }
         return @json_encode($items);
-    }
-
-    public function getApiClient()
-    {
-        if (!$this->client) {
-            $this->client = new CEM_MagentoApiClient(Mage::app()->getStore());
-        }
-        return $this->client;
     }
 
     public function isSalesTrackingEnabled()

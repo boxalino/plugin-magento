@@ -25,7 +25,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
         if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::getItems();
         }
-
+        $name = Mage::getStoreConfig('Boxalino_Recommendation/cart/widget');
         #####################################################################################
 
         $cartItems = array();
@@ -44,9 +44,9 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
         $_REQUEST['basketContent'] = json_encode($cartItems);
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nRecommendation');
-        $p13nRecommendation = new P13nRecommendation();
+        $p13nRecommendation = Boxalino_CemSearch_Helper_P13n_Recommendation::Instance();
 
-        $response = $p13nRecommendation->getRecommendation('cart');
+        $response = $p13nRecommendation->getRecommendation('basket', $name);
         $entityIds = array();
 
         if ($response === null) {

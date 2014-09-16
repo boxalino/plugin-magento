@@ -18,7 +18,7 @@ class Boxalino_CemSearch_Model_Session extends Mage_Core_Model_Session_Abstract
 
     public function getScripts()
     {
-        $scripts = [];
+        $scripts = array();
         if (isset($this->_data['scipts']) && is_array($this->_data['scipts'])) {
             $scripts = $this->_data['scipts'];
         }

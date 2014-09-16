@@ -5,7 +5,7 @@
  * Mail: michal.sordyl@codete.co
  * Date: 28.05.14
  */
-class P13nConfig
+class Boxalino_CemSearch_Helper_P13n_Config
 {
     private $host;
     private $account;
