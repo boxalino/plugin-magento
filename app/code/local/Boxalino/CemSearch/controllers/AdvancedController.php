@@ -26,6 +26,8 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
     public function resultAction()
     {
 
+        $queryAttribute = array();
+
         if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::resultAction();
         }
@@ -44,6 +46,10 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
                     ->setQueryParams($params)
                     ->getUrl('*/*/')
             );
+        }
+
+        foreach($tmp->getAttributes() as $at){
+            $queryAttribute[$at->getStoreLabel()] = $at->getAttributeCode();
         }
 
         $criteria = $tmp->getSearchCriterias();
@@ -110,7 +116,8 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         foreach ($criteria as $criterium) {
 
-            $name = strtolower($criterium['name']);
+//            $name = strtolower($criterium['name']);
+            $name = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($queryAttribute[$criterium['name']]);
 
             if (in_array($name, $skip)) {
                 continue;

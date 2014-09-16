@@ -240,4 +240,5 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
         return $this->_countries[$countryCode];
     }
+
 }
