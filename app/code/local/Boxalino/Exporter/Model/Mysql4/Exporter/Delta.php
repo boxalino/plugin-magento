@@ -13,7 +13,6 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
     protected function _construct()
     {
         $this->_init('boxalinoexporter/delta', '');
-        $this->_getLastIndex();
     }
 
     /**
@@ -35,8 +34,10 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
         $dates = array();
         $indexes = Mage::getModel('index/indexer')->getProcessesCollection()->getData();
         foreach ($indexes as $index) {
-            if (($index['indexer_code'] == 'boxalinoexporter_indexer' || $index['indexer_code'] == 'boxalinoexporter_delta') && !empty($index['started_at'])) {
+            if ($index['indexer_code'] == 'boxalinoexporter_indexer' && !empty($index['started_at'])) {
                 $dates[] = DateTime::createFromFormat('Y-m-d H:i:s', $index['started_at']);
+            } elseif ($index['indexer_code'] == 'boxalinoexporter_delta' && !empty($index['ended_at'])) {
+                $dates[] = DateTime::createFromFormat('Y-m-d H:i:s', $index['ended_at']);
             }
         }
         if (count($dates) == 2) {
@@ -58,7 +59,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
      */
     protected function _getTransactions()
     {
-        $transaction = Mage::getModel('sales/order')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect('*');
+        $transaction = Mage::getModel('sales/order')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_getLastIndex(), 'date' => true))->addAttributeToSelect('*');
         return $transaction;
     }
 
@@ -68,7 +69,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
      */
     protected function _getCustomers()
     {
-        $customers = Mage::getModel('customer/customer')->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect('*');
+        $customers = Mage::getModel('customer/customer')->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_getLastIndex(), 'date' => true))->addAttributeToSelect('*');
         return $customers;
     }
 
@@ -78,7 +79,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
      */
     protected function _getCategories()
     {
-        $categories = Mage::getModel('catalog/category')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect('*');
+        $categories = Mage::getModel('catalog/category')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect('*');
         return $categories;
     }
 
@@ -89,7 +90,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
     protected function _getProductTags()
     {
         if (empty($this->_allProductTags)) {
-            $tags = Mage::getResourceModel('tag/product_collection')->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->getData();
+            $tags = Mage::getResourceModel('tag/product_collection')->addAttributeToFilter('updated_at', array('from' => $this->_getLastIndex(), 'date' => true))->getData();
             foreach ($tags as $tag) {
                 $this->_allProductTags[$tag['entity_id']] = $tag['tag_id'];
             }
@@ -103,7 +104,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
      */
     protected function _getStoreProducts()
     {
-        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_lastIndex, 'date' => true))->addAttributeToSelect($this->_listOfAttributes);
+        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToFilter('updated_at', array('from' => $this->_getLastIndex(), 'date' => true))->addAttributeToSelect($this->_listOfAttributes);
         return $products;
     }
 
