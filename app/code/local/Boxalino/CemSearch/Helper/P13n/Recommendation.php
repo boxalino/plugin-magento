@@ -47,7 +47,12 @@ class Boxalino_CemSearch_Helper_P13n_Recommendation
         $widgets = array();
         $recommendations = Mage::getStoreConfig('Boxalino_Recommendation');
         foreach($recommendations as $recommendation) {
-            if((!empty($recommendation['min']) && !empty($recommendation['max']) && !empty($recommendation['scenario'])) && ($recommendation['min'] <= $recommendation['max']) && $recommendation['status'] == true) {
+            if(
+                (!empty($recommendation['min']) || $recommendation['min'] >= 0) &&
+                (!empty($recommendation['max']) || $recommendation['max'] >= 0) &&
+                !empty($recommendation['scenario']) &&
+                ($recommendation['min'] <= $recommendation['max']) &&
+                $recommendation['status'] == true) {
                 if ($recommendation['scenario'] == $widgetType) {
                     $widgets[] = array('name' => $recommendation['widget'], 'min_recs' => $recommendation['min'], 'max_recs' => $recommendation['max']);
                 }
