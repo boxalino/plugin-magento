@@ -219,7 +219,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
     public function getFiltersValues($params)
     {
         $filters = new stdClass();
-        unset($params['q']);
         if(isset($params['cat'])) {
             $filters->filter_hc_category = '';
             $category = Mage::getModel('catalog/category')->load($params['cat']);
@@ -247,16 +246,19 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         }
         if(isset($params)) {
             foreach ($params as $param => $values) {
-                $values = html_entity_decode($values);
-                preg_match_all('!\d+!', $values, $matches);
-                if(is_array($matches[0])) {
-                    $attrValues = array();
-                    foreach ($matches[0] as $id) {
-                        $paramName = 'filter_' . $param;
-                        $attribute = $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($param)->getSource()->getOptionText($id);
-                        $attrValues[] = $attribute;
+                $getAttribute = Mage::getModel('catalog/product')->getResource()->getAttribute($param);
+                if($getAttribute !== false) {
+                    $values = html_entity_decode($values);
+                    preg_match_all('!\d+!', $values, $matches);
+                    if (is_array($matches[0])) {
+                        $attrValues = array();
+                        foreach ($matches[0] as $id) {
+                            $paramName = 'filter_' . $param;
+                            $attribute = $attribute = $getAttribute->getSource()->getOptionText($id);
+                            $attrValues[] = $attribute;
+                        }
+                        $filters->$paramName = $attrValues;
                     }
-                    $filters->$paramName = $attrValues;
                 }
             }
         }
