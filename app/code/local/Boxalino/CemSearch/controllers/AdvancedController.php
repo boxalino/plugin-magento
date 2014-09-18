@@ -60,7 +60,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
         $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
-        $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Sort(
+        $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
             $storeConfig['host'],
             Mage::helper('Boxalino_CemSearch')->getAccount(),
             $storeConfig['p13n_username'],
