@@ -124,9 +124,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     $categoryNames[] = $categoryName;
                 }
             }
-            $categoryDepth = count($categoryNames) - 1;
+//            $categoryDepth = count($categoryNames) - 1;
 
-            $this->addFilterHierarchy('categories', $categoryDepth, $categoryNames);
+            $this->addFilterHierarchy('categories', $categoryId, $categoryNames);
 
         }
     }

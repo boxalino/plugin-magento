@@ -48,6 +48,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $adapter = $this->_getWriteAdapter();
 
         $this->resetSearchResults($query);
+
+        if($entity_ids === null || count($entity_ids) < 1){
+            return $this;
+        }
+
         if (!$query->getIsProcessed() || true) {
 
             $searchType = $object->getSearchType($query->getStoreId());
