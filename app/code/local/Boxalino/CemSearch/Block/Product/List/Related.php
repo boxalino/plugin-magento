@@ -21,6 +21,7 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
         if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0) {
             return parent::_prepareData();
         }
+        $name = Mage::getStoreConfig('Boxalino_Recommendation/related/widget');
 
         $product = Mage::registry('product');
         /* @var $product Mage_Catalog_Model_Product */
@@ -30,9 +31,9 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
         $_REQUEST['productId'] = $product->getId();
 
         Mage::helper('Boxalino_CemSearch')->__loadClass('P13nRecommendation');
-        $p13nRecommendation = new P13nRecommendation();
+        $p13nRecommendation = Boxalino_CemSearch_Helper_P13n_Recommendation::Instance();
 
-        $response = $p13nRecommendation->getRecommendation('related');
+        $response = $p13nRecommendation->getRecommendation('product', $name);
         $entityIds = array();
 
         if ($response === null) {
@@ -45,7 +46,6 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
         }
 
 ###############################################################
-
         $this->_itemCollection = Mage::getResourceModel('catalog/product_collection')
             ->addFieldToFilter('entity_id', $entityIds)
             ->addAttributeToSelect('*');
@@ -56,7 +56,6 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
             );
             $this->_addProductAttributesAndPrices($this->_itemCollection);
         }
-
         Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($this->_itemCollection);
 
         $this->_itemCollection->load();

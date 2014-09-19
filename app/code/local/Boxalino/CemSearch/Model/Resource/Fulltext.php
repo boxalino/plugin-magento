@@ -11,22 +11,18 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             return parent::prepareResult($object, $queryText, $query);
         }
 
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
-        Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
-
         $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
-        $p13nConfig = new P13nConfig(
+        $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
             $storeConfig['host'],
             Mage::helper('Boxalino_CemSearch')->getAccount(),
             $storeConfig['p13n_username'],
             $storeConfig['p13n_password'],
             $storeConfig['domain']
         );
-        $p13nSort = new P13nSort();
+        $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
         $p13nSort->push('score', true);   // score / discountedPrice / title_en
-        $p13n = new P13nAdapter($p13nConfig);
+        $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
         $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
         $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);

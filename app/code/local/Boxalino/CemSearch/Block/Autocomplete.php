@@ -107,20 +107,16 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $counter = 0;
             $data = array();
 
-            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nConfig');
-            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nSort');
-            Mage::helper('Boxalino_CemSearch')->__loadClass('P13nAdapter');
-
             $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
-            $p13nConfig = new P13nConfig(
+            $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
                 $storeConfig['host'],
                 Mage::helper('Boxalino_CemSearch')->getAccount(),
                 $storeConfig['p13n_username'],
                 $storeConfig['p13n_password'],
                 $storeConfig['domain']
             );
-            $p13n = new P13nAdapter($p13nConfig);
+            $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 

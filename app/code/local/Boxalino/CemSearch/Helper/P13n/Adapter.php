@@ -5,9 +5,7 @@
  * Date: 28.05.14
  */
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Lib' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'Thrift' . DIRECTORY_SEPARATOR . 'HttpP13n.php';
-
-class P13nAdapter
+class Boxalino_CemSearch_Helper_P13n_Adapter
 {
     private $config = null;
     private $p13n = null;
@@ -19,13 +17,14 @@ class P13nAdapter
     private $inquiry = null;
     private $searchQuery = null;
     private $filters = array();
+    const VISITOR_COOKIE_TIME = 31536000;
 
-    public function __construct(P13nConfig $config)
+    public function __construct(Boxalino_CemSearch_Helper_P13n_Config $config)
     {
         $this->config = $config;
         $this->p13n = new HttpP13n();
         $this->configureP13n();
-        $this->createChoiseRequest();
+        $this->createChoiceRequest();
     }
 
     private function configureP13n()
@@ -34,7 +33,7 @@ class P13nAdapter
         $this->p13n->setAuthorization($this->config->getUsername(), $this->config->getPassword());
     }
 
-    private function createChoiseRequest()
+    private function createChoiceRequest()
     {
         $this->choiceRequest = $this->p13n->getChoiceRequest($this->config->getAccount(), $this->config->getDomain());
     }
@@ -220,8 +219,7 @@ class P13nAdapter
     {
         $choiceId = 'autocomplete';
         $fields = array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
-
-        $this->autocompleteRequest = $this->p13n->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
+        $this->autocompleteRequest = $this->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
 
         $searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
         $searchQuery->indexId = $this->config->getAccount();
@@ -241,7 +239,6 @@ class P13nAdapter
         $this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
         $this->autocompleteRequest->searchChoiceId = $choiceId;
         $this->autocompleteRequest->searchQuery = $searchQuery;
-
         $this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
 
     }
@@ -286,7 +283,6 @@ class P13nAdapter
     public function getEntitiesIds()
     {
         $result = array();
-        //print_r($this->choiceResponse);
         foreach ($this->choiceResponse->variants as $variant) {
             /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
             $searchResult = $variant->searchResult;
@@ -349,6 +345,55 @@ class P13nAdapter
         }
         echo '</table>';
 
+    }
+
+    /**
+     * @param string $accountname
+     * @param string $cookieDomain
+     * @return \com\boxalino\p13n\api\thrift\AutocompleteRequest
+     */
+    private function getAutocompleteRequest($accountname, $cookieDomain = null)
+    {
+        $request = new \com\boxalino\p13n\api\thrift\AutocompleteRequest();
+
+        // Setup information about account
+        $userRecord = new \com\boxalino\p13n\api\thrift\UserRecord();
+        $userRecord->username = $accountname;
+        $request->userRecord = $userRecord;
+
+        if (empty($_COOKIE['cems'])) {
+            $sessionid = session_id();
+            if (empty($sessionid)) {
+                session_start();
+                $sessionid = session_id();
+            }
+        } else {
+            $sessionid = $_COOKIE['cems'];
+        }
+
+        if (empty($_COOKIE['cemv'])) {
+            $profileid = '';
+            if (function_exists('openssl_random_pseudo_bytes')) {
+                $profileid = bin2hex(openssl_random_pseudo_bytes(16));
+            }
+            if (empty($profileid)) {
+                $profileid = uniqid('', true);
+            }
+        } else {
+            $profileid = $_COOKIE['cemv'];
+        }
+        $request->profileId = $profileid;
+
+        // Refresh cookies
+        if (empty($cookieDomain)) {
+            setcookie('cems', $sessionid, 0);
+            setcookie('cemv', $profileid, time() + self::VISITOR_COOKIE_TIME);
+        } else {
+            setcookie('cems', $sessionid, 0, '/', $cookieDomain);
+            setcookie('cemv', $profileid, time() + 1800, '/', self::VISITOR_COOKIE_TIME);
+        }
+
+        return $request;
     }
 
 }

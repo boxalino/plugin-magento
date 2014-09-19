@@ -23,54 +23,51 @@
 
 namespace Thrift\Serializer;
 
-use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Transport\TMemoryBuffer;
+use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Type\TMessageType;
 
 /**
  * Utility class for serializing and deserializing
  * a thrift object using TBinaryProtocolAccelerated.
  */
-class TBinarySerializer
-{
+class TBinarySerializer {
 
-    // NOTE(rmarin): Because thrift_protocol_write_binary
-    // adds a begin message prefix, you cannot specify
-    // a transport in which to serialize an object. It has to
-    // be a string. Otherwise we will break the compatibility with
-    // normal deserialization.
-    public static function serialize($object)
-    {
-        $transport = new TMemoryBuffer();
-        $protocol = new TBinaryProtocolAccelerated($transport);
-        if (function_exists('thrift_protocol_write_binary')) {
-            thrift_protocol_write_binary($protocol, $object->getName(),
-                TMessageType::REPLY, $object,
-                0, $protocol->isStrictWrite());
+  // NOTE(rmarin): Because thrift_protocol_write_binary
+  // adds a begin message prefix, you cannot specify
+  // a transport in which to serialize an object. It has to
+  // be a string. Otherwise we will break the compatibility with
+  // normal deserialization.
+  public static function serialize($object) {
+	$transport = new TMemoryBuffer();
+	$protocol = new TBinaryProtocolAccelerated($transport);
+	if (function_exists('thrift_protocol_write_binary')) {
+	  thrift_protocol_write_binary($protocol, $object->getName(),
+								   TMessageType::REPLY, $object,
+								   0, $protocol->isStrictWrite());
 
-            $protocol->readMessageBegin($unused_name, $unused_type,
-                $unused_seqid);
-        } else {
-            $object->write($protocol);
-        }
-        $protocol->getTransport()->flush();
-        return $transport->getBuffer();
-    }
+	  $protocol->readMessageBegin($unused_name, $unused_type,
+								  $unused_seqid);
+	} else {
+	  $object->write($protocol);
+	}
+	$protocol->getTransport()->flush();
+	return $transport->getBuffer();
+  }
 
-    public static function deserialize($string_object, $class_name)
-    {
-        $transport = new TMemoryBuffer();
-        $protocol = new TBinaryProtocolAccelerated($transport);
-        if (function_exists('thrift_protocol_read_binary')) {
-            $protocol->writeMessageBegin('', TMessageType::REPLY, 0);
-            $transport->write($string_object);
-            return thrift_protocol_read_binary($protocol, $class_name,
-                $protocol->isStrictRead());
-        } else {
-            $transport->write($string_object);
-            $object = new $class_name();
-            $object->read($protocol);
-            return $object;
-        }
-    }
+  public static function deserialize($string_object, $class_name) {
+	 $transport = new TMemoryBuffer();
+	 $protocol = new TBinaryProtocolAccelerated($transport);
+	 if (function_exists('thrift_protocol_read_binary')) {
+	   $protocol->writeMessageBegin('', TMessageType::REPLY, 0);
+	   $transport->write($string_object);
+	   return thrift_protocol_read_binary($protocol, $class_name,
+										  $protocol->isStrictRead());
+	 } else {
+	   $transport->write($string_object);
+	   $object = new $class_name();
+	   $object->read($protocol);
+	   return $object;
+	 }
+  }
 }
