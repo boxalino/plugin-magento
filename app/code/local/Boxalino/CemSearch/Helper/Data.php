@@ -9,11 +9,24 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         spl_autoload_register(array('Boxalino_CemSearch_Helper_Data', '__loadClass'), TRUE, TRUE);
     }
 
-    public static function __loadClass($name, $isCem = false)
+    public static function __loadClass()
     {
-        if (strpos($name, 'P13n') !== false || $isCem) {
+        $loadList = array(
+            'Exception/TException',
+            'Type/TType',
+            'Transport/TTransport',
+            'Transport/THttpClient',
+            'Transport/P13nTHttpClient',
+            'Factory/TStringFuncFactory',
+            'StringFunc/TStringFunc',
+            'StringFunc/Core',
+            'Protocol/TProtocol',
+            'Protocol/TCompactProtocol',
+            'Type/TMessageType',
+        );
+        foreach($loadList as $name) {
             try {
-                include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/' . $name . '.php');
+                include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/Thrift/' . $name . '.php');
             } catch (Exception $e) {
                 Mage::throwException($e->getMessage());
             }

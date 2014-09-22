@@ -8,6 +8,7 @@ abstract class AbstractThrift
 
     public function __construct()
     {
+        var_dump('t');
         if (self::$thriftClassLoader === null) {
             $this->initClassLoader();
         }
