@@ -80,7 +80,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->searchQuery->hitCount = $hitCount;
     }
 
-    private function setUpSorting(P13nSort $sorting)
+    private function setUpSorting(Boxalino_CemSearch_Helper_P13n_Sort $sorting)
     {
         $sortFieldsArray = $sorting->getSorts();
         $sortFields = array();

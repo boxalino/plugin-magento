@@ -552,9 +552,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                                 break;
                         }
                     }
-
                     $return[] = array(
-                        'order_id' => $transaction->getIncrementId(),
+                        'order_id' => $transaction->getId(),
                         'entity_id' => $product->getProductId(),
                         'customer_id' => $transaction->getCustomerId(),
                         'price' => $product->getOriginalPrice(),
@@ -567,10 +566,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'shipping_date' => $status == 2 ? $transaction->getUpdatedAt() : null,
                         'status' => $transaction->getStatus()
                     );
-
                 }
             }
-
             unset($transactions);
             return $return;
         }
