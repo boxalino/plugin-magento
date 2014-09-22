@@ -109,7 +109,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
      * will search all products in category 'Men' (with subcategories)
      *
      */
-    public function addFilterCategory($categoryId)
+    public function addFilterCategories($categoryId)
     {
         $categoryNames = array();
         if (isset($categoryId) && $categoryId > 0) {
@@ -129,6 +129,30 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $this->addFilterHierarchy('categories', $categoryId, $categoryNames);
 
         }
+    }
+
+    /**
+     * @param $categoryId
+     */
+    public function addFilterCategory($categoryId){
+
+        if (isset($categoryId) && $categoryId > 0){
+            $category = Mage::getModel('catalog/category')->load($categoryId);
+
+            if($category != null){
+//                $this->addFilterHierarchy('categories', $categoryId, $category->getName());
+                $filter = new \com\boxalino\p13n\api\thrift\Filter();
+
+                $filter->fieldName = 'categories';
+
+                $filter->hierarchyId = $categoryId;
+                $filter->hierarchy = array($category->getName());
+
+                $this->filters[] = $filter;
+            }
+
+        }
+
     }
 
     /**
