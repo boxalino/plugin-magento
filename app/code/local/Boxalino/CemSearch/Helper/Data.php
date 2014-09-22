@@ -1,5 +1,4 @@
 <?php
-
 class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 {
 
@@ -9,14 +8,12 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         spl_autoload_register(array('Boxalino_CemSearch_Helper_Data', '__loadClass'), TRUE, TRUE);
     }
 
-    public static function __loadClass($name, $isCem = false)
+    public static function __loadClass($name)
     {
-        if (strpos($name, 'P13n') !== false || $isCem) {
-            try {
-                include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/' . $name . '.php');
-            } catch (Exception $e) {
-                Mage::throwException($e->getMessage());
-            }
+        try {
+            include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/' . str_replace('\\', '/', $name) . '.php');
+        } catch (Exception $e) {
+//            Mage::throwException($e->getMessage());
         }
     }
 

@@ -368,6 +368,31 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             }
 
+            if (!isset($this->_transformedProducts['productsMtM']['entity_ids'])) {
+                $this->_transformedProducts['productsMtM']['entity_ids'] = array();
+            }
+
+            if($product->getTypeId() === 'grouped'){
+
+                foreach($product->getTypeInstance(true)->getAssociatedProducts($product) as $p){
+
+                    if (isset($this->_tmp['entity_ids'][$id]) && in_array( $p->getEntityId(), $this->_tmp['entity_ids'][$id])) {
+                        continue;
+                    }
+
+                    $this->_transformedProducts['productsMtM']['entity_ids'][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
+                        'entity_id' => $id, 'entity_ids_id' =>  $p->getEntityId());
+
+                    if(isset($this->_tmp['entity_ids'][$id])){
+                        $this->_tmp['entity_ids'][$id][] =  $p->getEntityId();
+                    } else{
+                        $this->_tmp['entity_ids'][$id] =  array($p->getEntityId());
+                    }
+
+                }
+
+            }
+
             if ($haveParent) {
                 continue;
             }
@@ -401,6 +426,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $localeCount++;
             }
+
+
 
             ksort($this->_transformedProducts['products'][$id]);
 
@@ -525,9 +552,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                                 break;
                         }
                     }
-
                     $return[] = array(
-                        'order_id' => $transaction->getIncrementId(),
+                        'order_id' => $transaction->getId(),
                         'entity_id' => $product->getProductId(),
                         'customer_id' => $transaction->getCustomerId(),
                         'price' => $product->getOriginalPrice(),
@@ -540,10 +566,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'shipping_date' => $status == 2 ? $transaction->getUpdatedAt() : null,
                         'status' => $transaction->getStatus()
                     );
-
                 }
             }
-
             unset($transactions);
             return $return;
         }
@@ -797,12 +821,13 @@ XML;
         $this->sxml_append_options($source);
         #########################################################################
 
-        $attr = array_keys($this->_attributesValuesByName);
+        $attrs = array_keys($this->_attributesValuesByName);
         if ($this->_storeConfig['export_tags']) {
-            $attr[] = 'tag';
+            $attrs[] = 'tag';
+
         }
 
-        foreach ($attr as $attr) {
+        foreach ($attrs as $attr) {
 
             $attr = Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($attr);
 
@@ -836,7 +861,7 @@ XML;
 
         }
 
-        #########################################################################
+       ########################################################################
         if ($this->_storeConfig['export_categories']) {
             //categories
             $sourceCategory = $sources->addChild('source');
@@ -903,6 +928,35 @@ XML;
             }
 
         }
+        ##################################
+        //Export child ids
+        $attr = Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName("entity_ids");
+
+        //product & attribute
+        $source = $sources->addChild('source');
+        $source->addAttribute('type', 'item_data_file');
+        $source->addAttribute('id', 'item_' . $attr);
+
+        $source->addChild('file')->addAttribute('value', 'product_' . $attr . '.csv');
+        $source->addChild('itemIdColumn')->addAttribute('value', 'entity_id');
+
+        $this->sxml_append_options($source);
+
+
+        // property
+        $property = $properties->addChild('property');
+        $property->addAttribute('id', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName('entity_ids'));
+        $property->addAttribute('type', 'text');
+
+        $transform = $property->addChild('transform');
+        $logic = $transform->addChild('logic');
+        $ls = 'item_entity_ids';
+        $logic->addAttribute('source', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($ls));
+        $logic->addAttribute('type', 'direct');
+        $logic->addChild('field')->addAttribute('column', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName('entity_ids_id'));
+
+        ##################################
+
         if ($this->_storeConfig['export_customers']) {
             $customer = simplexml_load_string($customerString);
             $this->sxml_append($containers, $customer);

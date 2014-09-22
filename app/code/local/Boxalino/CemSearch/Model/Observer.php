@@ -29,22 +29,25 @@ class Boxalino_CemSearch_Model_Observer
     public function onOrderSuccessPageView(Varien_Event_Observer $event)
     {
         try {
-            $quoteId = Mage::getSingleton('Boxalino_CemSearch_Model_Session')->getLastQuoteId();
-            $quote = Mage::getModel('sales/quote')->load($quoteId);
-
+            $orders = Mage::getModel('sales/order')->getCollection()
+                ->setOrder('entity_id','DESC')
+                ->setPageSize(1)
+                ->setCurPage(1);
+            $order = $orders->getFirstItem();
+            $transactionId = $order->getData()['entity_id'];
             $products = array();
             $fullPrice = 0;
-            foreach ($quote->getAllItems() as $item) {
+            foreach ($order->getAllItems() as $item) {
                 if ($item->getPrice() > 0) {
                     $products[] = array(
                         'product' => $item->getProduct()->getId(),
-                        'quantity' => $item->getQty(),
+                        'quantity' => $item->getData('qty_ordered'),
                         'price' => $item->getPrice()
                     );
                     $fullPrice = $fullPrice + $item->getPrice();
                 }
             }
-            $script = Mage::helper('Boxalino_CemSearch')->reportPurchase($products, $quoteId, $fullPrice, Mage::app()->getStore()->getCurrentCurrencyCode());
+            $script = Mage::helper('Boxalino_CemSearch')->reportPurchase($products, $transactionId, $fullPrice, Mage::app()->getStore()->getCurrentCurrencyCode());
 
             $session = Mage::getSingleton('Boxalino_CemSearch_Model_Session');
             $session->addScript($script);
