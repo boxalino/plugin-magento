@@ -147,13 +147,29 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _mergeAllAttributes()
     {
         $this->_listOfAttributes = Mage::helper('boxalinoexporter')->defaultAttributes();
+
+        $attributes = array();
+
+        foreach(Mage::getResourceModel('catalog/product_attribute_collection')->getItems() as $at){
+            $attributes[] = $at->getAttributeCode();
+        }
+
         if (isset($this->_storeConfig['additional_attributes']) && $this->_storeConfig['additional_attributes'] != '') {
             $fields = explode(',', $this->_storeConfig['additional_attributes']);
             foreach ($fields as $field) {
-                $this->_listOfAttributes[] = $field;
+
+                if(!in_array($field, $attributes)){
+                    Mage::throwException("Attribute \"$field\" not exist!" );
+                }
+
+                if($field != null && strlen($field) > 0){
+                    $this->_listOfAttributes[] = $field;
+                }
+
             }
             unset($fields);
         }
+
     }
 
     /**
