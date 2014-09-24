@@ -10,10 +10,12 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
     public static function __loadClass($name)
     {
-        try {
-            include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/' . str_replace('\\', '/', $name) . '.php');
-        } catch (Exception $e) {
-//            Mage::throwException($e->getMessage());
+        if(strpos($name, 'Thrift\\') !== false){
+            try {
+                include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/' . str_replace('\\', '/', $name) . '.php');
+            } catch (Exception $e) {
+                Mage::throwException($e->getMessage());
+            }
         }
     }
 
