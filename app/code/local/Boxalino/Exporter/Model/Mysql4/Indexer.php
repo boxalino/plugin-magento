@@ -1226,7 +1226,7 @@ XML;
     protected function _closeExport()
     {
         foreach ($this->_files as $f) {
-//            @unlink($f);
+            @unlink($f);
         }
     }
 
