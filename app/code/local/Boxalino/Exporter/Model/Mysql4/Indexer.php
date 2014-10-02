@@ -378,36 +378,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     case 'category_ids':
                         break;
                     default:
-                        $productParam[$attr] = trim($product->$attr);
+                        $productParam[$attr] = trim($product->$attr).'';
                         break;
                 }
 
             }
 
-            if (!isset($this->_transformedProducts['productsMtM']['entity_ids'])) {
-                $this->_transformedProducts['productsMtM']['entity_ids'] = array();
-            }
-
-            if($product->getTypeId() === 'grouped'){
-
-                foreach($product->getTypeInstance(true)->getAssociatedProducts($product) as $p){
-
-                    if (isset($this->_tmp['entity_ids'][$id]) && in_array( $p->getEntityId(), $this->_tmp['entity_ids'][$id])) {
-                        continue;
-                    }
-
-                    $this->_transformedProducts['productsMtM']['entity_ids'][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
-                        'entity_id' => $id, 'entity_ids_id' =>  $p->getEntityId());
-
-                    if(isset($this->_tmp['entity_ids'][$id])){
-                        $this->_tmp['entity_ids'][$id][] =  $p->getEntityId();
-                    } else{
-                        $this->_tmp['entity_ids'][$id] =  array($p->getEntityId());
-                    }
-
-                }
-
-            }
 
             if ($haveParent) {
                 continue;
@@ -442,8 +418,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $localeCount++;
             }
-
-
 
             ksort($this->_transformedProducts['products'][$id]);
 
@@ -659,6 +633,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //Create name for file
         $exportFile = '/tmp/boxalino/' . $this->_storeConfig['di_username'];
 
+        $csvFiles = array_filter($csvFiles);
+
         //Create xml
         $this->createXML($exportFile . '.xml');
 
@@ -680,6 +656,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function createCsv($name, $data, $csv)
     {
         $file = $name . '.csv';
+
+        if(!is_array($data) || count($data) == 0){
+            Mage::getModel('adminhtml/session')->addWarning("Data for $file have wrong format or is empty. " . "[" . gettype($data) . "]");
+
+//            return null;
+        }
+
         $csvdata = array_merge(array(array_keys(end($data))), $data);
         $csvdata[0][0] = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($csvdata[0][0]);
         $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
@@ -687,6 +670,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $this->_files[] = '/tmp/boxalino/' . $file;
 
         return $file;
+
+
     }
 
     /**
@@ -710,6 +695,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
 
         $helper = Mage::helper('boxalinoexporter');
+        $this->_files = array_filter($this->_files);
 
         $xml = new SimpleXMLElement('<root/>');
 
@@ -845,6 +831,10 @@ XML;
 
         foreach ($attrs as $attr) {
 
+//            if(!array_key_exists($attr . '.csv', $this->_files)){
+//                continue;
+//            }
+
             $attr = Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($attr);
 
             //attribute
@@ -919,6 +909,11 @@ XML;
             if ($prop['id'] == 'entity_id') {
 
             }
+
+//            if($prop['type'] == 'reference' && !array_key_exists($prop['name'], $this->_files)){
+//                continue;
+//            }
+
             $property = $properties->addChild('property');
             $property->addAttribute('id', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($prop['id']));
             $property->addAttribute('type', $prop['ptype']);
@@ -945,31 +940,6 @@ XML;
 
         }
         ##################################
-        //Export child ids
-        $attr = Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName("entity_ids");
-
-        //product & attribute
-        $source = $sources->addChild('source');
-        $source->addAttribute('type', 'item_data_file');
-        $source->addAttribute('id', 'item_' . $attr);
-
-        $source->addChild('file')->addAttribute('value', 'product_' . $attr . '.csv');
-        $source->addChild('itemIdColumn')->addAttribute('value', 'entity_id');
-
-        $this->sxml_append_options($source);
-
-
-        // property
-        $property = $properties->addChild('property');
-        $property->addAttribute('id', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName('entity_ids'));
-        $property->addAttribute('type', 'text');
-
-        $transform = $property->addChild('transform');
-        $logic = $transform->addChild('logic');
-        $ls = 'item_entity_ids';
-        $logic->addAttribute('source', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName($ls));
-        $logic->addAttribute('type', 'direct');
-        $logic->addChild('field')->addAttribute('column', Mage::Helper("Boxalino_CemSearch")->sanitizeFieldName('entity_ids_id'));
 
         ##################################
 
@@ -994,6 +964,7 @@ XML;
 //        $dom->save($name);
 
         $this->_files[] = $name;
+
 
     }
 
@@ -1175,6 +1146,7 @@ XML;
 
     protected function pushXML($file)
     {
+
         $fields = array(
             "username" => $this->_storeConfig['di_username'],
             "password" => $this->_storeConfig['di_password'],
@@ -1203,8 +1175,8 @@ XML;
 
         $responseBody = curl_exec($s);
         curl_close($s);
-        if (strpos($responseBody, 'Internal Server Error')) {
-            Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));
+        if (strpos($responseBody, 'Internal Server Error') !== false) {
+            Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));;
         }
         return $responseBody;
     }
