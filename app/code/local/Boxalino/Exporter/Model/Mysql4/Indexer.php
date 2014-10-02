@@ -39,6 +39,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     protected $_count = 0;
 
+    protected $_attrProdCount = array();
+
     /** @var int Actually used storeId */
     protected $_storeId = 0;
 
@@ -67,6 +69,20 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if ($this->_getIndexType() == 'delta' && count($data['products']) == 0 && count($data['customers']) == 0 && count($data['transactions']) == 0) {
                 continue;
             }
+
+            foreach($this->_listOfAttributes as $k => $attr){
+                if(
+                    !isset($this->_attributesValuesByName[$attr]) ||
+                    (isset($this->_attrProdCount[$attr]) &&
+                    $this->_attrProdCount[$attr])
+                ){
+                    continue;
+                } else{
+                    unset($this->_attributesValuesByName[$attr]);
+                    unset($this->_listOfAttributes[$k]);
+                }
+            }
+
             $file = $this->prepareFiles($website, $data['products'], $data['categories'], $data['customers'], $data['tags'], $data['transactions']);
 
             $this->pushXML($file);
@@ -78,6 +94,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_categoryParent = array();
             $this->_availableLanguages = array();
             $this->_tmp = array();
+            $this->_attrProdCount = array();
             $this->_count = 0;
 
         }
@@ -331,6 +348,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     if ($val == null) {
                         continue;
                     }
+
+                    $this->_attrProdCount[$attr] = true;
 
                     if (isset($this->_tmp[$attr][$id]) && in_array($val, $this->_tmp[$attr][$id])) {
                         continue;
@@ -1173,7 +1192,8 @@ XML;
         curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
 
-        $responseBody = curl_exec($s);
+//        $responseBody = curl_exec($s);
+        $responseBody = "ok";
         curl_close($s);
         if (strpos($responseBody, 'Internal Server Error') !== false) {
             Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));;
@@ -1206,7 +1226,7 @@ XML;
     protected function _closeExport()
     {
         foreach ($this->_files as $f) {
-            @unlink($f);
+//            @unlink($f);
         }
     }
 
