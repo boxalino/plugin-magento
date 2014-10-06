@@ -1192,8 +1192,7 @@ XML;
         curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($s, CURLOPT_POSTFIELDS, $fields);
 
-//        $responseBody = curl_exec($s);
-        $responseBody = "ok";
+        $responseBody = curl_exec($s);
         curl_close($s);
         if (strpos($responseBody, 'Internal Server Error') !== false) {
             Mage::throwException(Mage::helper('boxalinoexporter')->getError($responseBody));;
