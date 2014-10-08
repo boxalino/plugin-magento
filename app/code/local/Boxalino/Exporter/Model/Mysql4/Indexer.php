@@ -341,7 +341,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 if (isset($this->_attributesValuesByName[$attr])) {
 
-                    $val = $product->$attr;
+                    $val = $helper->XML_ENCLOSURE . htmlspecialchars(trim($product->$attr)) . $helper->XML_ENCLOSURE;
 
                     $attr = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($attr);
 
@@ -392,17 +392,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     case 'description':
                     case 'short_description':
                     case 'name':
-                        $productParam[$attr . '_' . $this->_storeConfig['language']] = $helper->XML_ENCLOSURE . htmlspecialchars(str_replace(',', ' ', trim($product->$attr))) . $helper->XML_ENCLOSURE;
+                        $productParam[$attr . '_' . $this->_storeConfig['language']] = $helper->XML_ENCLOSURE . htmlspecialchars(trim($product->$attr)) . $helper->XML_ENCLOSURE;
                         break;
                     case 'category_ids':
                         break;
                     default:
-                        $productParam[$attr] = trim($product->$attr).'';
+                        $productParam[$attr] = $helper->XML_ENCLOSURE . htmlspecialchars(trim($product->$attr)) . $helper->XML_ENCLOSURE;
                         break;
                 }
 
             }
-
 
             if ($haveParent) {
                 continue;
