@@ -12,7 +12,6 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      *
      * @var null
      */
-    static private $parentId = null;
     /**
      * Array of variants ids for specified products.
      *
@@ -29,6 +28,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     protected $_attributesWithIds = array();
     protected $_allTags = array();
     protected $_countries = array();
+    private $parentId = null;
 
     public function defaultAttributes()
     {
