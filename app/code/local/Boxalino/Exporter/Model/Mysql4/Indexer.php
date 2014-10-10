@@ -55,8 +55,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
 
         $this->_websiteExport();
-//        $this->_closeExport();
-//        return $this;
+        $this->_closeExport();
+        return $this;
     }
 
     /**
