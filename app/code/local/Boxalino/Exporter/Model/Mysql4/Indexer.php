@@ -134,11 +134,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $this->_availableLanguages[] = $this->_storeConfig['language'];
                 }
             }
+
             if ($this->_isEnabled()) {
                 $this->_exportCustomers();
                 $this->_exportTransactions();
                 $products = $this->_exportProducts();
             }
+
         }
 
         return array(
@@ -336,17 +338,23 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $count = $limit;
         $page = 1;
         $header = true;
+        $collection = Mage::getModel('catalog/product')
+            ->getCollection()
+            ->setOrder('entity_id', 'ASC');;
 
         while($count >= $limit){
 
             $products_to_save = array();
 
+            if ($countMax > 0 && $this->_count >= $countMax) {
+                break;
+            }
+
             foreach ($this->group->getStores() as $store) {
 
                 $lang = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
 
-                $products = Mage::getModel('catalog/product')
-                ->getCollection()
+                $products = $collection
                 ->setStore($store->getId())
                 ->setPageSize($limit)
                 ->setCurPage($page)
@@ -460,15 +468,17 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             }
                         }
                         $this->_count++;
+                        $localeCount++;
 
                     } elseif (isset($this->_transformedProducts['products'][$id])) {
-                        if ($countMax > 0 && $localeCount >= $countMax) {
-                            break;
-                        }
+//                        if ($countMax > 0 && $localeCount >= $countMax) {
+//                            break;
+//                        }
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
 
-                        $localeCount++;
                     }
+
+
 
                     ksort($this->_transformedProducts['products'][$id]);
 
@@ -486,8 +496,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->savePartToCsv('products.csv', $data);
 
             $this->_transformedProducts['products'] = array();
-
-
 
             $page++;
 
@@ -522,7 +530,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $page = 1;
             $header = true;
 
-            while($count >= $limit){
+            do{
 
                 $products_to_save = array();
                 $customers = Mage::getModel('customer/customer')
@@ -572,7 +580,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $count = count($products_to_save);
                 $page++;
 
-            }
+            } while($count >= $limit);
             unset($customers);
         }
 
@@ -1365,7 +1373,6 @@ XML;
         $helper = Mage::helper('boxalinoexporter');
 
         //save
-
         if(!in_array($file, $this->_file)){
             $this->_files[] = $file;
         }
