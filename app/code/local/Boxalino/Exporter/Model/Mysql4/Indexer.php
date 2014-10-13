@@ -338,9 +338,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $count = $limit;
         $page = 1;
         $header = true;
-        $collection = Mage::getModel('catalog/product')
-            ->getCollection()
-            ->setOrder('entity_id', 'ASC');;
+
+//            ->setOrder('entity_id', 'ASC');
 
         while($count >= $limit){
 
@@ -350,15 +349,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 break;
             }
 
+
+
             foreach ($this->group->getStores() as $store) {
 
                 $lang = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
+
+                $collection = Mage::getModel('catalog/product')
+                    ->getCollection();
 
                 $products = $collection
                 ->setStore($store->getId())
                 ->setPageSize($limit)
                 ->setCurPage($page)
                 ->addAttributeToSelect($attrs);
+
+                $count = count($products);
 
                 foreach ($products as $product) {
                     if (count($product->getWebsiteIds()) == 0) {
@@ -478,15 +484,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     }
 
-
-
                     ksort($this->_transformedProducts['products'][$id]);
 
                 }
             }
 
             $data = $this->_transformedProducts['products'];
-            $count = count($products);
 
             if($header){
                 $data = array_merge(array(array_keys(end($data))), $data);
