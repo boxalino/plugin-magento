@@ -34,7 +34,8 @@ class Boxalino_CemSearch_Model_Observer
                 ->setPageSize(1)
                 ->setCurPage(1);
             $order = $orders->getFirstItem();
-            $transactionId = $order->getData()['entity_id'];
+            $orderData = $order->getData();
+            $transactionId = $orderData['entity_id'];
             $products = array();
             $fullPrice = 0;
             foreach ($order->getAllItems() as $item) {
