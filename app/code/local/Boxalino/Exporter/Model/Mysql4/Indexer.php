@@ -697,34 +697,34 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         if (!file_exists("/tmp/boxalino")) {
             mkdir("/tmp/boxalino");
         }
-        $csv = new Varien_File_Csv();
+//        $csv = new Varien_File_Csv();
 
         $helper = Mage::helper('boxalinoexporter');
-        $csv->setDelimiter($helper->XML_DELIMITER);
-        $csv->setEnclosure(null);
+//        $csv->setDelimiter($helper->XML_DELIMITER);
+//        $csv->setEnclosure(null);
 
         //create csv
         //save attributes
         foreach ($this->_attributesValuesByName as $attrName => $attrValues) {
-            $csvFiles[] = $this->createCsv(Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($attrName), $attrValues, $csv);
+            $csvFiles[] = $this->createCsv(Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($attrName), $attrValues);
         }
 
         //save categories
         if ($categories != null) {
-            $csvFiles[] = $this->createCsv('categories', $categories, $csv);
+            $csvFiles[] = $this->createCsv('categories', $categories);
             unset($categories);
         }
 
         //save tags
         if ($tags != null) {
-            $csvFiles[] = $this->createCsv('tag', $tags, $csv);
+            $csvFiles[] = $this->createCsv('tag', $tags);
 
             $loop = 1;
             foreach ($this->_getProductTags() as $product_id => $tag_id) {
                 $csvdata[] = array('id' => $loop++, 'entity_id' => $product_id, 'tag_id' => $tag_id);
             }
 
-            $csvFiles[] = $this->createCsv('product_tag', $csvdata, $csv);
+            $csvFiles[] = $this->createCsv('product_tag', $csvdata);
 
         }
 
@@ -743,7 +743,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
 //        //products & attributes
         foreach ($products['productsMtM'] as $key => $val) {
-            $csvFiles[] = $this->createCsv("product_" . Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($key) , $val, $csv);
+            $csvFiles[] = $this->createCsv("product_" . Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($key) , $val);
         }
 //        csv done
 
@@ -771,7 +771,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      * @param $csv
      * @return string
      */
-    protected function createCsv($name, $data, $csv)
+    protected function createCsv($name, $data)
     {
         $file = $name . '.csv';
 
@@ -781,7 +781,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $csvdata = array_merge(array(array_keys(end($data))), $data);
         $csvdata[0][0] = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($csvdata[0][0]);
-        $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
+
+//        $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
+
+        $helper = Mage::helper('boxalinoexporter');
+
+        $fh = fopen($this->_dir . '/' . $file, 'a');
+        foreach ($csvdata as $dataRow) {
+            fputcsv($fh, $dataRow, $helper->XML_DELIMITER, $helper->XML_ENCLOSURE);
+        }
+        fclose($fh);
 
         $this->_files[] = $file;
 
@@ -1351,7 +1360,7 @@ XML;
         if (!file_exists("/tmp/boxalino")) {
             mkdir("/tmp/boxalino");
         }
-        $csv = new Varien_File_Csv();
+//        $csv = new Varien_File_Csv();
 
         $helper = Mage::helper('boxalinoexporter');
 
@@ -1361,9 +1370,9 @@ XML;
             $this->_files[] = $file;
         }
 
-        $fh = fopen('/tmp/boxalino/' . $file, 'a');
+        $fh = fopen($this->_dir . '/' . $file, 'a');
         foreach ($data as $dataRow) {
-            $csv->fputcsv($fh, $dataRow, $helper->XML_DELIMITER, null);
+            fputcsv($fh, $dataRow, $helper->XML_DELIMITER, $helper->XML_ENCLOSURE);
         }
         fclose($fh);
 
@@ -1381,7 +1390,9 @@ XML;
 
         $helper = Mage::helper('boxalinoexporter');
 
-        return $helper->XML_ENCLOSURE . htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string))) . $helper->XML_ENCLOSURE;
+        return htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string)));
+
+//        return $helper->XML_ENCLOSURE . htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string))) . $helper->XML_ENCLOSURE;
 
     }
 
