@@ -491,7 +491,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $data = $this->_transformedProducts['products'];
 
-            if($header){
+            if($header && count($data) > 0){
                 $data = array_merge(array(array_keys(end($data))), $data);
                 $header = false;
             }
@@ -675,6 +675,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
 
                 $data = $products_to_save;
+                $count = count($transactions);
 
                 if($header){
                     $data = array_merge(array(array_keys(end($products_to_save))), $products_to_save);
@@ -683,7 +684,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $this->savePartToCsv('transactions.csv', $data);
 
-                $count = count($products_to_save);
                 $page++;
 
             }
