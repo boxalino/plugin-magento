@@ -28,7 +28,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     protected $_attributesWithIds = array();
     protected $_allTags = array();
     protected $_countries = array();
-    private $parentId = null;
+    static private $parentId = null;
 
     public function defaultAttributes()
     {
@@ -192,7 +192,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         }
 
         self::$simpleIds = $simpleIds;
-        $this->$parentId = $parentIds;
+        self::$parentId = $parentIds;
     }
 
     /**

@@ -126,6 +126,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $this->group = $group;
 
+            if ($this->_isEnabled()) {
+                $this->_exportCustomers();
+                $this->_exportTransactions();
+                $products = $this->_exportProducts();
+            }
+
             foreach ($group->getStores() as $store) {
                 $this->_prepareStoreConfig($store->getId());
                 if ($this->_isEnabled()) {
@@ -133,12 +139,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $tags = $this->_exportTags();
                     $this->_availableLanguages[] = $this->_storeConfig['language'];
                 }
-            }
-
-            if ($this->_isEnabled()) {
-                $this->_exportCustomers();
-                $this->_exportTransactions();
-                $products = $this->_exportProducts();
             }
 
         }
@@ -283,7 +283,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $this->_transformedCategories[$category->getId()] = array('category_id' => $category->getId(), 'parent_id' => $parentId, 'value_' . $this->_storeConfig['language'] => $this->escapeString($category->getName()));
                 }
             }
-            unset($categories);
+            $categories = null;;
             return $this->_transformedCategories;
         }
 
@@ -314,7 +314,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
             }
 
-            unset($tags);
+            $tags = null;
             return $this->_transformedTags;
         }
 
@@ -355,7 +355,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $lang = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
 
-                $collection = Mage::getModel('catalog/product')
+                $collection = Mage::getSingleton('catalog/product')
                     ->getCollection();
 
                 $products = $collection
@@ -368,6 +368,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 foreach ($products as $product) {
                     if (count($product->getWebsiteIds()) == 0) {
+                        $products = null;
                         continue;
                     }
 
@@ -380,7 +381,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $id = $helper->getParentId($id);
                         $haveParent = true;
                     } else if ($product->getVisibility() == 1 && $helper->getParentId($id) == null) {
-                        unset($product);
+                        $product = null;
                         continue;
                     }
 
@@ -484,6 +485,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     }
 
+                    $product = null;
+
                     ksort($this->_transformedProducts['products'][$id]);
 
                 }
@@ -504,9 +507,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $page++;
 
+            $products = null;
+
         }
 
-        unset($products);
+
         return $this->_transformedProducts;
     }
 
@@ -586,7 +591,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $page++;
 
             } while($count >= $limit);
-            unset($customers);
+            $customers = null;
         }
 
         return null;
@@ -674,6 +679,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             'status' => $transaction->getStatus()
                         );
                     }
+
+                    $products = null;
                 }
 
                 $data = $products_to_save;
@@ -688,8 +695,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $page++;
 
+                $transactions = null;
+
             }
-            unset($customers);
+
         }
 
         return null;
@@ -702,7 +711,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /**
      * @description Preparing files to send
      */
-    protected function prepareFiles($website, $products, $categories = null, /*$customers = null,*/ $tags = null /*,$transactions = null*/)
+    protected function prepareFiles($website, &$products, &$categories = null, /*$customers = null,*/ &$tags = null /*,$transactions = null*/)
     {
 
         //Prepare attributes
@@ -725,7 +734,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //save categories
         if ($categories != null) {
             $csvFiles[] = $this->createCsv('categories', $categories);
-            unset($categories);
+            $categories = null;
         }
 
         //save tags
@@ -757,6 +766,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 //        //products & attributes
         foreach ($products['productsMtM'] as $key => $val) {
             $csvFiles[] = $this->createCsv("product_" . Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($key) , $val);
+            $products['productsMtM']['key'] = null;
         }
 //        csv done
 
@@ -784,7 +794,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      * @param $csv
      * @return string
      */
-    protected function createCsv($name, $data)
+    protected function createCsv($name, &$data)
     {
         $file = $name . '.csv';
 
@@ -823,7 +833,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($tags as $tag) {
                 $this->_allProductTags[$tag['entity_id']] = $tag['tag_id'];
             }
-            unset($tags);
+            $tags = null;
         }
 
         return $this->_allProductTags;
@@ -1362,7 +1372,7 @@ XML;
             foreach ($products as $product) {
                 $this->_productsStockQty[$product->getProductId()] = $product->getQty();
             }
-            unset($products);
+            $products = null;
         }
 
         return $this->_productsStockQty;
@@ -1387,6 +1397,7 @@ XML;
             fputcsv($fh, $dataRow, $helper->XML_DELIMITER, $helper->XML_ENCLOSURE);
         }
         fclose($fh);
+        $fh = null;
 
     }
 
@@ -1414,6 +1425,10 @@ XML;
 
 //        return $helper->XML_ENCLOSURE . htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string))) . $helper->XML_ENCLOSURE;
 
+    }
+
+    private static function clearMemory(&$obj){
+        $obj = null;
     }
 
 }
