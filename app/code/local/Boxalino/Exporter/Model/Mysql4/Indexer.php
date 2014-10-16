@@ -250,7 +250,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      */
     protected function _isEnabled()
     {
-        if ($this->_storeConfig['enabled']) {
+        if (isset($this->_storeConfig['enabled']) && $this->_storeConfig['enabled']) {
             return true;
         } else if(!isset($this->_storeConfig['enabled']) && Mage::getStoreConfig('Boxalino_General/general/enabled')){
             return true;
@@ -489,16 +489,18 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
             }
 
-            $data = $this->_transformedProducts['products'];
+            if(isset($this->_transformedProducts['products']) && count($this->_transformedProducts['products']) > 0){
+                $data = $this->_transformedProducts['products'];
 
-            if($header && count($data) > 0){
-                $data = array_merge(array(array_keys(end($data))), $data);
-                $header = false;
+                if($header && count($data) > 0){
+                    $data = array_merge(array(array_keys(end($data))), $data);
+                    $header = false;
+                }
+
+                $this->savePartToCsv('products.csv', $data);
+
+                $this->_transformedProducts['products'] = array();
             }
-
-            $this->savePartToCsv('products.csv', $data);
-
-            $this->_transformedProducts['products'] = array();
 
             $page++;
 
@@ -1376,7 +1378,7 @@ XML;
         $helper = Mage::helper('boxalinoexporter');
 
         //save
-        if(!in_array($file, $this->_file)){
+        if(!in_array($file, $this->_files)){
             $this->_files[] = $file;
         }
 
@@ -1389,9 +1391,17 @@ XML;
     }
 
     public static function delTree($dir) {
+        if(!file_exists($dir)){
+            return;
+        }
         $files = array_diff(scandir($dir), array('.','..'));
         foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+            if(is_dir("$dir/$file")){
+                delTree("$dir/$file");
+            } else if(file_exists("$dir/$file")){
+                @unlink("$dir/$file");
+            }
+//            (is_dir("$dir/$file")) ? delTree("$dir/$file") : @unlink("$dir/$file");
         }
         return rmdir($dir);
     }
