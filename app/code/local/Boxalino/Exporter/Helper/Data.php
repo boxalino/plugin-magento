@@ -17,7 +17,6 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      *
      * @var null
      */
-    static private $simpleIds = null;
     public $XML_DELIMITER = ',';
     public $XML_ENCLOSURE = '"';
     public $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
@@ -28,7 +27,6 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     protected $_attributesWithIds = array();
     protected $_allTags = array();
     protected $_countries = array();
-    static private $parentId = null;
 
     public function defaultAttributes()
     {
@@ -128,96 +126,6 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             return self::URL_XML;
         }
 
-    }
-
-    /**
-     * Return parent id.
-     *
-     * @param null $productId
-     * @return null|int|array
-     */
-    public function getParentId($productId = null)
-    {
-        // Load connections if necessary.
-        $this->loadProductLinks();
-
-        // If no product is specified - return whole array.
-        if (!isset($productId)) {
-            return $this->parentId;
-        }
-
-        // If we have parent id for specified product - return it.
-        if (isset($this->parentId[$productId])) {
-            return $this->parentId[$productId];
-        }
-
-        // No parent - return null.
-        return null;
-    }
-
-    /**
-     * Load connection arrays if necessary.
-     */
-    private function loadProductLinks()
-    {
-
-        // If arrays already set - nothing to do here.
-        if (isset($this->parentId) && isset($this->simpleIds)) {
-            return;
-        }
-
-        // Get database connection
-        $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $tableName = $connection->getTableName('catalog_product_super_link');
-        // Get all data from `catalog_product_super_link`
-        $query = 'select * from ' . $tableName;
-        $this->_simples = array();
-        $this->_configurables = array();
-
-        $simpleIds = array();
-        $parentIds = array();
-        // Iterate through collection
-        foreach ($connection->fetchAll($query) as $row) {
-            $productId = $row['product_id'];
-            $parentId = $row['parent_id'];
-
-            // Set simpleIds array if not set yet for specified parent.
-            if (!isset($simpleIds[$parentId])) {
-                $simpleIds[$parentId] = array();
-            }
-            // Add simple product to collection of parent.
-            $simpleIds[$parentId][] = $productId;
-            // Add parent to simple product.
-            $parentIds[$productId] = $parentId;
-        }
-
-        self::$simpleIds = $simpleIds;
-        self::$parentId = $parentIds;
-    }
-
-    /**
-     * Return simple ids.
-     *
-     * @param null $productId
-     * @return null|int|array
-     */
-    public function getSimpleIds($productId = null)
-    {
-
-        // Load connections if necessary.
-        $this->loadProductLinks();
-
-        // If no product is specified - return whole array.
-        if (!isset($productId)) {
-            return $this->simpleIds;
-        }
-
-        // If we have simple ids for specified product - return it.
-        if (isset($this->simpleIds[$productId])) {
-            return $this->simpleIds[$productId];
-        }
-        // No simple ids - return null.
-        return null;
     }
 
     public function getError($responseBody)
