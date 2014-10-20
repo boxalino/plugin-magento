@@ -96,6 +96,9 @@
             </Boxalino_CemSearch>
         </helpers>
         <models>
+            <boxalino_cemsearch>
+                <class>Boxalino_CemSearch_Model</class>
+            </boxalino_cemsearch>
             <catalogsearch_resource>
                 <rewrite>
                     <fulltext>Boxalino_CemSearch_Model_Resource_Fulltext</fulltext>
@@ -151,6 +154,7 @@
                 <enabled>1</enabled>
                 <account_dev>0</account_dev>
                 <host>cdn.bx-cloud.com</host>
+                <logs_saving>0</logs_saving>
             </general>
             <search>
                 <quick_search>search</quick_search>

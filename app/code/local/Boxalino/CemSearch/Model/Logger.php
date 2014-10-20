@@ -1,0 +1,44 @@
+<?php
+
+class Boxalino_CemSearch_Model_Logger
+{
+    static private $_lastMemory = 0;
+    static private $_startLogging = null;
+    static private $_fileName = null;
+
+    /**
+     * @param string $type Error, Warning, Info, Success
+     * @param array $data array('memory_usage' => '', 'method' => '', 'description' => ''),
+     */
+    static public function saveMemoryTracking($type, $loggedAction, array $data)
+    {
+        if(Mage::getStoreConfig('Boxalino_General/general/logs_saving')) {
+            if (self::$_startLogging == null) {
+                self::$_startLogging = date('d-m-Y_H:i:s');
+            }
+            if (self::$_fileName == null) {
+                self::initFile($loggedAction . '-' . self::$_startLogging . '.txt');
+            }
+            $difference = $data['memory_usage'] - self::$_lastMemory;
+            $line = date('d-m-Y H:i:s').' '.strtoupper($type).': '.$loggedAction.' / '.$data['method'].' / '.$data['description'].'. Memory usage: '.$data['memory_usage']. ' - Difference='. $difference . "\n";
+            file_put_contents(self::$_fileName, $line, FILE_APPEND);
+            self::$_lastMemory = $data['memory_usage'];
+        }
+    }
+
+    private function initFile($name)
+    {
+        $logDir  = Mage::getBaseDir('var') . DS . 'boxalino_logs';
+        self::$_fileName = $logDir . DS . $name;
+
+        if (!is_dir($logDir)) {
+            mkdir($logDir);
+            chmod($logDir, 0777);
+        }
+
+        if (!file_exists(self::$_fileName)) {
+            file_put_contents(self::$_fileName, '');
+            chmod(self::$_fileName, 0777);
+        }
+    }
+}
