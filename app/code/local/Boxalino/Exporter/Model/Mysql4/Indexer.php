@@ -386,8 +386,6 @@ SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.
         $page = 1;
         $header = true;
 
-//            ->setOrder('entity_id', 'ASC');
-
         while($count >= $limit){
 
             $products_to_save = array();
@@ -601,7 +599,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                             break;
                         }
                         $productParam['entity_id'] = $id;
-        //                $productParam['parent_id'] = $this->_helperExporter->getParentId($id);
                         $this->_transformedProducts['products'][$id] = $productParam;
 
                         //Add categories
@@ -619,9 +616,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         $localeCount++;
 
                     } elseif (isset($this->_transformedProducts['products'][$id])) {
-//                        if ($countMax > 0 && $localeCount >= $countMax) {
-//                            break;
-//                        }
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
 
                     }
@@ -887,10 +881,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
         if (!file_exists("/tmp/boxalino")) {
             mkdir("/tmp/boxalino");
         }
-//        $csv = new Varien_File_Csv();
-
-//        $csv->setDelimiter($this->_helperExporter->XML_DELIMITER);
-//        $csv->setEnclosure(null);
 
         //create csv
         //save attributes
@@ -953,8 +943,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
         $csvdata = array_merge(array(array_keys(end($data))), $data);
         $csvdata[0][0] = $this->_helperSearch->sanitizeFieldName($csvdata[0][0]);
-
-//        $csv->saveData('/tmp/boxalino/' . $file, $csvdata);
 
         $fh = fopen($this->_dir . '/' . $file, 'a');
         foreach ($csvdata as $dataRow) {
@@ -1404,9 +1392,7 @@ XML;
     {
         if (file_exists($name)) {
             @unlink($name);
-        }
- //
-//        $this->_files[] = $name;
+        };
 
         $zip = new ZipArchive();
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
@@ -1526,7 +1512,6 @@ XML;
         if (!file_exists("/tmp/boxalino")) {
             mkdir("/tmp/boxalino");
         }
-//        $csv = new Varien_File_Csv();
 
         //save
         if(!in_array($file, $this->_files)){
@@ -1561,10 +1546,7 @@ XML;
 
     protected function escapeString($string){
 
-
         return htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string)));
-
-//        return $this->_helperExporter->XML_ENCLOSURE . htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string))) . $this->_helperExporter->XML_ENCLOSURE;
 
     }
 
