@@ -81,6 +81,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
                     $this->_attributesWithIds[] = $attribute['attribute_code'];
                 }
             }
+            $attributes = null;
         }
         return $this->_attributesWithIds;
     }
@@ -96,6 +97,8 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             foreach ($tags as $tag) {
                 $this->_allTags[$tag['tag_id']] = $tag['name'];
             }
+            $tags = null;
+            $tagsModel = null;
         }
 
         return $this->_allTags;
@@ -143,7 +146,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     public function getCountry($countryCode)
     {
         if(!isset($this->_countries[$countryCode])) {
-            $this->_countries[$countryCode] = Mage::getModel('directory/country')->loadByCode($countryCode);
+            $this->_countries[$countryCode] = Mage::getSingleton('directory/country')->loadByCode($countryCode);
         }
 
         return $this->_countries[$countryCode];

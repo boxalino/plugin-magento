@@ -13,7 +13,7 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
         $this->_init('boxalinoexporter/indexer', '');
     }
 
-    protected function _prepareFiles($products, $categories = null, $customers = null, $tags = null, $transactions = null)
+    protected function _prepareFiles($website,&$categories = null, &$tags = null)
     {
     }
 
@@ -23,9 +23,9 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
      */
     protected function _getTransactions()
     {
-        $transaction = Mage::getModel('sales/order')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect('*');
-
-        return $transaction;
+//        $transaction = Mage::getModel('sales/order')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect('*');
+//
+//        return $transaction;
     }
 
     /**
@@ -34,9 +34,9 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
      */
     protected function _getCustomers()
     {
-        $customers = Mage::getModel('customer/customer')->getCollection()->addAttributeToSelect('*');
-
-        return $customers;
+//        $customers = Mage::getModel('customer/customer')->getCollection()->addAttributeToSelect('*');
+//
+//        return $customers;
     }
 
     /**
@@ -56,8 +56,8 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Indexer extends Boxalino_Exporter_
      */
     protected function _getStoreProducts()
     {
-        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect($this->_listOfAttributes);
-        return $products;
+//        $products = Mage::getModel('catalog/product')->setStoreId($this->_storeId)->getCollection()->addAttributeToSelect($this->_listOfAttributes);
+//        return $products;
     }
 
     /**

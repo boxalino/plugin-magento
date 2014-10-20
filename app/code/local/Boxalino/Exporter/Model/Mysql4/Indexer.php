@@ -103,7 +103,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
             }
 
-            $file = $this->prepareFiles($website, $data['products'], $data['categories'], /*$data['customers'],*/ $data['tags'] /*, $data['transactions']*/);
+            $file = $this->prepareFiles($website, $data['categories'], $data['tags']);
 
             $this->pushXML($file);
             $this->pushZip($file);
@@ -340,15 +340,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $attrs = $this->_listOfAttributes;
 
-//        $resource = Mage::getSingleton('core/resource');
-//        $readConnection = $resource->getConnection('core_read');
         $query = "
 SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.`attribute_code`, `main_table`.`attribute_model`, `main_table`.`backend_model`, `main_table`.`backend_type`, `main_table`.`backend_table`, `main_table`.`frontend_input`, `main_table`.`source_model`, `additional_table`.`is_global`, `additional_table`.`is_html_allowed_on_front`, `additional_table`.`is_wysiwyg_enabled` FROM `eav_attribute` AS `main_table`
  INNER JOIN `catalog_eav_attribute` AS `additional_table` ON additional_table.attribute_id = main_table.attribute_id WHERE (main_table.entity_type_id = 4) AND (attribute_code IN('" .
             implode('\',\'', $this->_listOfAttributes) .
             "'))
 ";
-
 
         $config  = Mage::getConfig()->getResourceConnectionConfig("default_setup");
 
@@ -357,6 +354,7 @@ SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.
             'pass' => $config->password,
             'dbname' => $config->dbname
         );
+        unset($config);
 
         $pdo = new PDO('mysql:host=' . $dbinfo['host'] .';dbname=' . $dbinfo['dbname'], $dbinfo['user'], $dbinfo['pass']);
 
@@ -379,8 +377,6 @@ SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.
                 $attrFDB[$r['attribute_id']] = $r['attribute_code'];
             }
         }
-
-//        var_dump($attrsFromDb);die();
 
         $countMax = $this->_storeConfig['maximum_population'];
         $localeCount = 0;
@@ -509,7 +505,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         $product->$key = $value;
                     }
 
+                    $pr = null;
+
                     if (count($product->website) == 0) {
+
                         $products = null;
                         continue;
                     }
@@ -549,13 +548,13 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                                 // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                                 if ($attr == 'visibility' && $val == '4') {
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
-                                        'entity_id' => $id, $attr . '_id' => '2');
+                                        0 => $id, 1 => '2');
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
-                                        'entity_id' => $id, $attr . '_id' => '3');
+                                        0 => $id, 1 => '3');
                                     $this->_tmp[$attr][$id][] = $val;
                                 } else {
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => count($this->_transformedProducts['productsMtM'][$attr])+1,*/
-                                        'entity_id' => $id, $attr . '_id' => $val);
+                                        0 => $id, 1 => $val);
                                     $this->_tmp[$attr][$id][] = $val;
                                 }
                             } else {
@@ -563,13 +562,13 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                                 // If visibility is set everywhere (have value "4"), then we split it for value "2" and "3" (search and catalog separately)
                                 if ($attr == 'visibility' && $val == '4') {
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/
-                                        'entity_id' => $id, $attr . '_id' => '2');
+                                        0 => $id, 1 => '2');
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 2,*/
-                                        'entity_id' => $id, $attr . '_id' => '3');
+                                        0 => $id, 1 => '3');
                                     $this->_tmp[$attr][$id] = array($val);
                                 } else {
                                     $this->_transformedProducts['productsMtM'][$attr][] = array(/*'id' => 1,*/
-                                        'entity_id' => $id, $attr . '_id' => $val);
+                                        0 => $id, 1 => $val);
                                     $this->_tmp[$attr][$id] = array($val);
                                 }
                             }
@@ -608,7 +607,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         //Add categories
                         foreach ($product->categories as $cat) {
                             while ($cat != null) {
-                                $this->_transformedProducts['productsMtM']['categories'][] = array('entity_id' => $id, 'category_id' => $cat);
+                                $this->_transformedProducts['productsMtM']['categories'][] = array(0 => $id, 1 => $cat);
                                 if (isset($this->_transformedCategories[$cat]['parent_id'])) {
                                     $cat = $this->_transformedCategories[$cat]['parent_id'];
                                 } else {
@@ -626,7 +625,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
 
                     }
-
+                    $productParam = null;
                     $product = null;
 
                     ksort($this->_transformedProducts['products'][$id]);
@@ -642,11 +641,17 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                     $dataMtM = $val;
 
                     if($header){
-                        $dataMtM = array_merge(array(array("product_id", $key . "_id")), $dataMtM);
+
+                        if($key == 'categories'){
+                            $dataMtM = array_merge(array(array("entity_id", "category_id")), $dataMtM);
+                        } else{
+                            $dataMtM = array_merge(array(array("entity_id", $key . "_id")), $dataMtM);
+                        }
+
                         $csvFiles[] = "product_" . $this->_helperSearch->sanitizeFieldName($key);
                     }
 
-                    $this->savePartToCsv( "product_" . $this->_helperSearch->sanitizeFieldName($key) , $dataMtM);
+                    $this->savePartToCsv( "product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv' , $dataMtM);
                     $this->_transformedProducts['productsMtM'][$key] = null;
                 }
 
@@ -656,8 +661,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                 }
 
                 $this->savePartToCsv('products.csv', $data);
-
-
 
                 $data = null;
 
@@ -671,6 +674,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
             $products = null;
 
         }
+
+        $this->_transformedProducts = null;
+        $this->_parentId = null;
+        $this->_simpleIds = null;
 
 
         return $this->_transformedProducts;
@@ -872,7 +879,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
     /**
      * @description Preparing files to send
      */
-    protected function prepareFiles($website, &$products, &$categories = null, /*$customers = null,*/ &$tags = null /*,$transactions = null*/)
+    protected function prepareFiles($website, &$categories = null,  &$tags = null )
     {
 
         //Prepare attributes
@@ -910,24 +917,6 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
         }
 
-//        //save transactions
-//        if ($transactions != null && count($transactions) > 0) {
-//            $csvFiles[] = $this->createCsv('transactions', $transactions, $csv);
-//        }
-//
-//        //save customers
-//        if ($customers != null) {
-//            $csvFiles[] = $this->createCsv('customers', $customers, $csv);
-//        }
-//
-//        //products
-//        $csvFiles[] = $this->createCsv('products', $products['products'], $csv);
-
-//        //products & attributes
-//        foreach ($products['productsMtM'] as $key => $val) {
-//            $csvFiles[] = $this->createCsv("product_" . $this->_helperSearch->sanitizeFieldName($key) , $val);
-//            $products['productsMtM'][$key] = null;
-//        }
 //        csv done
 
         //Create name for file
@@ -1604,8 +1593,6 @@ XML;
             return;
         }
 
-//        var_dump('asd');
-
         // Get database connection
         $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
         $tableName = $connection->getTableName('catalog_product_super_link');
@@ -1628,6 +1615,7 @@ XML;
             // Add parent to simple product.
             $this->_parentId[$productId] = $parentId;
         }
+        unset($connection);
         $this->_isLoad = true;
     }
 
