@@ -634,13 +634,16 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         $this->_transformedProducts['products'][$id] = $productParam;
 
                         //Add categories
-                        foreach ($product->categories as $cat) {
-                            while ($cat != null) {
-                                $this->_transformedProducts['productsMtM']['categories'][] = array(0 => $id, 1 => $cat);
-                                if (isset($this->_transformedCategories[$cat]['parent_id'])) {
-                                    $cat = $this->_transformedCategories[$cat]['parent_id'];
-                                } else {
-                                    $cat = null;
+                        if(isset($product->categories) && count($product->categories) > 0){
+                            foreach ($product->categories as $cat) {
+
+                                while ($cat != null) {
+                                    $this->_transformedProducts['productsMtM']['categories'][] = array(0 => $id, 1 => $cat);
+                                    if (isset($this->_transformedCategories[$cat]['parent_id'])) {
+                                        $cat = $this->_transformedCategories[$cat]['parent_id'];
+                                    } else {
+                                        $cat = null;
+                                    }
                                 }
                             }
                         }
@@ -829,6 +832,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
                 foreach ($transactions as $transaction) {
 
+                    if ($transaction->getStatus() == 'canceled') {
+                        continue;
+                    }
+
                     $configurable = array();
 
                     Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Transactions - get all items - before'));
@@ -845,16 +852,16 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
                         //is configurable - simple product
                         if (intval($product->getPrice()) == 0) {
-                            $pid = $configurable[$product->getParentItemId()];
+                            if(isset($configurable[$product->getParentItemId()])){
+                                $pid = $configurable[$product->getParentItemId()];
+                            } else{
+                                $pid = Mage::getModel('catalog/product')->load($product->getParentItemId());
+                            }
                             $product->setOriginalPrice($pid->getOriginalPrice());
                             $product->setPrice($pid->getPrice());
                         }
 
                         $status = 0; // 0 - pending, 1 - confirmed, 2 - shipping
-
-                        if ($transaction->getStatus() == 'canceled') {
-                            continue;
-                        }
 
                         if ($transaction->getUpdatedAt() != $transaction->getCreatedAt()) {
 
@@ -886,6 +893,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         );
                     }
 
+                    $configurable = null;
                     $products = null;
                 }
 
