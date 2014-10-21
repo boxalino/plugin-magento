@@ -26,7 +26,7 @@ class Boxalino_CemSearch_Model_Logger
         }
     }
 
-    private function initFile($name)
+    static private function initFile($name)
     {
         $logDir  = Mage::getBaseDir('var') . DS . 'boxalino_logs';
         self::$_fileName = $logDir . DS . $name;
