@@ -161,15 +161,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $products = $this->_exportProducts();
             }
 
-
         }
 
         return array(
             'products' => $products,
             'categories' => $categories,
-//            'customers' => $customers,
             'tags' => $tags,
-//            'transactions' => $transactions
         );
     }
 
@@ -867,6 +864,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
                             switch ($transaction->getStatus()) {
                                 case 'canceled':
+                                    continue;
                                     continue;
                                     break;
                                 case 'processing':
