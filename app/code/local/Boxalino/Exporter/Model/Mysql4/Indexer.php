@@ -55,6 +55,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     private $_simpleIds = null;
     private $_isLoad = false;
     private $logger = null;
+    private $_pdo = null;
 
     /**
      * @description Start of apocalypse
@@ -62,6 +63,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     public function reindexAll()
     {
         Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Indexer init'));
+        $this->initPDO();
         $this->_websiteExport();
         $this->_closeExport();
         return $this;
@@ -741,24 +743,86 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
             $page = 1;
             $header = true;
 
+            $query = "SELECT `eav_entity_type`.* FROM `eav_entity_type` WHERE (`eav_entity_type`.`entity_type_code`='customer')";
+            $result = $this->fetchFromQuery($query);
+
+            $query = "SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.`attribute_code`, `main_table`.`attribute_model`, `main_table`.`backend_model`, `main_table`.`backend_type`, `main_table`.`backend_table`, `main_table`.`frontend_model`, `main_table`.`frontend_input`, `main_table`.`frontend_label`, `main_table`.`frontend_class`, `main_table`.`source_model`, `main_table`.`is_required`, `main_table`.`is_user_defined`, `main_table`.`default_value`, `main_table`.`is_unique`, `main_table`.`note`, `additional_table`.`is_visible`, `additional_table`.`input_filter`, `additional_table`.`multiline_count`, `additional_table`.`validate_rules`, `additional_table`.`is_system`, `additional_table`.`sort_order`, `additional_table`.`data_model`, `additional_table`.`is_used_for_customer_segment`, `scope_table`.`website_id` AS `scope_website_id`, `scope_table`.`is_visible` AS `scope_is_visible`, `scope_table`.`is_required` AS `scope_is_required`, `scope_table`.`default_value` AS `scope_default_value`, `scope_table`.`multiline_count` AS `scope_multiline_count` FROM `eav_attribute` AS `main_table`
+ INNER JOIN `customer_eav_attribute` AS `additional_table` ON additional_table.attribute_id = main_table.attribute_id
+ LEFT JOIN `customer_eav_attribute_website` AS `scope_table` ON scope_table.attribute_id = main_table.attribute_id AND scope_table.website_id = " . $this->group->getWebsiteId() . " WHERE (main_table.entity_type_id = " . $result['entity_type_id'] . ")";
+
+            $customerAttributes = array();
+            $attrsFromDb = array(
+                "int" => array(),
+                "varchar" => array(),
+                "text" => array(),
+                "datetime" => array(),
+            );
+
+            foreach($this->fetchAllFromQuery($query) as $attr){
+                $customerAttributes[$attr['attribute_id']] = $attr['attribute_code'];
+                if(isset($attrsFromDb[$attr['backend_type']])){
+                    $attrsFromDb[$attr['backend_type']][] = $attr['attribute_id'];
+
+                }
+            }
+            ksort($customerAttributes);
+
             do{
                 Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Customers - load page '.$page));
                 $customers_to_save = array();
-                $customers = Mage::getModel('customer/customer')
-                    ->getCollection()
-                    ->setPageSize($limit)
-                    ->setCurPage($page)
-                    ->addAttributeToSelect('*');
+
+                $customers = array();
+
+                $query = "SELECT  `e`.entity_id FROM  `customer_entity` AS  `e` WHERE (`e`.`entity_type_id` =  '1') LIMIT $limit OFFSET " . (($page-1) * $limit);
+                foreach($this->fetchAllFromQuery($query) as $r){
+                    $customers[$r['entity_id']] = array('id' => $r['entity_id']);
+                }
+
+                $ids = implode(',', array_keys($customers));
+                $query = "SELECT `customer_entity_varchar`.`entity_id` , `customer_entity_varchar`.`attribute_id` , `customer_entity_varchar`.`value` FROM `customer_entity_varchar` WHERE( entity_type_id =1) AND ( entity_id IN ( $ids ) ) AND ( attribute_id IN ( " . implode(',', $attrsFromDb['varchar']) . " ) ) UNION ALL SELECT `customer_entity_int`.`entity_id` , `customer_entity_int`.`attribute_id` , `customer_entity_int`.`value` FROM `customer_entity_int` WHERE ( entity_type_id =1 ) AND ( entity_id IN ( $ids ) ) AND ( attribute_id IN ( " . implode(',', $attrsFromDb['int']) ." ) ) UNION ALL SELECT `customer_entity_datetime`.`entity_id` , `customer_entity_datetime`.`attribute_id` , `customer_entity_datetime`.`value` FROM `customer_entity_datetime` WHERE ( entity_type_id =1 ) AND ( entity_id IN ( $ids ) ) AND ( attribute_id IN ( " . implode(',', $attrsFromDb['datetime']) . " ) )";
+
+                foreach($this->fetchAllFromQuery($query) as $r){
+                    $customers[$r['entity_id']][$customerAttributes[$r['attribute_id']]] = $r['value'];
+                }
+
+                $query = "SELECT `eav_entity_type`.* FROM `eav_entity_type` WHERE (`eav_entity_type`.`entity_type_code`='customer_address')";
+                $result = $this->fetchFromQuery($query);
+                $entityTypeId = $result['entity_type_id'];
+                $query = "SELECT  `main_table`.`attribute_id` ,  `main_table`.`entity_type_id` ,  `main_table`.`attribute_code` FROM  `eav_attribute` AS  `main_table` WHERE (main_table.entity_type_id =" . $entityTypeId . ")";
+
+                $addressAttr = array();
+                foreach($this->fetchAllFromQuery($query) as $r){
+                    if($r['attribute_code'] == 'country_id' || $r['attribute_code'] == 'postcode'){
+                        $addressAttr[$r['attribute_id']] = $r['attribute_code'];
+                    }
+                }
+
                 Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Customers - loaded page '.$page));
 
-                foreach ($customers as $customer) {
+                foreach ($customers as $c) {
                     Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Customers - Load billing address '));
-                    $billing = $customer->getPrimaryBillingAddress();
-                    if(!empty($billing)) {
-                        $countryCode = $billing->getCountry();
+
+                    $customer = $this->castToObject($c);
+
+                    $query = "SELECT `e`.* FROM `customer_address_entity` AS `e` WHERE (`e`.`entity_type_id` = '2') AND (`e`.`parent_id` = '" . $customer->id ."')";
+                    $res = $this->fetchFromQuery($query);
+                    $addId = $res['entity_id'];
+
+                    $query = "SELECT `customer_address_entity_varchar`.`entity_id` , `customer_address_entity_varchar`.`attribute_id` , `customer_address_entity_varchar`.`value` FROM `customer_address_entity_varchar` WHERE( entity_type_id =$entityTypeId) AND ( entity_id IN ( $addId ) ) AND ( attribute_id IN ( " . implode(',', array_keys($addressAttr)) ." ) )";
+
+                    $billingResult = array();
+
+                    foreach($this->fetchAllFromQuery($query) as $br){
+                        if(in_array($br['attribute_id'], array_keys($addressAttr))){
+                            $billingResult[$addressAttr[$br['attribute_id']]] = $br['value'];
+                        }
                     }
 
-                    switch ($customer->getGender()) {
+                    if(isset($billingResult['country_id'])) {
+                        $countryCode = $billingResult['country_id'];
+                    }
+
+                    switch (isset($customer->gender)?$customer->gender:0) {
                         case 1:
                             $gender = 'male';
                             break;
@@ -771,11 +835,11 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                     }
 
                     $customers_to_save[] = array(
-                        'customer_id' => $customer->getId(),
+                        'customer_id' => $customer->id,
                         'gender' => $gender,
-                        'dob' => $customer->getDob(),
+                        'dob' => isset($customer->dob)?$customer->dob:'',
                         'country' => !empty($countryCode) ? $this->_helperExporter->getCountry($countryCode)->getName() : '',
-                        'zip' => !empty($billing) ? $billing->getPostcode() : ''
+                        'zip' => isset($billingResult['postcode']) ? $billingResult['postcode']: ''
                     );
 
                 }
@@ -795,6 +859,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
             } while($count >= $limit);
             $customers = null;
         }
+
         Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Customers - end of exporting '));
         return null;
     }
@@ -1701,6 +1766,47 @@ XML;
         }
         // No simple ids - return null.
         return null;
+    }
+
+    private function initPDO(){
+        $config  = Mage::getConfig()->getResourceConnectionConfig("default_setup");
+
+        $dbinfo = array('host' => $config->host,
+            'user' => $config->username,
+            'pass' => $config->password,
+            'dbname' => $config->dbname
+        );
+        unset($config);
+
+        $this->_pdo = new PDO('mysql:host=' . $dbinfo['host'] .';dbname=' . $dbinfo['dbname'], $dbinfo['user'], $dbinfo['pass']);
+    }
+
+    private function fetchAllFromQuery($query){
+        $readConnection = $this->_pdo->prepare($query);
+        $readConnection->execute();
+        $results = $readConnection->fetchAll();
+
+        return $results;
+    }
+
+    private function fetchFromQuery($query){
+        $readConnection = $this->_pdo->prepare($query);
+        $readConnection->execute();
+        $results = $readConnection->fetch();
+
+        return $results;
+    }
+
+    private function castToObject($data){
+
+        $object = new stdClass();
+        foreach ($data as $key => $value)
+        {
+            $object->$key = $value;
+        }
+
+        return $object;
+
     }
 
 }
