@@ -883,51 +883,60 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
             while($count >= $limit){
                 Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Transactions - load page '.$page));
 
+                $query = "SELECT `main_table`.* FROM `sales_flat_order` AS `main_table` WHERE status <> 'canceled' LIMIT $limit OFFSET " . (($page-1) * $limit);
+
                 $transactions_to_save = array();
-                $transactions = Mage::getModel('sales/order')
-//                    ->setStoreId($this->_storeId)
-                    ->getCollection()
-                    ->setPageSize($limit)
-                    ->setCurPage($page)
-                    ->addAttributeToSelect('*');
+
+                $transactions = $this->fetchAllFromQuery($query);
                 Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Transactions - loaded page '.$page));
 
-                foreach ($transactions as $transaction) {
+                foreach ($transactions as $tr) {
 
-                    if ($transaction->getStatus() == 'canceled') {
-                        continue;
-                    }
-
-                    $configurable = array();
+                    $transaction = $this->castToObject($tr);
 
                     Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Transactions - get all items - before'));
-                    $products = ($transaction->getAllItems());
+
+                    $query = "SELECT `main_table`.* FROM `sales_flat_order_item` AS `main_table` WHERE (order_id = '" . $transaction->entity_id . "') ORDER BY `product_type`";
+                    $products = $this->fetchAllFromQuery($query);
+
                     Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Transactions - get all items - after'));
 
-                    foreach ($products as $product) {
+                    foreach ($products as $pr) {
+
+                        $product = $this->castToObject($pr);
 
                         //is configurable
-                        if ($product->getParentItemId() == null && $product->getProductType() != 'simple') {
-                            $configurable[$product->getId()] = $product;
+                        if ($product->product_type == 'configurable') {
+                            $configurable[$product->product_id] = $product;
                             continue;
                         }
 
+                        $productOptions = unserialize($product->product_options);
+
                         //is configurable - simple product
-                        if (intval($product->getPrice()) == 0) {
-                            if(isset($configurable[$product->getParentItemId()])){
-                                $pid = $configurable[$product->getParentItemId()];
+                        if (intval($product->price) == 0 && $product->product_type == 'simple') {
+
+                            if(isset($configurable[$productOptions['info_buyRequest']['product']])){
+                                $pid = $configurable[$productOptions['info_buyRequest']['product']];
+
+                                $product->original_price = $pid->original_price;
+                                $product->price = $pid->price;
                             } else{
-                                $pid = Mage::getModel('catalog/product')->load($product->getParentItemId());
+                                $pid = Mage::getModel('catalog/product')->load($productOptions['info_buyRequest']['product']);
+
+                                $product->original_price = ($pid->getOriginalPrice());
+                                $product->price = ($pid->getPrice());
+
+                                unset($product);
                             }
-                            $product->setOriginalPrice($pid->getOriginalPrice());
-                            $product->setPrice($pid->getPrice());
+
                         }
 
                         $status = 0; // 0 - pending, 1 - confirmed, 2 - shipping
 
-                        if ($transaction->getUpdatedAt() != $transaction->getCreatedAt()) {
+                        if ($transaction->updated_at != $transaction->created_at) {
 
-                            switch ($transaction->getStatus()) {
+                            switch ($transaction->status) {
                                 case 'canceled':
                                     continue;
                                     continue;
@@ -940,19 +949,20 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                                     break;
                             }
                         }
+
                         $transactions_to_save[] = array(
-                            'order_id' => $transaction->getId(),
-                            'entity_id' => $product->getProductId(),
-                            'customer_id' => $transaction->getCustomerId(),
-                            'price' => $product->getOriginalPrice(),
-                            'discounted_price' => $product->getPrice(),
-                            'quantity' => $product->getQtyOrdered(),
-                            'total_order_value' => ($transaction->getBaseSubtotal() + $transaction->getShippingAmount()),
-                            'shipping_costs' => $transaction->getShippingAmount(),
-                            'order_date' => $transaction->getCreatedAt(),
-                            'confirmation_date' => $status == 1 ? $transaction->getUpdatedAt() : null,
-                            'shipping_date' => $status == 2 ? $transaction->getUpdatedAt() : null,
-                            'status' => $transaction->getStatus()
+                            'order_id' => $transaction->entity_id,
+                            'entity_id' => $product->product_id,
+                            'customer_id' => isset($transaction->customer_id)?$transaction->customer_id:"",
+                            'price' => $product->original_price,
+                            'discounted_price' => $product->price,
+                            'quantity' => $product->qty_ordered,
+                            'total_order_value' => ($transaction->base_subtotal + $transaction->shipping_amount),
+                            'shipping_costs' => $transaction->shipping_amount,
+                            'order_date' => $transaction->created_at,
+                            'confirmation_date' => $status == 1 ? $transaction->updated_at : null,
+                            'shipping_date' => $status == 2 ? $transaction->updated_at : null,
+                            'status' => $transaction->status
                         );
                     }
 
