@@ -846,6 +846,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
                 $data = $customers_to_save;
 
+                if(count($customers) == 0 && $header){
+                    return null;
+                }
+
                 if($header){
                     $data = array_merge(array(array_keys(end($customers_to_save))), $customers_to_save);
                     $header = false;
@@ -973,6 +977,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                 $data = $transactions_to_save;
                 $count = count($transactions);
 
+                if($count == 0 && $header){
+                    return null;
+                }
+
                 if($header){
                     $data = array_merge(array(array_keys(end($transactions_to_save))), $transactions_to_save);
                     $header = false;
@@ -1042,7 +1050,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
         $csvFiles = array_filter($csvFiles);
 
         //Create xml
-        $this->createXML($exportFile . '.xml');
+        $this->createXML($exportFile . '.xml', $tags != null?true:false);
 
         //Create zip
 
@@ -1101,7 +1109,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
         return $this->_allProductTags;
     }
 
-    protected function createXML($name)
+    protected function createXML($name, $withTag)
     {
 
         $xml = new SimpleXMLElement('<root/>');
@@ -1232,7 +1240,7 @@ XML;
         #########################################################################
 
         $attrs = array_keys($this->_attributesValuesByName);
-        if ($this->_storeConfig['export_tags']) {
+        if ($this->_storeConfig['export_tags'] && $withTag) {
             $attrs[] = 'tag';
 
         }
@@ -1311,7 +1319,7 @@ XML;
 
         //property
         $properties = $products->addChild('properties');
-        $props = $this->prepareProperties();
+        $props = $this->prepareProperties($withTag);
 
         foreach ($props as $prop) {
             if ($prop['id'] == 'entity_id') {
@@ -1389,7 +1397,7 @@ XML;
     /**
      * @return array
      */
-    function prepareProperties()
+    function prepareProperties($withTag)
     {
 
         $properties = array();
@@ -1468,7 +1476,7 @@ XML;
             }
         }
         //tag
-        if ($this->_storeConfig['export_tags']) {
+        if ($this->_storeConfig['export_tags'] && $withTag ) {
             $properties[] = array(
                 'id' => 'tag',
                 'name' => 'tag',
