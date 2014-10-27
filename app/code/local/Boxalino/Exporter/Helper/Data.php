@@ -145,8 +145,10 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     public function getCountry($countryCode)
     {
+
         if(!isset($this->_countries[$countryCode])) {
-            $this->_countries[$countryCode] = Mage::getSingleton('directory/country')->loadByCode($countryCode);
+            $country = Mage::getModel('directory/country')->loadByCode($countryCode);
+            $this->_countries[$countryCode] = $country;
         }
 
         return $this->_countries[$countryCode];

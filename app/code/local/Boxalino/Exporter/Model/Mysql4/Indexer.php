@@ -110,7 +110,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'something with attributes - after'));
             $file = $this->prepareFiles($website, $data['categories'], $data['tags']);
             Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Push files'));
-
+die();
             $this->pushXML($file);
             $this->pushZip($file);
 
@@ -746,9 +746,10 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
             $query = "SELECT `eav_entity_type`.* FROM `eav_entity_type` WHERE (`eav_entity_type`.`entity_type_code`='customer')";
             $result = $this->fetchFromQuery($query);
 
-            $query = "SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.`attribute_code`, `main_table`.`attribute_model`, `main_table`.`backend_model`, `main_table`.`backend_type`, `main_table`.`backend_table`, `main_table`.`frontend_model`, `main_table`.`frontend_input`, `main_table`.`frontend_label`, `main_table`.`frontend_class`, `main_table`.`source_model`, `main_table`.`is_required`, `main_table`.`is_user_defined`, `main_table`.`default_value`, `main_table`.`is_unique`, `main_table`.`note`, `additional_table`.`is_visible`, `additional_table`.`input_filter`, `additional_table`.`multiline_count`, `additional_table`.`validate_rules`, `additional_table`.`is_system`, `additional_table`.`sort_order`, `additional_table`.`data_model`, `additional_table`.`is_used_for_customer_segment`, `scope_table`.`website_id` AS `scope_website_id`, `scope_table`.`is_visible` AS `scope_is_visible`, `scope_table`.`is_required` AS `scope_is_required`, `scope_table`.`default_value` AS `scope_default_value`, `scope_table`.`multiline_count` AS `scope_multiline_count` FROM `eav_attribute` AS `main_table`
+            $query = "SELECT `main_table`.`attribute_id`, `main_table`.`entity_type_id`, `main_table`.`attribute_code`, `main_table`.`attribute_model`, `main_table`.`backend_model`, `main_table`.`backend_type`, `main_table`.`backend_table`, `main_table`.`frontend_model`, `main_table`.`frontend_input`, `main_table`.`frontend_label`, `main_table`.`frontend_class`, `main_table`.`source_model`, `main_table`.`is_required`, `main_table`.`is_user_defined`, `main_table`.`default_value`, `main_table`.`is_unique`, `main_table`.`note`, `additional_table`.`is_visible`, `additional_table`.`input_filter`, `additional_table`.`multiline_count`, `additional_table`.`validate_rules`, `additional_table`.`is_system`, `additional_table`.`sort_order`, `additional_table`.`data_model`, `scope_table`.`website_id` AS `scope_website_id`, `scope_table`.`is_visible` AS `scope_is_visible`, `scope_table`.`is_required` AS `scope_is_required`, `scope_table`.`default_value` AS `scope_default_value`, `scope_table`.`multiline_count` AS `scope_multiline_count` FROM `eav_attribute` AS `main_table`
  INNER JOIN `customer_eav_attribute` AS `additional_table` ON additional_table.attribute_id = main_table.attribute_id
- LEFT JOIN `customer_eav_attribute_website` AS `scope_table` ON scope_table.attribute_id = main_table.attribute_id AND scope_table.website_id = " . $this->group->getWebsiteId() . " WHERE (main_table.entity_type_id = " . $result['entity_type_id'] . ")";
+ LEFT JOIN `customer_eav_attribute_website` AS `scope_table` ON scope_table.attribute_id = main_table.attribute_id AND scope_table.website_id =  " . $this->group->getWebsiteId() . " WHERE (main_table.entity_type_id = " . $result['entity_type_id'] . ")";
+
 
             $customerAttributes = array();
             $attrsFromDb = array(
@@ -818,20 +819,20 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
                         }
                     }
 
+                    $countryCode = null;
+
                     if(isset($billingResult['country_id'])) {
                         $countryCode = $billingResult['country_id'];
                     }
 
-                    switch (isset($customer->gender)?$customer->gender:0) {
-                        case 1:
-                            $gender = 'male';
-                            break;
-                        case 2:
+                    if(isset($customer->gender)){
+                        if($customer->gender%2 == 0){
                             $gender = 'female';
-                            break;
-                        default:
-                            $gender = null;
-                            break;
+                        } else{
+                            $gender = 'male';
+                        }
+                    } else{
+                        $gender = null;
                     }
 
                     $customers_to_save[] = array(
