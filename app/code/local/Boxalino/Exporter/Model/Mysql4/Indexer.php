@@ -76,7 +76,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _websiteExport()
     {
         $this->_helperExporter = Mage::helper('boxalinoexporter');
-        $this->_helperSearch = Mage::helper("Boxalino_CemSearch");
+        $this->_helperSearch = Mage::helper("boxalinoexporter");
         Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Helpers init'));
         foreach (Mage::app()->getWebsites() as $website) {
 
@@ -110,7 +110,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'something with attributes - after'));
             $file = $this->prepareFiles($website, $data['categories'], $data['tags']);
             Boxalino_CemSearch_Model_Logger::saveMemoryTracking('info', 'Indexer', array('memory_usage' => memory_get_usage(true), 'method' => __METHOD__, 'description' => 'Push files'));
-die();
+
             $this->pushXML($file);
             $this->pushZip($file);
 
