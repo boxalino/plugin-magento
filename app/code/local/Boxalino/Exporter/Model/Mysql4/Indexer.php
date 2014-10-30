@@ -672,7 +672,7 @@ SELECT `t_d`.`entity_id`, `t_d`.`attribute_id`, `t_d`.`value` AS `default_value`
 
                     $dataMtM = $val;
 
-                    if($header){
+                    if($header || !file_exists($this->_dir . '/' . "product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv')){
 
                         if($key == 'categories'){
                             $dataMtM = array_merge(array(array("entity_id", "category_id")), $dataMtM);
