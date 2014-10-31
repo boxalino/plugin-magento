@@ -14,9 +14,9 @@ class HttpP13n
     protected $client = null;
     protected $transport = null;
     protected $host;
-    protected $port = 80;
+    protected $port = 443;
     protected $uri = '/p13n.web/p13n';
-    protected $schema = 'http';
+    protected $schema = 'https';
     protected $username;
     protected $password;
 
