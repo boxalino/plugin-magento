@@ -158,3 +158,5 @@
 /.htaccess.sample
 /files.txt
 /app/code/local/Boxalino/Cem
+/.settings
+/.project

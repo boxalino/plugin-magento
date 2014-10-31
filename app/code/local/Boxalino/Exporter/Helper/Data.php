@@ -4,19 +4,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 {
     const URL_XML = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/source/update';
     const URL_XML_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/source/update';
-    const URL_ZIP = "http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push";
-    const URL_ZIP_DEV = "http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push";
-    /**
-     * Array of parent_id for specified products.
-     * IMPORTANT: We assume that every simple product has at most one configurable parent.
-     *
-     * @var null
-     */
-    /**
-     * Array of variants ids for specified products.
-     *
-     * @var null
-     */
+    const URL_ZIP = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push';
+    const URL_ZIP_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push';
+
     public $XML_DELIMITER = ',';
     public $XML_ENCLOSURE = '"';
     public $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
@@ -27,23 +17,16 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     protected $_attributesWithIds = array();
     protected $_allTags = array();
     protected $_countries = array();
-
-    public function defaultAttributes()
-    {
-        $attributes = array(
-            'entity_id',
-            'name',
-            'description',
-            'short_description',
-            'sku',
-            'price',
-            'special_price',
-            'visibility',
-            'category_ids',
-        );
-
-        return $attributes;
-    }
+    protected $_languages = array(
+        'en',
+        'fr',
+        'de',
+        'it',
+        'es',
+        'zh',
+        'cz',
+        'ru',
+    );
 
     /**
      * @param $language
@@ -51,21 +34,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function isAvailableLanguages($language)
     {
-        $languages = array(
-            'en',
-            'fr',
-            'de',
-            'it',
-            'es',
-            'zh',
-            'cz',
-            'ru',
-        );
-
-        if (array_search($language, $languages) !== false) {
+        if (array_search($language, $this->_languages) !== false) {
             return true;
         }
-
         return false;
     }
 
@@ -191,6 +162,27 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         $text = trim($text, $delimiter);
 
         return $text;
+    }
+
+    public function escapeString($string)
+    {
+        return htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string)));
+    }
+
+    public function delTree($dir)
+    {
+        if(!file_exists($dir)){
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.','..'));
+        foreach ($files as $file) {
+            if(is_dir("$dir/$file")){
+                self::delTree("$dir/$file");
+            } else if(file_exists("$dir/$file")){
+                @unlink("$dir/$file");
+            }
+        }
+        return rmdir($dir);
     }
 
 }

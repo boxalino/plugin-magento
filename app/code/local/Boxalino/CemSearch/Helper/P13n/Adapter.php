@@ -124,7 +124,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     $categoryNames[] = $categoryName;
                 }
             }
-//            $categoryDepth = count($categoryNames) - 1;
 
             $this->addFilterHierarchy('categories', $categoryId, $categoryNames);
 
@@ -140,7 +139,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $category = Mage::getModel('catalog/category')->load($categoryId);
 
             if($category != null){
-//                $this->addFilterHierarchy('categories', $categoryId, $category->getName());
                 $filter = new \com\boxalino\p13n\api\thrift\Filter();
 
                 $filter->fieldName = 'categories';

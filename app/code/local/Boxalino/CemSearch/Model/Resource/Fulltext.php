@@ -112,8 +112,6 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 array(),
                 Varien_Db_Adapter_Interface::INSERT_ON_DUPLICATE);
             $adapter->query($sql, $bind);
-
-            //$query->setIsProcessed(1);
         }
 
 

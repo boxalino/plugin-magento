@@ -32,6 +32,6 @@ class Boxalino_CemSearch_Block_Head extends Boxalino_CemSearch_Block_Abstract
 
     public function addExternalJS($args)
     {
-        echo '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>';
+        echo '<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>';
     }
 }

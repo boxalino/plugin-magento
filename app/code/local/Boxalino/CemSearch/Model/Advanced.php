@@ -4,7 +4,7 @@
  * Created at: 06.06.14 11:45
  */
 
-require_once "Mage/CatalogSearch/Model/Advanced.php";
+require_once 'Mage/CatalogSearch/Model/Advanced.php';
 
 /**
  *
@@ -12,7 +12,6 @@ require_once "Mage/CatalogSearch/Model/Advanced.php";
  * @package     Mage_CatalogSearch
  * @author      Szymon Nosal <szymon.nosal@codete.com>
  */
-//class Boxalino_CemSearch_Model_Advanced extends Mage_Core_Model_Abstract
 class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advanced
 {
     /**
@@ -72,21 +71,10 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
                     } else {
                         $rate = 1;
                     }
-//                    if ($this->_getResource()->addRatedPriceFilter(
-//                        $this->getProductCollection(), $attribute, $value, $rate)
-//                    ) {
-//                        $hasConditions = true;
-//                        $this->_addSearchCriteria($attribute, $value);
-//                    }
                     $this->_addSearchCriteria($attribute, $value);
                 }
             } else if ($attribute->isIndexable()) {
                 if (!is_string($value) || strlen($value) != 0) {
-//                    if ($this->_getResource()->addIndexableAttributeModifiedFilter(
-//                        $this->getProductCollection(), $attribute, $value)) {
-//                        $hasConditions = true;
-//                        $this->_addSearchCriteria($attribute, $value);
-//                    }
                     $this->_addSearchCriteria($attribute, $value);
                 }
             } else {
@@ -96,17 +84,8 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
                 }
 
                 $this->_addSearchCriteria($attribute, $value);
-
-//                $table = $attribute->getBackend()->getTable();
-//                if ($attribute->getBackendType() == 'static'){
-//                    $attributeId = $attribute->getAttributeCode();
-//                } else {
-//                    $attributeId = $attribute->getId();
-//                }
-//                $allConditions[$table][$attributeId] = $condition;
             }
         }
-//        $allConditions = array();
         //Add id from boxalino
         $this->getProductCollection()->addIdFromBoxalino($ids);
         if ($allConditions) {

@@ -83,7 +83,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
             $p13nSort,
             0, $limit
         );
-        ## ADD FILTERS
+        //add filters
 
         $skip = array('name');
 
@@ -116,7 +116,6 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         foreach ($criteria as $criterium) {
 
-//            $name = strtolower($criterium['name']);
             $name = Mage::helper("Boxalino_CemSearch")->sanitizeFieldName($queryAttribute[$criterium['name']]);
 
             if (in_array($name, $skip)) {

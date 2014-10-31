@@ -115,10 +115,6 @@ class Boxalino_CemSearch_Helper_P13n_Client
                 $contextItem->role = 'mainProduct';
                 $inquiry->contextItems = array($contextItem);
             }
-//        elseif ($widgetType === 'category' && Utils::requestExists('categoryId')) {
-//            $categoryId = Utils::requestString('categoryId');
-//            $choiceRequest->requestContext->parameters['category_id'] = array($categoryId);
-//        }
             $choiceRequest->inquiries[] = $inquiry;
         }
         $choiceResponse = $this->p13n->choose($choiceRequest);
