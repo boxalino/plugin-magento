@@ -10,14 +10,14 @@ class P13nTCurlClient extends TCurlClient {
     private static $curlHandle;
 
     protected $authorizationString;
-  
+
   /**
    * Opens and sends the actual request over the HTTP connection
    *
    * @throws TTransportException if a writing error occurs
    */
     public function flush() {
-//	// God, PHP really has some esoteric ways of doing simple things.
+        // God, PHP really has some esoteric ways of doing simple things.
         if (!self::$curlHandle) {
             register_shutdown_function(array('Thrift\\Transport\\TCurlClient', 'closeCurlHandle'));
             self::$curlHandle = curl_init();
@@ -25,10 +25,10 @@ class P13nTCurlClient extends TCurlClient {
             curl_setopt(self::$curlHandle, CURLOPT_BINARYTRANSFER, true);
             curl_setopt(self::$curlHandle, CURLOPT_USERAGENT, 'PHP/TCurlClient');
             curl_setopt(self::$curlHandle, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt(self::$curlHandle, CURLOPT_FOLLOWLOCATION, true);
+            // FOLLOWLOCATION cannot be activated when safe_mode is enabled or an open_basedir is set
+            @curl_setopt(self::$curlHandle, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt(self::$curlHandle, CURLOPT_MAXREDIRS, 1);
         }
-        // God, PHP really has some esoteric ways of doing simple things.
         $host = $this->host_.($this->port_ != 80 ? ':'.$this->port_ : '');
         $fullUrl = $this->scheme_."://".$host.$this->uri_;
 
