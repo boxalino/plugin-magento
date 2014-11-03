@@ -440,11 +440,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'entity_id',
                     'attribute_id',
                 );
-                $joinCondition = 't_s.attribute_id = t_d.attribute_id AND t_s.entity_id = t_d.entity_id';
+                $joinCondition = $db->quoteInto('t_s.attribute_id = t_d.attribute_id AND t_s.entity_id = t_d.entity_id AND t_s.store_id = ?', $storeId);
                 $joinColumns = array('value' => 'IF(t_s.value_id IS NULL, t_d.value, t_s.value)');
 
                 $select1 = $db->select()
-                              ->where('t_s.store_id = ?', $storeId)
                               ->where('t_d.store_id = ?', 0)
                               ->where('t_d.entity_type_id = ?', 4)
                               ->where('t_d.entity_id IN(?)', $ids);
