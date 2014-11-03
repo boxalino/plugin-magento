@@ -49,10 +49,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected $_helperExporter = null;
     protected $_helperSearch = null;
 
-    private $_parentId = null;
-    private $_isLoad = false;
-
-    private $_entityIds = null;
+    protected $_entityIds = null;
 
     /**
      * @description Start of reindex
@@ -416,8 +413,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - fetch products - before');
                 $select = $db->select()
                              ->from(
-                                array('e' => 'catalog_product_entity'),
-                                array('id' => 'entity_id')
+                                array('e' => 'catalog_product_entity')
                              )
                              ->limit($limit, ($page-1) * $limit);
                 $results = $db->fetchAll($select);
@@ -426,10 +422,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $products = array();
                 $ids = array();
                 foreach($results as $r) {
-                    $products[$r['id']] = $r;
-                    $ids[] = $r['id'];
-                    $products[$r['id']]['website'] = array();
-                    $products[$r['id']]['categories'] = array();
+                    $products[$r['entity_id']] = $r;
+                    $ids[] = $r['entity_id'];
+                    $products[$r['entity_id']]['website'] = array();
+                    $products[$r['entity_id']]['categories'] = array();
                 }
 
                 $count = count($results);
@@ -582,10 +578,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $productParam = array();
                     $haveParent = false;
 
-                    if ($this->getParentId($id) != null && $product['type_id'] == 'simple') {
-                        $id = $this->getParentId($id);
+                    if (array_key_exists('parent_id', $product)) {
+                        $id = $product['parent_id'];
                         $haveParent = true;
-                    } else if ($product['visibility'] == 1 && $this->getParentId($id) == null) {
+                    } else if ($product['visibility'] == 1 && !array_key_exists('parent_id', $product)) {
                         continue;
                     }
 
@@ -1727,61 +1723,6 @@ XML;
                 'description' => $message
             )
         );
-    }
-
-    /**
-     * Load connection arrays if necessary.
-     */
-    private function loadProductLinks()
-    {
-        // If arrays already set - nothing to do here.
-        if ($this->_isLoad) {
-            return;
-        }
-
-        // Get all data from `catalog_product_super_link`
-        $db = $this->_getReadAdapter();
-        $select = $db->select()
-                     ->from(
-                        'catalog_product_super_link',
-                        array(
-                            'product_id',
-                            'parent_id',
-                        )
-                     );
-        foreach($db->fetchAll($select) as $row) {
-            $productId = $row['product_id'];
-            $parentId = $row['parent_id'];
-
-            // Add parent to simple product.
-            $this->_parentId[$productId] = $parentId;
-        }
-        $this->_isLoad = true;
-    }
-
-    /**
-     * Return parent id.
-     *
-     * @param null $productId
-     * @return null|int|array
-     */
-    public function getParentId($productId = null)
-    {
-        // Load connections if necessary.
-        $this->loadProductLinks();
-
-        // If no product is specified - return whole array.
-        if (!isset($productId)) {
-            return $this->_parentId;
-        }
-
-        // If we have parent id for specified product - return it.
-        if (isset($this->_parentId[$productId])) {
-            return $this->_parentId[$productId];
-        }
-
-        // No parent - return null.
-        return null;
     }
 
     /**
