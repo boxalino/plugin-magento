@@ -52,6 +52,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     private $_parentId = null;
     private $_isLoad = false;
 
+    private $_entityIds = null;
+
     /**
      * @description Start of reindex
      */
@@ -1002,7 +1004,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                                 'qty_ordered',
                              )
                          )
-                         ->where('order`.status <> ?', 'canceled')
+                         ->where('order.status <> ?', 'canceled')
                          ->order(array('order.entity_id', 'item.product_type'))
                          ->limit($limit, ($page-1) * $limit);
             $transactions = $db->fetchAll($select);
@@ -1791,19 +1793,19 @@ XML;
      */
     public function getEntityIdFor($entityType)
     {
-        if ($this->entityIds == null) {
+        if ($this->_entityIds == null) {
             $db = $this->_getReadAdapter();
             $select = $db->select()
                          ->from(
                              'eav_entity_type',
                              array('entity_type_id', 'entity_type_code')
                          );
-            $this->entityIds = array();
+            $this->_entityIds = array();
             foreach ($db->fetchAll($select) as $row) {
-                $this->entityIds[$row['entity_type_code']] = $row['entity_type_id'];
+                $this->_entityIds[$row['entity_type_code']] = $row['entity_type_id'];
             }
         }
-        return array_key_exists($entityType, $this->entityIds) ? $this->entityIds[$entityType] : null;
+        return array_key_exists($entityType, $this->_entityIds) ? $this->_entityIds[$entityType] : null;
     }
 
 }
