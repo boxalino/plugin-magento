@@ -392,6 +392,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
         }
         self::logMem('Products - attributes preparing done');
+
         $countMax = $this->_storeConfig['maximum_population'];
         $localeCount = 0;
 
@@ -400,22 +401,33 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $page = 1;
         $header = true;
 
-        while ($count >= $limit) {
+        $stores = array();
+        foreach ($this->group->getStores() as $store){
+
+            $stores[$store->getId()]['id'] = $store->getId();
+            $stores[$store->getId()]['lang'] = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
+
+        }
+
+        while($count >= $limit) {
             if ($countMax > 0 && $this->_count >= $countMax) {
                 break;
             }
 
-            foreach ($this->group->getStores() as $store) {
+            foreach ($stores as $store) {
 
-                $storeId = $store->getId();
+                $storeId = $store['id'];
+                $lang = $store['lang'];
 
-                $lang = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
                 self::logMem('Products - fetch products - before');
                 $select = $db->select()
                     ->from(
                         array('e' => 'catalog_product_entity')
                     )
                     ->limit($limit, ($page - 1) * $limit);
+
+                $this->_getIndexType() == 'delta' ? $select->where('created_at >= ? OR updated_at >= ?', $this->_getLastIndex()) : '';
+
                 $results = $db->fetchAll($select);
                 self::logMem('Products - fetch products - after');
 
@@ -560,6 +572,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         )
                     )
                     ->where('product_id IN(?)', $ids);
+                $ids = null;
                 foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['categories'][] = $r['category_id'];
                 }
@@ -570,6 +583,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     self::logMem('Products - start transform');
 
                     if (count($product['website']) == 0) {
+                        $product = null;
                         continue;
                     }
 
@@ -582,6 +596,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $id = $product['parent_id'];
                         $haveParent = true;
                     } else if ($product['visibility'] == 1 && !array_key_exists('parent_id', $product)) {
+                        $product = null;
                         continue;
                     }
 
@@ -654,11 +669,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
 
                     if ($haveParent) {
+                        $product = null;
                         continue;
                     }
 
                     if (!isset($this->_transformedProducts['products'][$id])) {
                         if ($countMax > 0 && $this->_count >= $countMax) {
+                            $product = null;
+                            $products = null;
                             break;
                         }
                         $productParam['entity_id'] = $id;
@@ -717,6 +735,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     self::logMem('Products - save to file with corrected name');
                     $this->savePartToCsv("product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv', $dataMtM);
                     $this->_transformedProducts['productsMtM'][$key] = null;
+
+                    $dataMtM = null;
+
                 }
 
                 if ($header && count($data) > 0) {
@@ -726,8 +747,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - save to file');
                 $this->savePartToCsv('products.csv', $data);
                 $data = null;
-
+                $this->_transformedProducts['products'] = null;
                 $this->_transformedProducts['products'] = array();
+                $this->_transformedProducts['productsMtM'] = null;
                 $this->_transformedProducts['productsMtM'] = array();
 
             }
@@ -738,8 +760,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         }
 
+        $attrFDB = null;
+        $attrsFromDb = null;
+        $attrs = null;
         $this->_tmp = null;
         $this->_transformedProducts = null;
+        $db = null;
+
+
     }
 
     /**
