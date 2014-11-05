@@ -84,14 +84,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             self::logMem('something with attributes - before');
 
-            foreach($this->_listOfAttributes as $k => $attr) {
-                if(
+            foreach ($this->_listOfAttributes as $k => $attr) {
+                if (
                     !isset($this->_attributesValuesByName[$attr]) ||
                     (isset($this->_attrProdCount[$attr]) &&
-                    $this->_attrProdCount[$attr])
+                        $this->_attrProdCount[$attr])
                 ) {
                     continue;
-                } else{
+                } else {
                     unset($this->_attributesValuesByName[$attr]);
                     unset($this->_listOfAttributes[$k]);
                 }
@@ -132,7 +132,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->group = $group;
 
             foreach ($group->getStores() as $store) {
-                self::logMem('Start store:'.$store->getId());
+                self::logMem('Start store:' . $store->getId());
                 $this->_prepareStoreConfig($store->getId());
                 self::logMem('Configuration for store loaded');
                 if ($this->_isEnabled()) {
@@ -199,7 +199,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $attributes = array();
 
-        foreach(Mage::getResourceModel('catalog/product_attribute_collection')->getItems() as $at) {
+        foreach (Mage::getResourceModel('catalog/product_attribute_collection')->getItems() as $at) {
             $attributes[] = $at->getAttributeCode();
         }
 
@@ -207,11 +207,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $fields = explode(',', $this->_storeConfig['additional_attributes']);
             foreach ($fields as $field) {
 
-                if(!in_array($field, $attributes)) {
-                    Mage::throwException("Attribute \"$field\" not exist!" );
+                if (!in_array($field, $attributes)) {
+                    Mage::throwException("Attribute \"$field\" not exist!");
                 }
 
-                if($field != null && strlen($field) > 0) {
+                if ($field != null && strlen($field) > 0) {
                     $this->_listOfAttributes[] = $field;
                 }
 
@@ -269,7 +269,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         if (isset($this->_storeConfig['enabled']) && $this->_storeConfig['enabled']) {
             return true;
-        } else if(!isset($this->_storeConfig['enabled']) && Mage::getStoreConfig('Boxalino_General/general/enabled')) {
+        } else if (!isset($this->_storeConfig['enabled']) && Mage::getStoreConfig('Boxalino_General/general/enabled')) {
             return true;
         }
 
@@ -360,20 +360,20 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $db = $this->_getReadAdapter();
         $select = $db->select()
-                     ->from(
-                        array('main_table' => 'eav_attribute'),
-                        array(
-                            'attribute_id',
-                            'attribute_code',
-                            'backend_type',
-                        )
-                     )
-                     ->joinInner(
-                        array('additional_table' => 'catalog_eav_attribute'),
-                        'additional_table.attribute_id = main_table.attribute_id'
-                     )
-                     ->where('main_table.entity_type_id = ?', 4)
-                     ->where('main_table.attribute_code IN(?)', $attrs);
+            ->from(
+                array('main_table' => 'eav_attribute'),
+                array(
+                    'attribute_id',
+                    'attribute_code',
+                    'backend_type',
+                )
+            )
+            ->joinInner(
+                array('additional_table' => 'catalog_eav_attribute'),
+                'additional_table.attribute_id = main_table.attribute_id'
+            )
+            ->where('main_table.entity_type_id = ?', 4)
+            ->where('main_table.attribute_code IN(?)', $attrs);
 
         self::logMem('Products - connected to DB, built attribute info query');
 
@@ -384,9 +384,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'text'    => array(),
             'decimal' => array(),
         );
-        foreach($db->fetchAll($select) as $r) {
+        foreach ($db->fetchAll($select) as $r) {
             $type = $r['backend_type'];
-            if(isset($attrsFromDb[$type])) {
+            if (isset($attrsFromDb[$type])) {
                 $attrsFromDb[$type][] = $r['attribute_id'];
                 $attrFDB[$r['attribute_id']] = $r['attribute_code'];
             }
@@ -400,7 +400,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $page = 1;
         $header = true;
 
-        while($count >= $limit) {
+        while ($count >= $limit) {
             if ($countMax > 0 && $this->_count >= $countMax) {
                 break;
             }
@@ -412,16 +412,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $lang = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
                 self::logMem('Products - fetch products - before');
                 $select = $db->select()
-                             ->from(
-                                array('e' => 'catalog_product_entity')
-                             )
-                             ->limit($limit, ($page-1) * $limit);
+                    ->from(
+                        array('e' => 'catalog_product_entity')
+                    )
+                    ->limit($limit, ($page - 1) * $limit);
                 $results = $db->fetchAll($select);
                 self::logMem('Products - fetch products - after');
 
                 $products = array();
                 $ids = array();
-                foreach($results as $r) {
+                foreach ($results as $r) {
                     $products[$r['entity_id']] = $r;
                     $ids[] = $r['entity_id'];
                     $products[$r['entity_id']]['website'] = array();
@@ -440,127 +440,127 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $joinColumns = array('value' => 'IF(t_s.value_id IS NULL, t_d.value, t_s.value)');
 
                 $select1 = $db->select()
-                              ->where('t_d.store_id = ?', 0)
-                              ->where('t_d.entity_type_id = ?', 4)
-                              ->where('t_d.entity_id IN(?)', $ids);
+                    ->where('t_d.store_id = ?', 0)
+                    ->where('t_d.entity_type_id = ?', 4)
+                    ->where('t_d.entity_id IN(?)', $ids);
                 $select2 = clone $select1;
                 $select3 = clone $select1;
                 $select4 = clone $select1;
 
                 $select1->from(
-                            array('t_d' => 'catalog_product_entity_varchar'),
-                            $columns
-                        )
-                        ->joinLeft(
-                            array('t_s' => 'catalog_product_entity_varchar'),
-                            $joinCondition,
-                            $joinColumns
-                        )
-                        ->where('t_d.attribute_id IN(?)',  $attrsFromDb['varchar']);
+                    array('t_d' => 'catalog_product_entity_varchar'),
+                    $columns
+                )
+                    ->joinLeft(
+                        array('t_s' => 'catalog_product_entity_varchar'),
+                        $joinCondition,
+                        $joinColumns
+                    )
+                    ->where('t_d.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $select2->from(
-                            array('t_d' => 'catalog_product_entity_text'),
-                            $columns
-                        )
-                        ->joinLeft(
-                            array('t_s' => 'catalog_product_entity_text'),
-                            $joinCondition,
-                            $joinColumns
-                        )
-                        ->where('t_d.attribute_id IN(?)',  $attrsFromDb['text']);
+                    array('t_d' => 'catalog_product_entity_text'),
+                    $columns
+                )
+                    ->joinLeft(
+                        array('t_s' => 'catalog_product_entity_text'),
+                        $joinCondition,
+                        $joinColumns
+                    )
+                    ->where('t_d.attribute_id IN(?)', $attrsFromDb['text']);
                 $select3->from(
-                            array('t_d' => 'catalog_product_entity_decimal'),
-                            $columns
-                        )
-                        ->joinLeft(
-                            array('t_s' => 'catalog_product_entity_decimal'),
-                            $joinCondition,
-                            $joinColumns
-                        )
-                        ->where('t_d.attribute_id IN(?)',  $attrsFromDb['decimal']);
+                    array('t_d' => 'catalog_product_entity_decimal'),
+                    $columns
+                )
+                    ->joinLeft(
+                        array('t_s' => 'catalog_product_entity_decimal'),
+                        $joinCondition,
+                        $joinColumns
+                    )
+                    ->where('t_d.attribute_id IN(?)', $attrsFromDb['decimal']);
                 $select4->from(
-                            array('t_d' => 'catalog_product_entity_int'),
-                            $columns
-                        )
-                        ->joinLeft(
-                            array('t_s' => 'catalog_product_entity_int'),
-                            $joinCondition,
-                            $joinColumns
-                        )
-                        ->where('t_d.attribute_id IN(?)',  $attrsFromDb['int']);
+                    array('t_d' => 'catalog_product_entity_int'),
+                    $columns
+                )
+                    ->joinLeft(
+                        array('t_s' => 'catalog_product_entity_int'),
+                        $joinCondition,
+                        $joinColumns
+                    )
+                    ->where('t_d.attribute_id IN(?)', $attrsFromDb['int']);
 
                 $select = $db->select()
-                             ->union(
-                                 array($select1, $select2, $select3, $select4),
-                                 Zend_Db_Select::SQL_UNION_ALL
-                             );
+                    ->union(
+                        array($select1, $select2, $select3, $select4),
+                        Zend_Db_Select::SQL_UNION_ALL
+                    );
 
                 $select1 = null;
                 $select2 = null;
                 $select3 = null;
                 $select4 = null;
-                foreach($db->fetchAll($select) as $r) {
+                foreach ($db->fetchAll($select) as $r) {
                     $products[$r['entity_id']][$attrFDB[$r['attribute_id']]] = $r['value'];
                 }
                 self::logMem('Products - get attributes - after');
 
                 self::logMem('Products - get stock  - before');
                 $select = $db->select()
-                             ->from(
-                                'cataloginventory_stock_status',
-                                array(
-                                    'product_id',
-                                    'stock_status',
-                                )
-                             )
-                             ->where('stock_id = ?', 1)
-                             ->where('website_id = ?', 1)
-                             ->where('product_id IN(?)', $ids);
-                foreach($db->fetchAll($select) as $r) {
+                    ->from(
+                        'cataloginventory_stock_status',
+                        array(
+                            'product_id',
+                            'stock_status',
+                        )
+                    )
+                    ->where('stock_id = ?', 1)
+                    ->where('website_id = ?', 1)
+                    ->where('product_id IN(?)', $ids);
+                foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['stock_status'] = $r['stock_status'];
                 }
                 self::logMem('Products - get stock  - after');
 
                 self::logMem('Products - get products from website - before');
                 $select = $db->select()
-                             ->from(
-                                'catalog_product_website',
-                                array(
-                                    'product_id',
-                                    'website_id',
-                                )
-                             )
-                             ->where('product_id IN(?)', $ids);
-                foreach($db->fetchAll($select) as $r) {
+                    ->from(
+                        'catalog_product_website',
+                        array(
+                            'product_id',
+                            'website_id',
+                        )
+                    )
+                    ->where('product_id IN(?)', $ids);
+                foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['website'][] = $r['website_id'];
                 }
                 self::logMem('Products - get products from website - after');
 
                 self::logMem('Products - get products connections - before');
                 $select = $db->select()
-                             ->from(
-                                'catalog_product_super_link',
-                                array(
-                                    'product_id',
-                                    'parent_id',
-                                )
-                             )
-                             ->where('product_id IN(?)', $ids);
-                foreach($db->fetchAll($select) as $r) {
+                    ->from(
+                        'catalog_product_super_link',
+                        array(
+                            'product_id',
+                            'parent_id',
+                        )
+                    )
+                    ->where('product_id IN(?)', $ids);
+                foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['parent_id'] = $r['parent_id'];
                 }
                 self::logMem('Products - get products connections - after');
 
                 self::logMem('Products - get categories - before');
                 $select = $db->select()
-                             ->from(
-                                'catalog_category_product',
-                                array(
-                                    'product_id',
-                                    'category_id',
-                                )
-                             )
-                             ->where('product_id IN(?)', $ids);
-                foreach($db->fetchAll($select) as $r) {
+                    ->from(
+                        'catalog_category_product',
+                        array(
+                            'product_id',
+                            'category_id',
+                        )
+                    )
+                    ->where('product_id IN(?)', $ids);
+                foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['categories'][] = $r['category_id'];
                 }
                 $select = null;
@@ -665,7 +665,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $this->_transformedProducts['products'][$id] = $productParam;
 
                         //Add categories
-                        if(isset($product['categories']) && count($product['categories']) > 0) {
+                        if (isset($product['categories']) && count($product['categories']) > 0) {
                             foreach ($product['categories'] as $cat) {
 
                                 while ($cat != null) {
@@ -684,6 +684,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     } elseif (isset($this->_transformedProducts['products'][$id])) {
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
                     }
+
                     $productParam = null;
                     $product = null;
 
@@ -693,7 +694,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
             }
 
-            if(isset($this->_transformedProducts['products']) && count($this->_transformedProducts['products']) > 0) {
+            if (isset($this->_transformedProducts['products']) && count($this->_transformedProducts['products']) > 0) {
 
                 self::logMem('Products - validate names start');
 
@@ -703,22 +704,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     $dataMtM = $val;
 
-                    if($header || !file_exists($this->_dir . '/' . "product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv')) {
+                    if ($header || !file_exists($this->_dir . '/' . "product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv')) {
 
-                        if($key == 'categories') {
+                        if ($key == 'categories') {
                             $dataMtM = array_merge(array(array("entity_id", "category_id")), $dataMtM);
-                        } else{
+                        } else {
                             $dataMtM = array_merge(array(array("entity_id", $key . "_id")), $dataMtM);
                         }
                     }
                     self::logMem('Products - validate names end');
 
                     self::logMem('Products - save to file with corrected name');
-                    $this->savePartToCsv( "product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv' , $dataMtM);
+                    $this->savePartToCsv("product_" . $this->_helperSearch->sanitizeFieldName($key) . '.csv', $dataMtM);
                     $this->_transformedProducts['productsMtM'][$key] = null;
                 }
 
-                if($header && count($data) > 0) {
+                if ($header && count($data) > 0) {
                     $data = array_merge(array(array_keys(end($data))), $data);
                     $header = false;
                 }
@@ -771,36 +772,36 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $customerAttributes = array();
         $attrsFromDb = array(
-            'int'      => array(),
-            'varchar'  => array(),
+            'int' => array(),
+            'varchar' => array(),
             'datetime' => array(),
         );
 
         $db = $this->_getReadAdapter();
         $select = $db->select()
-                     ->from(
-                        array('main_table' => 'eav_attribute'),
-                        array(
-                            'attribute_id',
-                            'attribute_code',
-                            'backend_type',
-                        )
-                     )
-                     ->joinInner(
-                        array('additional_table' => 'catalog_eav_attribute'),
-                        'additional_table.attribute_id = main_table.attribute_id'
-                     )
-                     ->joinLeft( // @todo is this left join still necessary?
-                        array('scope_table' => 'customer_eav_attribute_website'),
-                        'scope_table.attribute_id = main_table.attribute_id'
-                     )
-                     ->where('scope_table.website_id = ?', $this->group->getWebsiteId())
-                     ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'));
+            ->from(
+                array('main_table' => 'eav_attribute'),
+                array(
+                    'aid' => 'attribute_id',
+                    'attribute_code',
+                    'backend_type',
+                )
+            )
+            ->joinInner(
+                array('additional_table' => 'customer_eav_attribute'),
+                'additional_table.attribute_id = main_table.attribute_id'
+            )
+            ->joinLeft( // @todo is this left join still necessary?
+                array('scope_table' => 'customer_eav_attribute_website'),
+                'scope_table.attribute_id = main_table.attribute_id AND ' .
+                'scope_table.website_id = ' . $this->group->getWebsiteId()
+            )
+            ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'));
 
-        foreach($db->fetchAll($select) as $attr) {
-            $customerAttributes[$attr['attribute_id']] = $attr['attribute_code'];
-            if(isset($attrsFromDb[$attr['backend_type']])) {
-                $attrsFromDb[$attr['backend_type']][] = $attr['attribute_id'];
+        foreach ($db->fetchAll($select) as $attr) {
+            $customerAttributes[$attr['aid']] = $attr['attribute_code'];
+            if (isset($attrsFromDb[$attr['backend_type']])) {
+                $attrsFromDb[$attr['backend_type']][] = $attr['aid'];
 
             }
         }
@@ -813,13 +814,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $customers = array();
 
             $select = $db->select()
-                         ->from(
-                            'customer_entity',
-                            array('entity_id')
-                         )
-                         ->where('entity_type_id = ?', '1')
-                         ->limit($limit, ($page-1) * $limit);
-            foreach($db->fetchAll($select) as $r) {
+                ->from(
+                    'customer_entity',
+                    array('entity_id', 'created_at', 'updated_at')
+                )
+                ->where('entity_type_id = ?', '1')->limit($limit, ($page - 1) * $limit);
+
+            $this->_getIndexType() == 'delta' ? $select->where('created_at >= ? OR updated_at >= ?', $this->_getLastIndex()) : '';
+
+            foreach ($db->fetchAll($select) as $r) {
                 $customers[$r['entity_id']] = array('id' => $r['entity_id']);
             }
 
@@ -831,25 +834,25 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             );
 
             $select1 = $db->select()
-                          ->where('entity_type_id = ?', 1)
-                          ->where('entity_id IN(?)', $ids);
+                ->where('entity_type_id = ?', 1)
+                ->where('entity_id IN(?)', $ids);
             $select2 = clone $select1;
             $select3 = clone $select1;
 
             $select1->from('customer_entity_varchar', $columns)
-                    ->where('attribute_id IN(?)',  $attrsFromDb['varchar']);
+                ->where('attribute_id IN(?)', $attrsFromDb['varchar']);
             $select2->from('customer_entity_int', $columns)
-                    ->where('attribute_id IN(?)',  $attrsFromDb['int']);
+                ->where('attribute_id IN(?)', $attrsFromDb['int']);
             $select3->from('customer_entity_datetime', $columns)
-                    ->where('attribute_id IN(?)',  $attrsFromDb['datetime']);
+                ->where('attribute_id IN(?)', $attrsFromDb['datetime']);
 
             $select = $db->select()
-                         ->union(
-                            array($select1, $select2, $select3),
-                            Zend_Db_Select::SQL_UNION_ALL
-                         );
+                ->union(
+                    array($select1, $select2, $select3),
+                    Zend_Db_Select::SQL_UNION_ALL
+                );
 
-            foreach($db->fetchAll($select) as $r) {
+            foreach ($db->fetchAll($select) as $r) {
                 $customers[$r['entity_id']][$customerAttributes[$r['attribute_id']]] = $r['value'];
             }
             $select1 = null;
@@ -857,84 +860,86 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $select3 = null;
 
             $select = $db->select()
-                         ->from(
-                            'eav_attribute',
-                            array(
-                                'attribute_id',
-                                'attribute_code',
-                            )
-                         )
-                         ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'));
+                ->from(
+                    'eav_attribute',
+                    array(
+                        'attribute_id',
+                        'attribute_code',
+                    )
+                )
+                ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'));
+
             $addressAttr = array();
-            foreach($db->fetchAll($select) as $r) {
-                if($r['attribute_code'] == 'country_id' || $r['attribute_code'] == 'postcode') {
+            foreach ($db->fetchAll($select) as $r) {
+                if ($r['attribute_code'] == 'country_id' || $r['attribute_code'] == 'postcode') {
                     $addressAttr[$r['attribute_id']] = $r['attribute_code'];
                 }
             }
             $addressIds = array_keys($addressAttr);
 
-            self::logMem('Customers - loaded page '.$page);
+            self::logMem('Customers - loaded page ' . $page);
 
             foreach ($customers as $customer) {
                 self::logMem('Customers - Load billing address ');
                 $id = $customer['id'];
 
                 $select = $db->select()
-                             ->from(
-                                'customer_address_entity',
-                                array('entity_id')
-                             )
-                             ->where('entity_type_id = ?', 2)
-                             ->where('parent_id = ?', $id);
+                    ->from(
+                        'customer_address_entity',
+                        array('entity_id')
+                    )
+                    ->where('entity_type_id = ?', 2)
+                    ->where('parent_id = ?', $id);
                 $res = $db->fetchRow($select);
 
                 $select = $db->select()
-                             ->from(
-                                'customer_address_entity_varchar',
-                                array('attribute_id', 'value')
-                             )
-                             ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
-                             ->where('entity_id = ?', $res['entity_id'])
-                             ->where('attribute_id IN(?)', $addressIds);
+                    ->from(
+                        'customer_address_entity_varchar',
+                        array('attribute_id', 'value')
+                    )
+                    ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
+                    ->where('entity_id = ?', $res['entity_id'])
+                    ->where('attribute_id IN(?)', $addressIds);
+
                 $billingResult = array();
-                foreach($db->fetchAll($select) as $br) {
-                    if(in_array($br['attribute_id'], $addressIds)) {
+                foreach ($db->fetchAll($select) as $br) {
+                    if (in_array($br['attribute_id'], $addressIds)) {
                         $billingResult[$addressAttr[$br['attribute_id']]] = $br['value'];
                     }
                 }
 
                 $countryCode = null;
-                if(isset($billingResult['country_id'])) {
+                if (isset($billingResult['country_id'])) {
                     $countryCode = $billingResult['country_id'];
                 }
 
-                if(array_key_exists('gender', $customer)) {
-                    if($customer['gender'] % 2 == 0) {
+                if (array_key_exists('gender', $customer)) {
+                    if ($customer['gender'] % 2 == 0) {
                         $gender = 'female';
                     } else {
                         $gender = 'male';
                     }
-                } else{
+                } else {
                     $gender = '';
                 }
 
                 $customers_to_save[] = array(
                     'customer_id' => $id,
-                    'gender'      => $gender,
-                    'dob'         => array_key_exists('dob', $customer) ? $customer['dob'] : '',
-                    'country'     => !empty($countryCode) ? $this->_helperExporter->getCountry($countryCode)->getName() : '',
-                    'zip'         => array_key_exists('postcode', $billingResult) ? $billingResult['postcode']: '',
+                    'gender' => $gender,
+                    'dob' => array_key_exists('dob', $customer) ? $customer['dob'] : '',
+                    'country' => !empty($countryCode) ? $this->_helperExporter->getCountry($countryCode)->getName() : '',
+                    'zip' => array_key_exists('postcode', $billingResult) ? $billingResult['postcode'] : '',
                 );
 
             }
 
             $data = $customers_to_save;
 
-            if(count($customers) == 0 && $header) {
+            if (count($customers) == 0 && $header) {
                 return null;
             }
 
-            if($header) {
+            if ($header) {
                 $data = array_merge(array(array_keys(end($customers_to_save))), $customers_to_save);
                 $header = false;
             }
@@ -945,7 +950,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $count = count($customers_to_save);
             $page++;
 
-        } while($count >= $limit);
+        } while ($count >= $limit);
         $customers = null;
 
         self::logMem('Customers - end of exporting');
@@ -969,39 +974,43 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $page = 1;
         $header = true;
 
-        while($count >= $limit) {
-            self::logMem('Transactions - load page '.$page);
+        while ($count >= $limit) {
+            self::logMem('Transactions - load page ' . $page);
             $transactions_to_save = array();
             $configurable = array();
 
-            $select = $db->select()
-                         ->from(
-                            array('order' => 'sales_flat_order'),
-                            array(
-                                'entity_id',
-                                'status',
-                                'updated_at',
-                                'created_at',
-                                'customer_id',
-                                'base_subtotal',
-                                'shipping_amount',
-                            )
-                         )
-                         ->joinLeft(
-                            array('item' => 'sales_flat_order_item'),
-                            'order.entity_id = item.order_id',
-                             array(
-                                'product_id',
-                                'product_options',
-                                'price',
-                                'original_price',
-                                'product_type',
-                                'qty_ordered',
-                             )
-                         )
-                         ->where('order.status <> ?', 'canceled')
-                         ->order(array('order.entity_id', 'item.product_type'))
-                         ->limit($limit, ($page-1) * $limit);
+            $select = $db
+                ->select()
+                ->from(
+                    array('order' => 'sales_flat_order'),
+                    array(
+                        'entity_id',
+                        'status',
+                        'updated_at',
+                        'created_at',
+                        'customer_id',
+                        'base_subtotal',
+                        'shipping_amount',
+                    )
+                )
+                ->joinLeft(
+                    array('item' => 'sales_flat_order_item'),
+                    'order.entity_id = item.order_id',
+                    array(
+                        'product_id',
+                        'product_options',
+                        'price',
+                        'original_price',
+                        'product_type',
+                        'qty_ordered',
+                    )
+                )
+                ->where('order.status <> ?', 'canceled')
+                ->order(array('order.entity_id', 'item.product_type'))
+                ->limit($limit, ($page - 1) * $limit);
+
+            $this->_getIndexType() == 'delta' ? $select->where('order.created_at >= ? OR order.updated_at >= ?', $this->_getLastIndex()) : '';
+
             $transactions = $db->fetchAll($select);
             self::logMem("Transactions - loaded page $page");
 
@@ -1016,12 +1025,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 //is configurable - simple product
                 if (intval($transaction['price']) == 0 && $transaction['product_type'] == 'simple') {
-                    if(isset($configurable[$productOptions['info_buyRequest']['product']])) {
+                    if (isset($configurable[$productOptions['info_buyRequest']['product']])) {
                         $pid = $configurable[$productOptions['info_buyRequest']['product']];
 
                         $transaction['original_price'] = $pid['original_price'];
                         $transaction['price'] = $pid['price'];
-                    } else{
+                    } else {
                         $pid = Mage::getModel('catalog/product')->load($productOptions['info_buyRequest']['product']);
 
                         $transaction['original_price'] = ($pid->getPrice());
@@ -1075,11 +1084,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $configurable = null;
             $transactions = null;
 
-            if($count == 0 && $header) {
+            if ($count == 0 && $header) {
                 return;
             }
 
-            if($header) {
+            if ($header) {
                 $data = array_merge(array(array_keys(end($transactions_to_save))), $transactions_to_save);
                 $header = false;
             }
@@ -1106,7 +1115,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /**
      * @description Preparing files to send
      */
-    protected function prepareFiles($website, &$categories = null,  &$tags = null )
+    protected function prepareFiles($website, &$categories = null, &$tags = null)
     {
 
         //Prepare attributes
@@ -1128,7 +1137,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         //save tags
-        if ($tags != null) {
+        if ($tags != null && $this->_getProductTags() != null) {
             $csvFiles[] = $this->createCsv('tag', $tags);
 
             $loop = 1;
@@ -1145,7 +1154,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $csvFiles = array_filter($csvFiles);
 
         //Create xml
-        $this->createXML($exportFile . '.xml', ($tags != null) ? true : false);
+        $this->createXML($exportFile . '.xml', ($tags != null && $this->_getProductTags() != null) ? true : false);
 
         //Create zip
         $this->createZip($exportFile . '.zip', array_filter($this->_files), $exportFile . '.xml');
@@ -1162,7 +1171,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $file = $name . '.csv';
 
-        if(!is_array($data) || count($data) == 0) {
+        if (!is_array($data) || count($data) == 0) {
             Mage::getModel('adminhtml/session')->addWarning("Data for $file is not an array or is empty. [" . gettype($data) . ']');
         }
 
@@ -1561,7 +1570,7 @@ XML;
             }
         }
         //tag
-        if ($this->_storeConfig['export_tags'] && $withTag ) {
+        if ($this->_storeConfig['export_tags'] && $withTag) {
             $properties[] = array(
                 'id'        => 'tag',
                 'name'      => 'tag',
@@ -1694,7 +1703,7 @@ XML;
         }
 
         //save
-        if(!in_array($file, $this->_files)) {
+        if (!in_array($file, $this->_files)) {
             $this->_files[] = $file;
         }
 
@@ -1713,7 +1722,7 @@ XML;
      */
     private static function logMem($message)
     {
-    	$callers=debug_backtrace();
+        $callers = debug_backtrace();
         Boxalino_CemSearch_Model_Logger::saveMemoryTracking(
             'info',
             'Indexer',
@@ -1736,10 +1745,10 @@ XML;
         if ($this->_entityIds == null) {
             $db = $this->_getReadAdapter();
             $select = $db->select()
-                         ->from(
-                             'eav_entity_type',
-                             array('entity_type_id', 'entity_type_code')
-                         );
+                ->from(
+                    'eav_entity_type',
+                    array('entity_type_id', 'entity_type_code')
+                );
             $this->_entityIds = array();
             foreach ($db->fetchAll($select) as $row) {
                 $this->_entityIds[$row['entity_type_code']] = $row['entity_type_id'];
