@@ -798,7 +798,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $page = 1;
         $header = true;
 
-        $customerAttributes = array();
         $attrsFromDb = array(
             'int' => array(),
             'varchar' => array(),
@@ -824,16 +823,14 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 'scope_table.attribute_id = main_table.attribute_id AND ' .
                 'scope_table.website_id = ' . $this->group->getWebsiteId()
             )
-            ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'));
+            ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'))
+            ->where('attribute_code IN ("dob", "gender")');
 
         foreach ($db->fetchAll($select) as $attr) {
-            $customerAttributes[$attr['aid']] = $attr['attribute_code'];
             if (isset($attrsFromDb[$attr['backend_type']])) {
                 $attrsFromDb[$attr['backend_type']][] = $attr['aid'];
-
             }
         }
-        ksort($customerAttributes);
 
         do {
             self::logMem("Customers - load page $page");
@@ -861,31 +858,53 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 'value',
             );
 
-            $select1 = $db->select()
-                ->where('entity_type_id = ?', 1)
-                ->where('entity_id IN(?)', $ids);
-            $select2 = clone $select1;
-            $select3 = clone $select1;
+            $select = $db->select()
+                ->joinLeft(array('ea' => 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
+                ->where('ce.entity_type_id = ?', 1)
+                ->where('ce.entity_id IN(?)', $ids);
 
-            $select1->from('customer_entity_varchar', $columns)
-                ->where('attribute_id IN(?)', $attrsFromDb['varchar']);
-            $select2->from('customer_entity_int', $columns)
-                ->where('attribute_id IN(?)', $attrsFromDb['int']);
-            $select3->from('customer_entity_datetime', $columns)
-                ->where('attribute_id IN(?)', $attrsFromDb['datetime']);
+            $select1 = null;
+            $select2 = null;
+            $select3 = null;
+
+            $selects = array();
+
+            if(count($attrsFromDb['varchar']) > 0){
+                $select1 = clone $select;
+                $select1->from(array('ce' => 'customer_entity_varchar'), $columns)
+                    ->where('ce.attribute_id IN(?)', $attrsFromDb['varchar']);
+                $selects[] = $select1;
+            }
+
+            if(count($attrsFromDb['int']) > 0){
+                $select2 = clone $select;
+                $select2->from(array('ce' => 'customer_entity_int'), $columns)
+                    ->where('ce.attribute_id IN(?)', $attrsFromDb['int']);
+                $selects[] = $select2;
+            }
+
+            if(count($attrsFromDb['datetime']) > 0){
+                $select3 = clone $select;
+                $select3->from(array('ce' => 'customer_entity_datetime'), $columns)
+                    ->where('ce.attribute_id IN(?)', $attrsFromDb['datetime']);
+                $selects[] = $select3;
+            }
 
             $select = $db->select()
                 ->union(
-                    array($select1, $select2, $select3),
+                    $selects,
                     Zend_Db_Select::SQL_UNION_ALL
                 );
 
             foreach ($db->fetchAll($select) as $r) {
-                $customers[$r['entity_id']][$customerAttributes[$r['attribute_id']]] = $r['value'];
+                $customers[$r['entity_id']][$r['attribute_code']] = $r['value'];
             }
+
+            $select = null;
             $select1 = null;
             $select2 = null;
             $select3 = null;
+            $selects = null;
 
             $select = $db->select()
                 ->from(
@@ -895,13 +914,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'attribute_code',
                     )
                 )
-                ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'));
+                ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
+                ->where('attribute_code IN ("country_id","postcode")');
 
             $addressAttr = array();
             foreach ($db->fetchAll($select) as $r) {
-                if ($r['attribute_code'] == 'country_id' || $r['attribute_code'] == 'postcode') {
-                    $addressAttr[$r['attribute_id']] = $r['attribute_code'];
-                }
+                $addressAttr[$r['attribute_id']] = $r['attribute_code'];
             }
             $addressIds = array_keys($addressAttr);
 
@@ -918,7 +936,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('entity_type_id = ?', 2)
                     ->where('parent_id = ?', $id);
-                $res = $db->fetchRow($select);
 
                 $select = $db->select()
                     ->from(
@@ -926,7 +943,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         array('attribute_id', 'value')
                     )
                     ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
-                    ->where('entity_id = ?', $res['entity_id'])
+                    ->where('entity_id = ?', $select)
                     ->where('attribute_id IN(?)', $addressIds);
 
                 $billingResult = array();
