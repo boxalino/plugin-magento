@@ -369,7 +369,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 array('additional_table' => 'catalog_eav_attribute'),
                 'additional_table.attribute_id = main_table.attribute_id'
             )
-            ->where('main_table.entity_type_id = ?', 4)
+            ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('catalog_product'))
             ->where('main_table.attribute_code IN(?)', $attrs);
 
         self::logMem('Products - connected to DB, built attribute info query');
@@ -380,6 +380,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'text'    => array(),
             'decimal' => array(),
         );
+
         foreach ($db->fetchAll($select) as $r) {
             $type = $r['backend_type'];
             if (isset($attrsFromDb[$type])) {
@@ -478,7 +479,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select1 = $db->select()
                     ->joinLeft(array('ea' => 'eav_attribute'), 't_d.attribute_id = ea.attribute_id', 'ea.attribute_code')
                     ->where('t_d.store_id = ?', 0)
-                    ->where('t_d.entity_type_id = ?', 4)
+                    ->where('t_d.entity_type_id = ?', $this->getEntityIdFor('catalog_product'))
                     ->where('t_d.entity_id IN(?)', $ids);
                 $select2 = clone $select1;
                 $select3 = clone $select1;
