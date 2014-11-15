@@ -12,11 +12,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     private $autocompleteRequest = null;
     private $choiceRequest = null;
     private $autocompleteResponse = null;
-    private $choiceResponse = null;
+    static private $choiceResponse = null;
     private $returnFields = null;
     private $inquiry = null;
     private $searchQuery = null;
     private $filters = array();
+    private $selectedFacets = array();
     const VISITOR_COOKIE_TIME = 31536000;
 
     public function __construct(Boxalino_CemSearch_Helper_P13n_Config $config)
@@ -25,6 +26,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->p13n = new HttpP13n();
         $this->configureP13n();
         $this->createChoiceRequest();
+    }
+
+    private function getChoiceResponse()
+    {
+        if(empty(self::$choiceResponse)) {
+            $this->search();
+        }
+        return self::$choiceResponse;
     }
 
     private function configureP13n()
@@ -78,6 +87,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->searchQuery->returnFields = $returnFields;
         $this->searchQuery->offset = $offset;
         $this->searchQuery->hitCount = $hitCount;
+        $this->searchQuery->facetRequests = $this->prepareFacets();
     }
 
     private function setUpSorting(Boxalino_CemSearch_Helper_P13n_Sort $sorting)
@@ -299,13 +309,84 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
         $this->choiceRequest->inquiries = array($this->inquiry);
-        $this->choiceResponse = $this->p13n->choose($this->choiceRequest);
+        self::$choiceResponse = $this->p13n->choose($this->choiceRequest);
+    }
+
+    private function prepareFacets()
+    {
+        $facets = array();
+        $normalFilters = '';
+        $topFilters = '';
+        $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/search/left_filters_enable');
+        $enableTopFilters = Mage::getStoreConfig('Boxalino_General/search/top_filters_enable');
+
+        if($enableLeftFilters == 1) {
+            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/search/left_filters_normal'));
+        }
+        if($enableTopFilters == 1) {
+            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/search/top_filters'));
+        }
+        foreach($normalFilters as $filterString) {
+            $filter = explode(':', $filterString);
+            if($filter[0] != '') {
+                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                $facet->fieldName = $filter[0];
+                $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
+                $facet->range = $filter[1] == 'ranged' ? true : false;
+                $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
+                $facets[] = $facet;
+            }
+        }
+        foreach($topFilters as $filter) {
+            if($filter != '') {
+                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                $facet->fieldName = $filter;
+                $facet->numerical = false;
+                $facet->range = false;
+                $facet->selectedValues = $this->facetSelectedValue($filter, 'standard');
+                $facets[] = $facet;
+            }
+        }
+        return $facets;
+    }
+
+    private function facetSelectedValue($name, $option)
+    {
+        if(empty($this->selectedFacets)) {
+            foreach($_REQUEST as $key => $values) {
+                if(strpos($key, 'bx_') !== false) {
+                    $fieldName = substr($key, 3);
+                    foreach($values as $value) {
+                        $this->selectedFacets[$fieldName][] = $value;
+                    }
+                }
+            }
+        }
+        $selectedFacets = array();
+        if(isset($this->selectedFacets[$name])) {
+            foreach ($this->selectedFacets as $facet) {
+                foreach ($facet as $key => $value) {
+                    $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
+                    if($option == 'ranged') {
+                        $rangedValue = explode('-', $value);
+                        $selectedFacet->rangeFromInclusive = $rangedValue[0];
+                        $selectedFacet->rangeToExclusive = $rangedValue[1];
+                    } else {
+                        $selectedFacet->stringValue = $value;
+                    }
+                    $selectedFacets[] = $selectedFacet;
+                }
+            }
+            return $selectedFacets;
+        }
+        return;
     }
 
     public function getEntitiesIds()
     {
         $result = array();
-        foreach ($this->choiceResponse->variants as $variant) {
+        $response = $this->getChoiceResponse();
+        foreach ($response->variants as $variant) {
             /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
             $searchResult = $variant->searchResult;
             foreach ($searchResult->hits as $item) {
@@ -318,7 +399,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     public function getEntities()
     {
         $result = array();
-        foreach ($this->choiceResponse->variants as $variant) {
+        $response = $this->getChoiceResponse();
+        foreach ($response->variants as $variant) {
             /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
             $searchResult = $variant->searchResult;
             foreach ($searchResult->hits as $item) {
@@ -328,11 +410,37 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $result;
     }
 
+    public function getFacetsData()
+    {
+        $preparedFacets = array();
+        $response = self::getChoiceResponse();
+        foreach($response->variants as $variant) {
+            $facets = $variant->searchResult->facetResponses;
+            foreach($facets as $facet) {
+                if(!empty($facet->values)) {
+                    $filter[$facet->fieldName] = array();
+                    foreach($facet->values as $value) {
+                        $param['stringValue'] = $value->stringValue;
+                        $param['hitCount'] = $value->hitCount;
+                        $param['rangeFromInclusive'] = $value->rangeFromInclusive;
+                        $param['rangeToExclusive'] = $value->rangeToExclusive;
+                        $param['hierarchyId'] = $value->hierarchyId;
+                        $param['hierarchy'] = $value->hierarchy;
+                        $param['selected'] = $value->selected;
+                        $filter[$facet->fieldName][] = $param;
+                    }
+                    $preparedFacets = $filter;
+                }
+            }
+        }
+        return $preparedFacets;
+    }
+
     public function printData()
     {
         $results = array();
         /** @var \com\boxalino\p13n\api\thrift\Variant $variant */
-        foreach ($this->choiceResponse->variants as $variant) {
+        foreach (self::$choiceResponse->variants as $variant) {
             /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
             $searchResult = $variant->searchResult;
             foreach ($searchResult->hits as $item) {

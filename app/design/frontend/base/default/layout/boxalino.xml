@@ -1,18 +1,40 @@
 <?xml version="1.0"?>
 
 <layout version="0.1.0">
-	<default>
-		<reference name="head">
-			<action method="addItem"><type>skin_css</type><name>css/boxalinoCemSearch.css</name></action>
-			<action method="addItem"><type>skin_js</type><name>js/boxalinoAutocomplete.js</name></action>
-			<action method="addItem" ifconfig="Boxalino_General/jquery/jquery_file"><type>skin_js</type><name>js/jquery-1.10.2.min.js</name></action>
-			<action method="addItem" ifconfig="Boxalino_General/jquery/noconflict_file"><type>skin_js</type><name>js/jquery-noConflict.js</name></action>
-			<!--<action method="addItem"><type>skin_js</type><name>js/ba.js</name></action>-->
+    <default>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/boxalinoCemSearch.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/boxalinoAutocomplete.js</name>
+            </action>
+            <action method="addItem" ifconfig="Boxalino_General/jquery/jquery_file">
+                <type>skin_js</type>
+                <name>js/jquery-1.10.2.min.js</name>
+            </action>
+            <action method="addItem" ifconfig="Boxalino_General/jquery/noconflict_file">
+                <type>skin_js</type>
+                <name>js/jquery-noConflict.js</name>
+            </action>
+            <!--<action method="addItem"><type>skin_js</type><name>js/ba.js</name></action>-->
 
             <block type="boxalino/head" name="boxalino_head" as="boxalino_head" template="boxalino/head.phtml"/>
-		</reference>
-        <reference name="top.search">
-            <action method="setTemplate"><template>boxalino/catalogsearch/form.mini.phtml</template></action>
         </reference>
-	</default>
+        <reference name="top.search">
+            <action method="setTemplate">
+                <template>boxalino/catalogsearch/form.mini.phtml</template>
+            </action>
+        </reference>
+    </default>
+    <catalogsearch_result_index>
+        <reference name="left">
+            <block  type="boxalino/facets" name="left_filters" as="left_filters" template="boxalino/left_filters.phtml"/>
+        </reference>
+        <reference name="content">
+            <block type="boxalino/facets" name="top_filters" as="top_filters" before="-" template="boxalino/top_filters.phtml"/>
+        </reference>
+    </catalogsearch_result_index>
 </layout>
