@@ -326,25 +326,29 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         if($enableTopFilters == 1) {
             $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/search/top_filters'));
         }
-        foreach($normalFilters as $filterString) {
-            $filter = explode(':', $filterString);
-            if($filter[0] != '') {
-                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                $facet->fieldName = $filter[0];
-                $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
-                $facet->range = $filter[1] == 'ranged' ? true : false;
-                $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
-                $facets[] = $facet;
+        if(!empty($normalFilters)) {
+            foreach ($normalFilters as $filterString) {
+                $filter = explode(':', $filterString);
+                if ($filter[0] != '') {
+                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                    $facet->fieldName = $filter[0];
+                    $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
+                    $facet->range = $filter[1] == 'ranged' ? true : false;
+                    $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
+                    $facets[] = $facet;
+                }
             }
         }
-        foreach($topFilters as $filter) {
-            if($filter != '') {
-                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                $facet->fieldName = $filter;
-                $facet->numerical = false;
-                $facet->range = false;
-                $facet->selectedValues = $this->facetSelectedValue($filter, 'standard');
-                $facets[] = $facet;
+        if($topFilters) {
+            foreach ($topFilters as $filter) {
+                if ($filter != '') {
+                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                    $facet->fieldName = $filter;
+                    $facet->numerical = false;
+                    $facet->range = false;
+                    $facet->selectedValues = $this->facetSelectedValue($filter, 'standard');
+                    $facets[] = $facet;
+                }
             }
         }
         return $facets;
