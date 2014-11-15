@@ -2,11 +2,11 @@
 
 class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 {
-    const URL_XML = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/source/update';
-    const URL_XML_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/source/update';
-    const URL_ZIP = 'http://di1.bx-cloud.com/frontend/dbmind/en/dbmind/api/data/push';
-    const URL_ZIP_DEV = 'http://di1.bx-cloud.com/frontend/dbmind/_/en/dbmind/api/data/push';
-
+    const URL_XML = '/frontend/dbmind/en/dbmind/api/data/source/update';
+    const URL_XML_DEV = '/frontend/dbmind/_/en/dbmind/api/data/source/update';
+    const URL_ZIP = '/frontend/dbmind/en/dbmind/api/data/push';
+    const URL_ZIP_DEV = '/frontend/dbmind/_/en/dbmind/api/data/push';
+    public $exportServer = '';
     public $XML_DELIMITER = ',';
     public $XML_ENCLOSURE = '"';
     public $XML_ENCLOSURE_TEXT = "&quot;"; // it's $XML_ENCLOSURE
@@ -38,6 +38,15 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
             return true;
         }
         return false;
+    }
+
+    public function getExportServer()
+    {
+        if(empty($this->exportServer)) {
+            $this->exportServer = Mage::getStoreConfig('boxalinoexporter/export_data/export_server');
+        }
+
+        return $this->exportServer;
     }
 
     /**
@@ -81,10 +90,11 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getZIPSyncUrl($dev = false)
     {
+        $exportServer = $this->getExportServer();
         if ($dev) {
-            return self::URL_ZIP_DEV;
+            return $exportServer.self::URL_ZIP_DEV;
         } else {
-            return self::URL_ZIP;
+            return $exportServer.self::URL_ZIP;
         }
     }
 
@@ -94,10 +104,11 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getXMLSyncUrl($dev = false)
     {
+        $exportServer = $this->getExportServer();
         if ($dev) {
-            return self::URL_XML_DEV;
+            return $exportServer.self::URL_XML_DEV;
         } else {
-            return self::URL_XML;
+            return $exportServer.self::URL_XML;
         }
 
     }

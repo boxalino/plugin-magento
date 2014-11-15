@@ -26,12 +26,21 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
+                        <export_server translate="label">
+                            <label>Export server</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Set server where data will be exported</comment>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </export_server>
                         <language translate="label">
                             <label>Language</label>
                             <frontend_type>text</frontend_type>
                             <comment>Set language of your store view
                                 <![CDATA[<br />Available: en, fr, de, it, es, zh, cz, ru]]></comment>
-                            <sort_order>1</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
