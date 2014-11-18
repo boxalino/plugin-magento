@@ -317,14 +317,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $facets = array();
         $normalFilters = '';
         $topFilters = '';
-        $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/search/left_filters_enable');
-        $enableTopFilters = Mage::getStoreConfig('Boxalino_General/search/top_filters_enable');
+        $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/filter/left_filters_enable');
+        $enableTopFilters = Mage::getStoreConfig('Boxalino_General/filter/top_filters_enable');
 
         if($enableLeftFilters == 1) {
-            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/search/left_filters_normal'));
+            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal'));
         }
         if($enableTopFilters == 1) {
-            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/search/top_filters'));
+            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         }
         if(!empty($normalFilters)) {
             foreach ($normalFilters as $filterString) {
@@ -368,18 +368,21 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         $selectedFacets = array();
         if(isset($this->selectedFacets[$name])) {
-            foreach ($this->selectedFacets as $facet) {
-                foreach ($facet as $key => $value) {
-                    $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
-                    if($option == 'ranged') {
-                        $rangedValue = explode('-', $value);
+            foreach ($this->selectedFacets[$name] as $value) {
+                $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
+                if($option == 'ranged') {
+                    $rangedValue = explode('-', $value);
+                    if($rangedValue[0] != '*') {
                         $selectedFacet->rangeFromInclusive = $rangedValue[0];
-                        $selectedFacet->rangeToExclusive = $rangedValue[1];
-                    } else {
-                        $selectedFacet->stringValue = $value;
                     }
-                    $selectedFacets[] = $selectedFacet;
+                    if($rangedValue[1] != '*') {
+                        $selectedFacet->rangeToExclusive = $rangedValue[1];
+                    }
+                } else {
+                    $selectedFacet->stringValue = $value;
                 }
+                $selectedFacets[] = $selectedFacet;
+
             }
             return $selectedFacets;
         }

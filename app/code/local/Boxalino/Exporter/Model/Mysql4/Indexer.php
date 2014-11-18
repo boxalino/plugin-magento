@@ -919,8 +919,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'customer_address_entity',
                         array('entity_id')
                     )
-                    ->where('entity_type_id = ?', 2)
-                    ->where('parent_id = ?', $id);
+                    ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
+                    ->where('parent_id = ?', $id)
+                    ->order('entity_id DESC')
+                    ->limit(1);
 
                 $select = $db->select()
                     ->from(

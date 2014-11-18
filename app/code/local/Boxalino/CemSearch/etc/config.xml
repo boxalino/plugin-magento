@@ -166,6 +166,12 @@
                 <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>id</entity_id>
             </search>
+            <filter>
+                <left_filters_enable>0</left_filters_enable>
+                <top_filters_enable>0</top_filters_enable>
+                <left_filters_multiselect>0</left_filters_multiselect>
+                <top_filters_multiselect>0</top_filters_multiselect>
+            </filter>
             <tracker>
                 <charset>UTF-8</charset>
                 <enabled>1</enabled>

@@ -56,7 +56,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
         $count--;
 
-        $html = '<ul><li style="display:none"></li>';
+        $html = '<ul class="queries"><li style="display:none"></li>';
         foreach ($suggestData as $index => $item) {
             if ($index == 0) {
                 $item['row_class'] .= ' first';
@@ -67,9 +67,9 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             }
 
             $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
-                . '<span class="amount">' . $item['num_of_results'] . '</span>' . $this->escapeHtml($item['title']) . '</li>';
+                . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
         }
-        $html .= '</ul><ul>';
+        $html .= '</ul><ul class="products">';
 
         $first_word = true;
         foreach ($this->_suggestDataProducts as $key => $word) {
@@ -80,11 +80,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     $class = 'hide';
                 }
                 $html .= '<li data-word="' . $key . '" class="product-autocomplete ' . $class . '" title="' . $this->escapeHtml($product->getName()) . '">';
-                $html .= '<a href="' . $product->getProductUrl() . '" ><table><tr><td>';
-                $html .= '<img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" />';
-                $html .= '</td><td>';
-                $html .= '<span>' . $product->getName() . '</span>';
-                $html .= '</td></tr></table></a>';
+                $html .= '<a href="' . $product->getProductUrl() . '" >';
+                $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
+                $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
+                $html .= '</a>';
                 $html .= '</li>';
             }
             $first_word = false;
