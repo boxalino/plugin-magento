@@ -219,81 +219,81 @@
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
-                        <fields>
-                            <left_filters_enable translate="label">
-                                <label>Enable filters (left side)</label>
-                                <frontend_type>select</frontend_type>
-                                <source_model>adminhtml/system_config_source_yesno</source_model>
-                                <sort_order>39</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </left_filters_enable>
-                            <left_filters_multioption translate="label">
-                                <label>Left filters multioption</label>
-                                <frontend_type>select</frontend_type>
-                                <source_model>adminhtml/system_config_source_yesno</source_model>
-                                <sort_order>40</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </left_filters_multioption>
-                            <left_filters_normal translate="label">
-                                <label>Normal filters (left side)</label>
-                                <frontend_type>text</frontend_type>
-                                <comment><![CDATA[ Write here comma-separated names of fields which you want to use as filters (for example: manufacturer)<br />
-                            Colon separate name of field (left) from option (right)]]></comment>
-                                <sort_order>50</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </left_filters_normal>
-                            <left_filters_normal_title translate="label">
-                                <label>Normal filters titles (left side)</label>
-                                <frontend_type>text</frontend_type>
-                                <comment>Write here comma-separated titles which should be displayed on page (in same order as names of fields)</comment>
-                                <sort_order>51</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </left_filters_normal_title>
-                            <top_filters_enable translate="label">
-                                <label>Enable top filters</label>
-                                <frontend_type>select</frontend_type>
-                                <source_model>adminhtml/system_config_source_yesno</source_model>
-                                <sort_order>58</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </top_filters_enable>
-                            <top_filters_multioption translate="label">
-                                <label>Top filters multioption</label>
-                                <frontend_type>select</frontend_type>
-                                <source_model>adminhtml/system_config_source_yesno</source_model>
-                                <sort_order>59</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </top_filters_multioption>
-                            <top_filters translate="label">
-                                <label>Top filters</label>
-                                <frontend_type>text</frontend_type>
-                                <comment>Write here comma-separated names of fields which you want to use as top filters</comment>
-                                <sort_order>60</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </top_filters>
-                            <top_filters_title translate="label">
-                                <label>Top filters titles</label>
-                                <frontend_type>text</frontend_type>
-                                <comment>Write here comma-separated titles which should be displayed on page (in same order as names of fields)</comment>
-                                <sort_order>61</sort_order>
-                                <show_in_default>1</show_in_default>
-                                <show_in_website>1</show_in_website>
-                                <show_in_store>0</show_in_store>
-                            </top_filters_title>
-                        </fields>
+                    <fields>
+                        <left_filters_enable translate="label">
+                            <label>Enable filters (left side)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>39</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </left_filters_enable>
+                        <left_filters_multioption translate="label">
+                            <label>Left filters multioption</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </left_filters_multioption>
+                        <left_filters_normal translate="label">
+                            <label>Normal filters (left side)</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[ Write here comma-separated names of fields which you want to use as filters (for example: manufacturer)<br />
+                        Colon separate name of field (left) from option (right)]]></comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </left_filters_normal>
+                        <left_filters_normal_title translate="label">
+                            <label>Normal filters titles (left side)</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Write here comma-separated titles which should be displayed on page (in same order as names of fields)</comment>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </left_filters_normal_title>
+                        <top_filters_enable translate="label">
+                            <label>Enable top filters</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </top_filters_enable>
+                        <top_filters_multioption translate="label">
+                            <label>Top filters multioption</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </top_filters_multioption>
+                        <top_filters translate="label">
+                            <label>Top filters</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Write here comma-separated names of fields which you want to use as top filters</comment>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </top_filters>
+                        <top_filters_title translate="label">
+                            <label>Top filters titles</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Write here comma-separated titles which should be displayed on page (in same order as names of fields)</comment>
+                            <sort_order>61</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </top_filters_title>
+                    </fields>
                 </filter>
                 <tracker translate="label" module="Boxalino_CemSearch">
                     <label>Tracking</label>

@@ -372,8 +372,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
                 if($option == 'ranged') {
                     $rangedValue = explode('-', $value);
-                    $selectedFacet->rangeFromInclusive = $rangedValue[0];
-                    $selectedFacet->rangeToExclusive = $rangedValue[1];
+                    if($rangedValue[0] != '*') {
+                        $selectedFacet->rangeFromInclusive = $rangedValue[0];
+                    }
+                    if($rangedValue[1] != '*') {
+                        $selectedFacet->rangeToExclusive = $rangedValue[1];
+                    }
                 } else {
                     $selectedFacet->stringValue = $value;
                 }

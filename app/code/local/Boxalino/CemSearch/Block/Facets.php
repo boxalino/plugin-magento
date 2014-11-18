@@ -31,7 +31,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                     if($values['stringValue'] == 1) {
                         $filters[$filter] = $allFilters[$filter][$key];
                         $filters[$filter]['title'] = $titles[$i];
-                        $filters[$filter]['url'] = $this->getFilterUrl($filter, '1', $allFilters[$filter][$key]['selected'], false);
+                        $filters[$filter]['url'] = $this->getTopFilterUrl($filter, '1', $allFilters[$filter][$key]['selected']);
                         $filters[$filter]['selected'] = $allFilters[$filter][$key]['selected'];
                     }
                 }
@@ -66,14 +66,53 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         return $filters;
     }
 
+    private function getTopFilterUrl($name, $value, $selected)
+    {
+        $multioption = Mage::getStoreConfig('Boxalino_General/filter/top_filters_multioption');
+        $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+        if($multioption == true) {
+            if ($selected === false) {
+                $url = $currentUrl . '&bx_' . $name . '[0]' . '=' . $value;
+            } else {
+                $url = str_replace('&bx_' . $name . '[0]' . '=' . $value, '', $currentUrl);
+            }
+        } else {
+            $topFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
+            if ($selected === false) {
+                foreach($topFilters as $filter) {
+                    $currentUrl = str_replace('&bx_' . $filter . '[0]' . '=' . $value, '', $currentUrl);
+                }
+                $url = $currentUrl . '&bx_' . $name . '[0]' . '=' . $value;
+            } else {
+                $url = str_replace('&bx_' . $name . '[0]' . '=' . $value, '', $currentUrl);
+            }
+        }
+        return $url;
+    }
+
     private function getFilterUrl($name, $value, $selected, $ranged = false, $position = 0)
     {
+        $multioption = Mage::getStoreConfig('Boxalino_General/filter/left_filters_multioption');
         $currentUrl = Mage::helper('core/url')->getCurrentUrl();
         if(!$ranged) {
-            if ($selected === false) {
-                $url = $currentUrl . '&bx_' . $name.'['.$position.']'. '=' . $value;
+            if($multioption == true) {
+                if ($selected === false) {
+                    $url = $currentUrl . '&bx_' . $name . '[' . $position . ']' . '=' . $value;
+                } else {
+                    $url = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . $value, '', $currentUrl);
+                }
             } else {
-                $url = str_replace('&bx_' . $name.'['.$position.']'. '=' . $value, '', $currentUrl);
+                $position = 0;
+                if ($selected === false) {
+                    if(isset($_REQUEST['bx_' . $name])) {
+                        foreach($_REQUEST['bx_' . $name] as $val) {
+                            $currentUrl = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . $val, '', $currentUrl);
+                        }
+                    }
+                    $url = $currentUrl . '&bx_' . $name . '[' . $position . ']' . '=' . $value;
+                } else {
+                    $url = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . $value, '', $currentUrl);
+                }
             }
         } else {
             if ($selected === false) {
@@ -82,7 +121,6 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                 $url = str_replace('&bx_' . $name.'['.$position.']'. '=' . $value['from'].'-'.$value['to'], '', $currentUrl);
             }
         }
-
         return $url;
     }
 
@@ -90,11 +128,11 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     {
         $data = array();
         if($option == 'ranged') {
-            $data['stringValue'] = Mage::helper('core')->currency($values['rangeFromInclusive'], true, false) . ' - ' . Mage::helper('core')->currency($values['rangeToExclusive'], true, false);
+            $data['stringValue'] = array('min' => $values['rangeFromInclusive'], 'max' => $values['rangeToExclusive']);
             $data['url'] = $this->getFilterUrl($filter, array('from' => $values['rangeFromInclusive'], 'to' => $values['rangeToExclusive']), $values['selected'], true, $position);
         } elseif($values['hierarchyId'] > 0) {
-            $data['hierarchyId'] =
-            $data['url'] = $this->getFilterUrl($filter, $values['hierarchyId'], $values['selected'], false, $position);
+            $data['hierarchyId'] = $values['hierarchyId'][0];
+            $data['url'] = $this->getFilterUrl($filter, $values['hierarchy'][0], $values['selected'], false, $position);
             $data['stringValue'] = $values['hierarchy'][0];
         } else {
             $data['url'] = $this->getFilterUrl($filter, $values['stringValue'], $values['selected'], false, $position);
@@ -103,5 +141,25 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         $data['hitCount'] = $values['hitCount'];
         $data['selected'] = $values['selected'];
         return $data;
+    }
+
+    public function removeFilterFromUrl($url, $filter, $vals)
+    {
+        if(isset($_REQUEST['bx_'.$filter])) {
+            foreach($vals as $val) {
+                $key = array_search($val, $_REQUEST['bx_'.$filter]);
+                if($key !== false) {
+                    $url = str_replace('&bx_'.$filter.'['.$key.']='.$vals[$key], '', $url);
+                }
+            }
+        }
+        return $url;
+    }
+
+    public function getMinMaxValues($values)
+    {
+        $first = $values[0];
+        $last = end($values);
+        return array('min' => round(floor($first['stringValue']['min']), -2), 'max' => round(ceil($last['stringValue']['max'])), 1);
     }
 }
