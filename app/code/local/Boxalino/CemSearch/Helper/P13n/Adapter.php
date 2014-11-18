@@ -317,34 +317,38 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $facets = array();
         $normalFilters = '';
         $topFilters = '';
-        $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/search/left_filters_enable');
-        $enableTopFilters = Mage::getStoreConfig('Boxalino_General/search/top_filters_enable');
+        $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/filter/left_filters_enable');
+        $enableTopFilters = Mage::getStoreConfig('Boxalino_General/filter/top_filters_enable');
 
         if($enableLeftFilters == 1) {
-            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/search/left_filters_normal'));
+            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal'));
         }
         if($enableTopFilters == 1) {
-            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/search/top_filters'));
+            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         }
-        foreach($normalFilters as $filterString) {
-            $filter = explode(':', $filterString);
-            if($filter[0] != '') {
-                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                $facet->fieldName = $filter[0];
-                $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
-                $facet->range = $filter[1] == 'ranged' ? true : false;
-                $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
-                $facets[] = $facet;
+        if(!empty($normalFilters)) {
+            foreach ($normalFilters as $filterString) {
+                $filter = explode(':', $filterString);
+                if ($filter[0] != '') {
+                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                    $facet->fieldName = $filter[0];
+                    $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
+                    $facet->range = $filter[1] == 'ranged' ? true : false;
+                    $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
+                    $facets[] = $facet;
+                }
             }
         }
-        foreach($topFilters as $filter) {
-            if($filter != '') {
-                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                $facet->fieldName = $filter;
-                $facet->numerical = false;
-                $facet->range = false;
-                $facet->selectedValues = $this->facetSelectedValue($filter, 'standard');
-                $facets[] = $facet;
+        if($topFilters) {
+            foreach ($topFilters as $filter) {
+                if ($filter != '') {
+                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                    $facet->fieldName = $filter;
+                    $facet->numerical = false;
+                    $facet->range = false;
+                    $facet->selectedValues = $this->facetSelectedValue($filter, 'standard');
+                    $facets[] = $facet;
+                }
             }
         }
         return $facets;
@@ -364,18 +368,17 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         $selectedFacets = array();
         if(isset($this->selectedFacets[$name])) {
-            foreach ($this->selectedFacets as $facet) {
-                foreach ($facet as $key => $value) {
-                    $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
-                    if($option == 'ranged') {
-                        $rangedValue = explode('-', $value);
-                        $selectedFacet->rangeFromInclusive = $rangedValue[0];
-                        $selectedFacet->rangeToExclusive = $rangedValue[1];
-                    } else {
-                        $selectedFacet->stringValue = $value;
-                    }
-                    $selectedFacets[] = $selectedFacet;
+            foreach ($this->selectedFacets[$name] as $value) {
+                $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
+                if($option == 'ranged') {
+                    $rangedValue = explode('-', $value);
+                    $selectedFacet->rangeFromInclusive = $rangedValue[0];
+                    $selectedFacet->rangeToExclusive = $rangedValue[1];
+                } else {
+                    $selectedFacet->stringValue = $value;
                 }
+                $selectedFacets[] = $selectedFacet;
+
             }
             return $selectedFacets;
         }

@@ -21,8 +21,8 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     public function getTopFilters()
     {
         $filters = array();
-        $topFilters = explode(',',Mage::getStoreConfig('Boxalino_General/search/top_filters'));
-        $titles = explode(',',Mage::getStoreConfig('Boxalino_General/search/top_filters_title'));
+        $topFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
+        $titles = explode(',',Mage::getStoreConfig('Boxalino_General/filter/top_filters_title'));
         $i = 0;
         $allFilters = $this->_allFilters;
         foreach($topFilters as $filter) {
@@ -32,6 +32,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                         $filters[$filter] = $allFilters[$filter][$key];
                         $filters[$filter]['title'] = $titles[$i];
                         $filters[$filter]['url'] = $this->getFilterUrl($filter, '1', $allFilters[$filter][$key]['selected'], false);
+                        $filters[$filter]['selected'] = $allFilters[$filter][$key]['selected'];
                     }
                 }
             }
@@ -43,8 +44,8 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     public function getLeftFilters()
     {
         $filters = array();
-        $leftFilters = explode(',',Mage::getStoreConfig('Boxalino_General/search/left_filters_normal'));
-        $leftFiltersTitles = explode(',',Mage::getStoreConfig('Boxalino_General/search/left_filters_normal_title'));
+        $leftFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal'));
+        $leftFiltersTitles = explode(',',Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal_title'));
         $i = 0;
         $allFilters = $this->_allFilters;
         foreach($leftFilters as $filterString) {
@@ -100,6 +101,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             $data['stringValue'] = $values['stringValue'];
         }
         $data['hitCount'] = $values['hitCount'];
+        $data['selected'] = $values['selected'];
         return $data;
     }
 }
