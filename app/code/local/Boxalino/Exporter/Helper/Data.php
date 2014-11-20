@@ -177,7 +177,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     public function escapeString($string)
     {
-        return htmlspecialchars(trim(preg_replace('/\s+/', ' ', $string)));
+        return htmlspecialchars(utf8_encode(trim(preg_replace('/\s+/', ' ', $string))));
     }
 
     public function delTree($dir)

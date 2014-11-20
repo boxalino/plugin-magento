@@ -102,6 +102,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->pushXML($file);
             $this->pushZip($file);
 
+            self::logMem('Files pushed');
+
             $this->_transformedCategories = array();
             $this->_transformedTags = array();
             $this->_transformedProducts = array();
@@ -663,10 +665,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             case 'description':
                             case 'short_description':
                             case 'name':
-                                $productParam[$attr . '_' . $lang] = $val;
+                                $productParam[$attr . '_' . $lang] = $this->_helperSearch->escapeString($val);
                                 break;
                             default:
-                                $productParam[$attr] = $val;
+                                $productParam[$attr] = $this->_helperSearch->escapeString($val);
                                 break;
                         }
                         self::logMem('Products - end attributes transform');
@@ -1673,7 +1675,6 @@ XML;
 
     protected function pushXML($file)
     {
-
         $fields = array(
             'username' => $this->_storeConfig['di_username'],
             'password' => $this->_storeConfig['di_password'],
@@ -1683,14 +1684,13 @@ XML;
         );
 
         $url = $this->_helperExporter->getXMLSyncUrl($this->_storeConfig['account_dev']);
-
         return $this->pushFile($fields, $url, 'xml');
 
     }
 
     protected function pushFile($fields, $url, $type)
     {
-
+        self::logMem($type.' push');
         $s = curl_init();
 
         curl_setopt($s, CURLOPT_URL, $url);
@@ -1703,8 +1703,10 @@ XML;
         $responseBody = curl_exec($s);
         curl_close($s);
         if (strpos($responseBody, 'Internal Server Error') !== false) {
+            self::logMem($type.' push error: '.$responseBody);
             Mage::throwException($this->_helperExporter->getError($responseBody));;
         }
+        self::logMem($type.' pushed. Response: '.$responseBody);
         return $responseBody;
     }
 
