@@ -44,6 +44,7 @@
     <default>
         <boxalinoexporter>
             <export_data>
+                <export_server>http://di1.bx-cloud.com</export_server>
                 <maximum_population>0</maximum_population>
                 <language>en</language>
                 <export_categories>1</export_categories>
