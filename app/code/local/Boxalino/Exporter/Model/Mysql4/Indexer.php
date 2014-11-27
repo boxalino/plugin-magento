@@ -623,11 +623,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     if (array_key_exists('parent_id', $product)) {
                         $id = $product['parent_id'];
                         $haveParent = true;
-                    } else if ($product['visibility'] == 1 && !array_key_exists('parent_id', $product)) {
-                        $product = null;
-                        continue;
                     }
-
                     foreach ($attrs as $attr) {
                         self::logMem('Products - start attributes transform');
 
@@ -644,10 +640,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                             // if visibility is set everywhere (have value "4"),
                             // then we split it for value "2" and "3" (search and catalog separately)
-                            if ($attr == 'visibility' && $val == '4') {
-                                fputcsv($filesMtM[$attr], array($id, '2'), $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
-                                fputcsv($filesMtM[$attr], array($id, '3'), $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
-
+                            if ($attr == 'visibility') {
+                                $productParam[$attr . '_' . $lang] = strtolower(str_replace(' ', '_',str_replace(',', '',$this->_attributesValuesByName[$attr][$val]['value_'.$lang])));
                             } else {
                                 fputcsv($filesMtM[$attr], array($id, $val), $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
                             }
@@ -1377,7 +1371,9 @@ XML;
         }
 
         foreach ($attrs as $attr) {
-
+            if($attr == 'visibility') {
+                continue;
+            }
             $attr = $this->_helperSearch->sanitizeFieldName($attr);
 
             //attribute
@@ -1556,6 +1552,7 @@ XML;
                     $ptype = 'id';
                     break;
                 case 'short_description':
+                case 'visibility':
                     $ptype = 'text';
                     break;
                 case 'weight':
@@ -1566,7 +1563,7 @@ XML;
                     break;
             }
 
-            if (isset($this->_attributesValuesByName[$attr])) {
+            if (isset($this->_attributesValuesByName[$attr]) && $attr != 'visibility') {
                 $properties[] = array(
                     'id'        => $attr,
                     'name'      => $attr,
@@ -1585,6 +1582,7 @@ XML;
                 switch ($attr) {
                     case 'description':
                     case 'short_description':
+                    case 'visibility':
                     case 'name':
                         $lang = true;
                         break;

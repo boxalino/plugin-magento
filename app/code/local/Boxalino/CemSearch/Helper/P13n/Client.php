@@ -115,6 +115,9 @@ class Boxalino_CemSearch_Helper_P13n_Client
                 $contextItem->role = 'mainProduct';
                 $inquiry->contextItems = array($contextItem);
             }
+            if($this->filterByVisibleProducts()) {
+                $inquiry->simpleSearchQuery->filters[] = $this->filterByVisibleProducts();
+            }
             $choiceRequest->inquiries[] = $inquiry;
         }
         $choiceResponse = $this->p13n->choose($choiceRequest);
@@ -195,6 +198,15 @@ class Boxalino_CemSearch_Helper_P13n_Client
             $inquiry->scope = $scope;
         }
         return $inquiry;
+    }
+
+    private function filterByVisibleProducts()
+    {
+        $filter = new \com\boxalino\p13n\api\thrift\Filter();
+        $filter->fieldName = 'products_visibility';
+        $filter->negative = true;
+        $filter->stringValues = array("not_visible_individually");
+        return $filter;
     }
 
     /**

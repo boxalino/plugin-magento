@@ -3,9 +3,9 @@
 class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 {
     const URL_XML = '/frontend/dbmind/en/dbmind/api/data/source/update';
-    const URL_XML_DEV = '/frontend/dbmind/_/en/dbmind/api/data/source/update';
+    const URL_XML_DEV = '/frontend/dbmind/en/dbmind/api/data/source/update?dev=true';
     const URL_ZIP = '/frontend/dbmind/en/dbmind/api/data/push';
-    const URL_ZIP_DEV = '/frontend/dbmind/_/en/dbmind/api/data/push';
+    const URL_ZIP_DEV = '/frontend/dbmind/en/dbmind/api/data/push?dev=true';
     public $exportServer = '';
     public $XML_DELIMITER = ',';
     public $XML_ENCLOSURE = '"';
