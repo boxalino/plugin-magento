@@ -261,6 +261,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $searchQuery->hitCount = $products_limit;
         $searchQuery->queryText = $text;
 
+        if($this->filterByVisibleProducts()) {
+            $searchQuery->filters[] = $this->filterByVisibleProducts();
+        }
         $autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
         $autocompleteQuery->indexId = $this->config->getAccount();
         $autocompleteQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
@@ -271,6 +274,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
         $this->autocompleteRequest->searchChoiceId = $choiceId;
         $this->autocompleteRequest->searchQuery = $searchQuery;
+
         $this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
 
     }
@@ -283,6 +287,15 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $suggestions[] = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
         }
         return $suggestions;
+    }
+
+    private function filterByVisibleProducts()
+    {
+        $filter = new \com\boxalino\p13n\api\thrift\Filter();
+        $filter->fieldName = 'products_visibility';
+        $filter->negative = true;
+        $filter->stringValues = array("not_visible_individually");
+        return $filter;
     }
 
     public function getAutocompleteProducts()
@@ -306,6 +319,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     {
         if (!empty($this->filters)) {
             $this->searchQuery->filters = $this->filters;
+        }
+        if($this->filterByVisibleProducts()) {
+            $this->searchQuery->filters[] = $this->filterByVisibleProducts();
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
         $this->choiceRequest->inquiries = array($this->inquiry);
