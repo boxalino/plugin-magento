@@ -395,7 +395,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                         $selectedFacet->rangeToExclusive = $rangedValue[1];
                     }
                 } else {
-                    $selectedFacet->stringValue = $value;
+                    $selectedFacet->stringValue = urldecode($value);
                 }
                 $selectedFacets[] = $selectedFacet;
 
