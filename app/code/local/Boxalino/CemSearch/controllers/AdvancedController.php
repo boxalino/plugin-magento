@@ -135,6 +135,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         //get result from boxalino
         $p13n->search();
+        $p13n->prepareAdditionalDataFromP13n();
         $entity_ids = $p13n->getEntitiesIds();
         unset($p13n);
 

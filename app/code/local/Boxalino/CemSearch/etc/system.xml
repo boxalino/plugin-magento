@@ -126,6 +126,16 @@
                             <show_in_store>0</show_in_store>
                             <validate>required-entry</validate>
                         </p13n_password>
+                        <additional_fields>
+                            <label>Return additional fields</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[ Write here comma-separated names of fields from the Data Intelligence which should be returned with P13n response<br />
+                        Colon separate option: global (without language version), local (with language version)]]></comment>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </additional_fields>
                     </fields>
                 </general>
 

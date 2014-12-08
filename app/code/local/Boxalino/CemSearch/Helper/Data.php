@@ -1,7 +1,7 @@
 <?php
 class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 {
-
+    private $additionalFields = null;
     public function __construct()
     {
         include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/Thrift/HttpP13n.php');
@@ -303,4 +303,11 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         return $text;
     }
 
+    public function getAdditionalFieldsFromP13n()
+    {
+        if($this->additionalFields == null) {
+            $this->additionalFields = explode(',',Mage::getStoreConfig('Boxalino_General/general/additional_fields'));
+        }
+        return !empty($this->additionalFields) ? $this->additionalFields : array();
+    }
 }

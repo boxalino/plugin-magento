@@ -43,6 +43,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         }
         $p13n->search();
         $entity_ids = $p13n->getEntitiesIds();
+        $p13n->prepareAdditionalDataFromP13n();
         unset($p13n); // !!!!!
 
         $adapter = $this->_getWriteAdapter();

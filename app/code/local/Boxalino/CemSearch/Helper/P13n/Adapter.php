@@ -64,6 +64,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     public function setupInquiry($choiceId, $search, $language, $returnFields, $sort, $offset = 0, $hitCount = 10)
     {
         $this->inquiry = $this->createInquiry();
+        $returnFields = array_merge($returnFields, Mage::helper('Boxalino_CemSearch')->getAdditionalFieldsFromP13n());
         $this->returnFields = $returnFields;
         $this->createAndSetUpSearchQuery($search, $language, $returnFields, $offset, $hitCount);
         $this->setUpSorting($sort);
@@ -264,6 +265,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         if($this->filterByVisibleProducts()) {
             $searchQuery->filters[] = $this->filterByVisibleProducts();
         }
+        if($this->filterByStatusProducts()) {
+            $searchQuery->filters[] = $this->filterByStatusProducts();
+        }
         $autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
         $autocompleteQuery->indexId = $this->config->getAccount();
         $autocompleteQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
@@ -298,6 +302,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $filter;
     }
 
+    private function filterByStatusProducts()
+    {
+        $filter = new \com\boxalino\p13n\api\thrift\Filter();
+        $filter->fieldName = 'products_status';
+        $filter->stringValues = array("enabled");
+        return $filter;
+    }
+
     public function getAutocompleteProducts()
     {
         $products = array();
@@ -322,6 +334,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         if($this->filterByVisibleProducts()) {
             $this->searchQuery->filters[] = $this->filterByVisibleProducts();
+        }
+        if($this->filterByStatusProducts()) {
+            $this->searchQuery->filters[] = $this->filterByStatusProducts();
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
         $this->choiceRequest->inquiries = array($this->inquiry);
@@ -419,18 +434,27 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $result;
     }
 
-    public function getEntities()
+    public function prepareAdditionalDataFromP13n()
     {
         $result = array();
-        $response = $this->getChoiceResponse();
-        foreach ($response->variants as $variant) {
-            /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
-            $searchResult = $variant->searchResult;
-            foreach ($searchResult->hits as $item) {
-                $result[] = $item->values;
+        $response = self::getChoiceResponse();
+        $additionalFields = Mage::helper('Boxalino_CemSearch')->getAdditionalFieldsFromP13n();
+        if(!empty($response->variants)) {
+            foreach ($response->variants as $variant) {
+                /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
+                $searchResult = $variant->searchResult;
+                foreach ($searchResult->hits as $item) {
+                    foreach($additionalFields as $field) {
+                        if(isset($item->values[$field])) {
+                            if(!empty($item->values[$field])) {
+                                $result[$item->values['id'][0]][$field] = $item->values[$field];
+                            }
+                        }
+                    }
+                }
             }
         }
-        return $result;
+        Mage::getModel('core/session')->setData('boxalino_additional_data', $result);
     }
 
     public function getFacetsData()

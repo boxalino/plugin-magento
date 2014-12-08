@@ -118,6 +118,9 @@ class Boxalino_CemSearch_Helper_P13n_Client
             if($this->filterByVisibleProducts()) {
                 $inquiry->simpleSearchQuery->filters[] = $this->filterByVisibleProducts();
             }
+            if($this->filterByStatusProducts()) {
+                $inquiry->simpleSearchQuery->filters[] = $this->filterByStatusProducts();
+            }
             $choiceRequest->inquiries[] = $inquiry;
         }
         $choiceResponse = $this->p13n->choose($choiceRequest);
@@ -206,6 +209,14 @@ class Boxalino_CemSearch_Helper_P13n_Client
         $filter->fieldName = 'products_visibility';
         $filter->negative = true;
         $filter->stringValues = array("not_visible_individually");
+        return $filter;
+    }
+
+    private function filterByStatusProducts()
+    {
+        $filter = new \com\boxalino\p13n\api\thrift\Filter();
+        $filter->fieldName = 'products_status';
+        $filter->stringValues = array("enabled");
         return $filter;
     }
 
