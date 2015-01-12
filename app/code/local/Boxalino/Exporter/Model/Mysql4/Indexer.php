@@ -60,7 +60,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             mkdir($this->_mainDir);
         }
         $this->_websiteExport();
-        $this->_helperExporter->delTree($this->_dir);
         return $this;
     }
 
