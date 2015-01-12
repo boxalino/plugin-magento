@@ -40,7 +40,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /** @var int Actually used storeId */
     protected $_storeId = 0;
 
-    protected $_dir = '/tmp/boxalino';
+    protected $_mainDir = '/tmp/boxalino';
+    protected $_dir = '';
 
     protected $group = null;
 
@@ -55,6 +56,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     public function reindexAll()
     {
         self::logMem('Indexer init');
+        if(!file_exists($this->_mainDir)){
+            mkdir($this->_mainDir);
+        }
         $this->_websiteExport();
         $this->_helperExporter->delTree($this->_dir);
         return $this;
@@ -71,12 +75,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         self::logMem('Helpers init');
         foreach (Mage::app()->getWebsites() as $website) {
 
-            $this->_helperExporter->delTree($this->_dir);
-            self::logMem('After delTree');
-
-            if (!$this->_isEnabled()) {
+            if (!$website->getConfig('Boxalino_General/general/enabled')) {
                 continue;
             }
+
+            $this->_dir = $this->_mainDir . '/' . $website->getConfig('Boxalino_General/general/di_username');
+            if(file_exists($this->_dir)){
+                $this->_helperExporter->delTree($this->_dir);
+            }
+            self::logMem('After delTree');
 
             $data = $this->_storeExport($website);
 
@@ -143,6 +150,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 }
             }
+
+            $this->_storeConfig['websiteId'] = $group->getId();
 
             if ($this->_isEnabled()) {
                 $this->_exportCustomers();
@@ -420,8 +429,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $key = 'category';
             }
 
-            if (!file_exists('/tmp/boxalino')) {
-                mkdir('/tmp/boxalino');
+            if (!file_exists($this->_dir)) {
+                mkdir($this->_dir);
             }
 
             $file = 'product_' . $attr . '.csv';
@@ -611,7 +620,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 foreach ($products as $product) {
                     self::logMem('Products - start transform');
 
-                    if (count($product['website']) == 0) {
+                    if (count($product['website']) == 0 || !in_array($this->_storeConfig['websiteId'], $product['website'])) {
                         $product = null;
                         continue;
                     }
@@ -1150,8 +1159,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //Prepare attributes
         $csvFiles = array();
-        if (!file_exists('/tmp/boxalino')) {
-            mkdir('/tmp/boxalino');
+        if (!file_exists($this->_dir)) {
+            mkdir($this->_dir);
         }
 
         //create csvs
@@ -1180,7 +1189,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         //csvs done
 
         //Create name for file
-        $exportFile = '/tmp/boxalino/' . $this->_storeConfig['di_username'];
+        $exportFile = $this->_dir . '/' . $this->_storeConfig['di_username'];
         $csvFiles = array_filter($csvFiles);
 
         //Create xml
@@ -1657,7 +1666,7 @@ XML;
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
 
             foreach ($csvFiles as $f) {
-                if (!$zip->addFile('/tmp/boxalino/' . $f, $f)) {
+                if (!$zip->addFile($this->_dir . '/' . $f, $f)) {
                     throw new Exception('Synchronization failure. Please try again.');
                 }
             }
@@ -1734,8 +1743,8 @@ XML;
     protected function savePartToCsv($file, &$data)
     {
 
-        if (!file_exists('/tmp/boxalino')) {
-            mkdir('/tmp/boxalino');
+        if (!file_exists($this->_dir)) {
+            mkdir($this->_dir);
         }
 
         //save

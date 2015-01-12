@@ -18,13 +18,31 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         );
 
         $adapter = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+
+        $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
+        $p13nSort->push('score', true);   // score / discountedPrice / title_en
+
+        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
+        $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
+
+        $limit = $generalConfig['quick_search_limit'] == 0 ? 1000 : $generalConfig['quick_search_limit'];
+
+        $adapter->setupInquiry(
+            $generalConfig['quick_search'],
+            Mage::helper('catalogsearch')->getQueryText(),
+            $lang,
+            array($generalConfig['entity_id'], 'categories'),
+            $p13nSort,
+            0, $limit
+        );
+
         $this->_allFilters = $adapter->getFacetsData();
     }
 
     public function getTopFilters()
     {
         $filters = array();
-        $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
+        $topFilters = explode(',', Mage::getStoreConfig('Boxalino_dla la wszystkich General/filter/top_filters'));
         $titles = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters_title'));
         $i = 0;
         $allFilters = $this->_allFilters;
