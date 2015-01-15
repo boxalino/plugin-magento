@@ -26,6 +26,45 @@ class Boxalino_CemSearch_Model_Logger
         }
     }
 
+    static public function saveFrontActions($type, $data, $separator = false){
+
+        $date = date('Y-m-d H:i:s');
+
+        if(isset($_REQUEST['dev_bx_disp']) && md5($_REQUEST['dev_bx_disp']) == '9a7f222ea63df5209a6206f0b1268ee5'){
+            print_r('<pre>');
+            print_r($date . ' ' . strtoupper($type) . '<br/>');
+            print_r($data);
+            print_r('</pre>');
+
+            print_r($separator ? "<br/>========================================================<br/>":"");
+        }
+
+        if(!Mage::getStoreConfig('Boxalino_General/general/logs_saving_frontend')){
+            return;
+        }
+
+        $day = date('Y-m-d_H:i');
+
+
+        // Create file if not exist
+        $logDir  = Mage::getBaseDir('var') . DS . 'boxalino_logs';
+        $file = $logDir . DS . 'request_' . $day;
+
+        if (!is_dir($logDir)) {
+            mkdir($logDir);
+            chmod($logDir, 0777);
+        }
+
+        if (!file_exists($file)) {
+            file_put_contents($file, '');
+            chmod($file, 0777);
+        }
+
+        //Save information into file
+        $line = $date . ' ' . strtoupper($type) . "\n" . print_r($data, true) . ($separator ? "\n=========================================================================\n":"\n");
+        file_put_contents($file, $line, FILE_APPEND);
+    }
+
     static private function initFile($name)
     {
         $logDir  = Mage::getBaseDir('var') . DS . 'boxalino_logs';

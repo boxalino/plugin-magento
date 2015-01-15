@@ -89,6 +89,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->searchQuery->offset = $offset;
         $this->searchQuery->hitCount = $hitCount;
         $this->searchQuery->facetRequests = $this->prepareFacets();
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('query', $search);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('facets', $this->searchQuery->facetRequests);
     }
 
     private function setUpSorting(Boxalino_CemSearch_Helper_P13n_Sort $sorting)
@@ -279,7 +282,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->autocompleteRequest->searchChoiceId = $choiceId;
         $this->autocompleteRequest->searchQuery = $searchQuery;
 
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Query', $text);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Request', $this->autocompleteRequest);
+
         $this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Response', $this->autocompleteResponse, 1);
 
     }
 
@@ -340,7 +348,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
         $this->choiceRequest->inquiries = array($this->inquiry);
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request', $this->choiceRequest);
+
         self::$choiceResponse = $this->p13n->choose($this->choiceRequest);
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Response', self::$choiceResponse, 1);
     }
 
     private function prepareFacets()
