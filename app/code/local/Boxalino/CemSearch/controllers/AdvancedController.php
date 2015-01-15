@@ -140,6 +140,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
         unset($p13n);
 
         try {
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('AdvancedController_ResultAction', 'storing catalogsearch/advanced for entities with id: ' . implode(', ', $entity_ids));
             Mage::getSingleton('catalogsearch/advanced')->addFilters($params, $entity_ids);
         } catch (Mage_Core_Exception $e) {
             Mage::getSingleton('catalogsearch/session')->addError($e->getMessage());

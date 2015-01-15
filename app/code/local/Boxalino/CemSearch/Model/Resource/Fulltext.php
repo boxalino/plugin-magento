@@ -108,6 +108,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 $select->where($where);
             }
 
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('Fulltext_PrepareResult', 'storing catalogsearch/result for entities with id: ' . implode(', ', $entity_ids));
             $sql = $adapter->insertFromSelect($select,
                 $this->getTable('catalogsearch/result'),
                 array(),

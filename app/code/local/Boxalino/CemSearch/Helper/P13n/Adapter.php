@@ -284,6 +284,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Query', $text);
         Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Request', $this->autocompleteRequest);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Request_serialized', serialize($this->autocompleteRequest));
 
         $this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
 
@@ -350,6 +351,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->choiceRequest->inquiries = array($this->inquiry);
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request', $this->choiceRequest);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request_serialized', serialize($this->choiceRequest));
 
         self::$choiceResponse = $this->p13n->choose($this->choiceRequest);
 
