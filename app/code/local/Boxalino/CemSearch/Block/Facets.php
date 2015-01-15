@@ -42,7 +42,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     public function getTopFilters()
     {
         $filters = array();
-        $topFilters = explode(',', Mage::getStoreConfig('Boxalino_dla la wszystkich General/filter/top_filters'));
+        $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         $titles = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters_title'));
         $i = 0;
         $allFilters = $this->_allFilters;
