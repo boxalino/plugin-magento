@@ -28,6 +28,10 @@ class Boxalino_CemSearch_Model_Logger
 
     static public function saveFrontActions($type, $data, $separator = false){
 
+        if(!Mage::getStoreConfig('Boxalino_General/general/logs_saving_frontend')) {
+            return;
+        }
+
         $date = date('Y-m-d H:i:s');
 
         if(isset($_REQUEST['dev_bx_disp']) && $_REQUEST['dev_bx_disp'] == 'true') {
@@ -37,10 +41,6 @@ class Boxalino_CemSearch_Model_Logger
             print_r('</pre>');
 
             print_r($separator ? "<br/>========================================================<br/>":"");
-        }
-
-        if(!Mage::getStoreConfig('Boxalino_General/general/logs_saving_frontend')) {
-            return;
         }
 
         $day = date('Y-m-d_H:i');
