@@ -307,7 +307,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $filter = new \com\boxalino\p13n\api\thrift\Filter();
         $filter->fieldName = 'products_visibility';
         $filter->negative = true;
-        $filter->stringValues = array("not_visible_individually");
+        $filter->stringValues = array(Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE);
         return $filter;
     }
 
@@ -315,7 +315,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     {
         $filter = new \com\boxalino\p13n\api\thrift\Filter();
         $filter->fieldName = 'products_status';
-        $filter->stringValues = array("enabled");
+        $filter->stringValues = array(Mage_Catalog_Model_Product_Status::STATUS_ENABLED);
         return $filter;
     }
 

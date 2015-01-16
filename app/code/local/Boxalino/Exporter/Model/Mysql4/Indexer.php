@@ -647,10 +647,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                             $this->_attrProdCount[$attr] = true;
 
-                            // if visibility is set everywhere (have value "4"),
-                            // then we split it for value "2" and "3" (search and catalog separately)
+                            // visibility as defined in Mage_Catalog_Model_Product_Visibility:
+                            // 4 - VISIBILITY_BOTH
+                            // 3 - VISIBILITY_IN_SEARCH
+                            // 2 - VISIBILITY_IN_CATALOG
+                            // 1 - VISIBILITY_NOT_VISIBLE
+                            // status as defined in Mage_Catalog_Model_Product_Status:
+                            // 2 - STATUS_DISABLED
+                            // 1 - STATUS_ENABLED
                             if ($attr == 'visibility' || $attr == 'status') {
-                                $productParam[$attr . '_' . $lang] = strtolower(str_replace(' ', '_',str_replace(',', '',$this->_attributesValuesByName[$attr][$val]['value_'.$lang])));
+                                $productParam[$attr . '_' . $lang] = $val;
                             } else {
                                 fputcsv($filesMtM[$attr], array($id, $val), $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
                             }
