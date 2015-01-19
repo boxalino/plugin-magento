@@ -36,7 +36,19 @@ class Boxalino_CemSearch_Helper_P13n_Recommendation
             if (isset($entity_id) && $entity_id !== '') {
                 $entityIdFieldName = $entity_id;
             }
-            $p13nClient = new Boxalino_CemSearch_Helper_P13n_Client($account, $authData, $language, $entityIdFieldName, true);
+
+            $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+
+            $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
+                $storeConfig['host'],
+                Mage::helper('Boxalino_CemSearch')->getAccount(),
+                $storeConfig['p13n_username'],
+                $storeConfig['p13n_password'],
+                $storeConfig['domain']
+            );
+
+            $p13nClient = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+            $p13nClient->createRecommendation($account, $authData, $language, $entityIdFieldName, true);
             $this->results = $p13nClient->getPersonalRecommendations($widgets, $returnFields, $widgetType);
         }
         return $this->results[$widgetName];
