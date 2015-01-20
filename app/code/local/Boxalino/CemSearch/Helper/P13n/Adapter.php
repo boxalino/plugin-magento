@@ -45,6 +45,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     private function createChoiceRequest()
     {
         $this->choiceRequest = $this->p13n->getChoiceRequest($this->config->getAccount(), $this->config->getDomain());
+        $this->choiceRequest = $this->p13n->addRequestContext($this->choiceRequest);
     }
 
     public function __destruct()
@@ -256,6 +257,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $choiceId = 'autocomplete';
         $fields = array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
         $this->autocompleteRequest = $this->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
+        $this->autocompleteRequest = $this->p13n->addRequestContext($this->autocompleteRequest);
 
         $searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
         $searchQuery->indexId = $this->config->getAccount();
@@ -679,6 +681,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             }
             $choiceRequest->inquiries[] = $inquiry;
         }
+        $choiceRequest = $this->p13n->addRequestContext($choiceRequest);
+        echo '<pre>';
+        print_r($choiceRequest);
+        echo '</pre>';
         $choiceResponse = $this->p13n->choose($choiceRequest);
         $results = array();
         /** @var \com\boxalino\p13n\api\thrift\Variant $variant */
