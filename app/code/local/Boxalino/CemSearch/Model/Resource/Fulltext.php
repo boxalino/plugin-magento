@@ -47,10 +47,12 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $entity_ids = $p13n->getEntitiesIds();
         $p13n->prepareAdditionalDataFromP13n();
 
-        //prepare relaxation
+        //prepare suggestion
         $relaxations = array();
         $searchRelaxation = $p13n->getChoiceRelaxation();
 
+        $maxHint = 0;
+        $maxName = '';
 
         foreach($searchRelaxation->suggestionsResults as $suggestion){
 
@@ -59,16 +61,60 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 'text' => $suggestion->queryText,
                 'href' => urlencode($suggestion->queryText)
                 );
+
+            if($suggestion->totalHitCount >= $maxHint){
+                $maxName = $suggestion->queryText;
+                $maxHint = $suggestion->totalHitCount;
+            }
         }
 
 //        self::$relaxations = $relaxations;
         $session = Mage::getSingleton("core/session");
         $session->setData("relax", $relaxations);
 
-        unset($p13n); // !!!!!
-
         $adapter = $this->_getWriteAdapter();
 
+        $this->resetSearchResults($query);
+
+//        if($entity_ids === null || count($entity_ids) < 1){
+//            return $this;
+//        }
+
+        //relaxation
+        // change, 3 as param from configuration
+        if(($entity_ids === null || count($entity_ids) <= 3) /*&& count($relaxations) > 0*/){
+
+            //display currently products
+            $session = Mage::getSingleton("core/session");
+            $session->setData("relax_products", $entity_ids);
+
+            $maxName = 'black';
+
+            //prepare new search
+            $p13n->setupInquiry(
+                $generalConfig['quick_search'],
+                $maxName,
+                $lang,
+                array($generalConfig['entity_id'], 'categories'),
+                $p13nSort,
+                0, $limit
+            );
+
+            $queryText = $maxName;
+            Mage::helper('catalogsearch')->setUrlForSearch('<a href="' . Mage::getBaseUrl().'catalogsearch/result/?q=' . urlencode($queryText) . '">' . $queryText . '</a>');
+
+            $p13n->setWithRelaxation(true);
+
+            if (isset($_GET['cat'])) {
+                $p13n->addFilterCategory($_GET['cat']);
+            }
+            $p13n->search();
+            $entity_ids = $p13n->getEntitiesIds();
+            $p13n->prepareAdditionalDataFromP13n();
+
+        }
+
+        unset($p13n); // !!!!!
         $this->resetSearchResults($query);
 
         if($entity_ids === null || count($entity_ids) < 1){

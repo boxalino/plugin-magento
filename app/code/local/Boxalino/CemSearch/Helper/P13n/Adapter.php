@@ -363,6 +363,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         self::$choiceResponse = $this->p13n->choose($this->choiceRequest);
 
+//        print('<pre>');
+//        print_r($this->choiceRequest);
+//        print('</pre>');
+
         Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Response', self::$choiceResponse, 1);
     }
 
@@ -454,6 +458,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 $result[] = $item->values[Mage::getStoreConfig('Boxalino_General/search/entity_id')][0];
             }
         }
+
         return $result;
     }
 

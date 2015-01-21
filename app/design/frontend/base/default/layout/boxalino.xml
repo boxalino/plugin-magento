@@ -35,6 +35,15 @@
         <reference name="content">
             <block type="boxalino/facets" name="top_filters" as="top_filters" before="-" template="boxalino/top_filters.phtml"/>
             <block type="core/template" name="relaxation_suggestion" as="relaxation_suggestion" before="-" template="boxalino/relaxation_suggestion.phtml"/>
+            <block type="catalog/product_list" name="relaxation_products" as="relaxation_products" before="-" template="boxalino/catalogsearch/relaxation_products.phtml">
+                <block type="core/text_list" name="product_list.name.after" as="name.after" />
+                <block type="core/text_list" name="product_list.after" as="after" />
+            </block>
+        </reference>
+        <reference name="search.result">
+            <action method="setTemplate">
+                <template>boxalino/catalogsearch/result.phtml</template>
+            </action>
         </reference>
     </catalogsearch_result_index>
 </layout>
