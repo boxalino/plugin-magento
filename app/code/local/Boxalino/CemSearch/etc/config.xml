@@ -88,6 +88,15 @@
                 </observers>
             </customer_login>
         </events>
+        <translate>
+            <modules>
+                <Boxalino_CemSearch>
+                    <files>
+                        <default>Boxalino.csv</default>
+                    </files>
+                </Boxalino_CemSearch>
+            </modules>
+        </translate>
     </frontend>
     <global>
         <helpers>

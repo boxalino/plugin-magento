@@ -74,6 +74,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     }
 
+    public function setWithRelaxation($value){
+        $this->inquiry->withRelaxation = $value;
+    }
+
+    public function getChoiceRelaxation(){
+        return self::$choiceResponse->variants[0]->searchRelaxation;
+    }
+
     private function createInquiry()
     {
         $inquiry = new \com\boxalino\p13n\api\thrift\ChoiceInquiry();
@@ -682,9 +690,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $choiceRequest->inquiries[] = $inquiry;
         }
         $choiceRequest = $this->p13n->addRequestContext($choiceRequest);
-        echo '<pre>';
-        print_r($choiceRequest);
-        echo '</pre>';
         $choiceResponse = $this->p13n->choose($choiceRequest);
         $results = array();
         /** @var \com\boxalino\p13n\api\thrift\Variant $variant */

@@ -68,3 +68,21 @@
 	border-top-right-radius: 0px !important;
 }
 
+.suggest {
+	display: block;
+	height: 100px;
+}
+
+.suggest li{
+	/*display: list-item;*/
+	float: left;
+	font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	height: 18px;
+	line-height: 18px;
+	/*list-style-image: none;*/
+	/*list-style-position: outside;*/
+	/*list-style-type: none;*/
+	text-align: left;
+	width: 31%;
+}

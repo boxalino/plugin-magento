@@ -38,12 +38,33 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             0, $limit
         );
 
+        $p13n->setWithRelaxation(true);
+
         if (isset($_GET['cat'])) {
             $p13n->addFilterCategory($_GET['cat']);
         }
         $p13n->search();
         $entity_ids = $p13n->getEntitiesIds();
         $p13n->prepareAdditionalDataFromP13n();
+
+        //prepare relaxation
+        $relaxations = array();
+        $searchRelaxation = $p13n->getChoiceRelaxation();
+
+
+        foreach($searchRelaxation->suggestionsResults as $suggestion){
+
+            $relaxations[] = array(
+                'hits' => $suggestion->totalHitCount,
+                'text' => $suggestion->queryText,
+                'href' => urlencode($suggestion->queryText)
+                );
+        }
+
+//        self::$relaxations = $relaxations;
+        $session = Mage::getSingleton("core/session");
+        $session->setData("relax", $relaxations);
+
         unset($p13n); // !!!!!
 
         $adapter = $this->_getWriteAdapter();

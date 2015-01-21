@@ -153,6 +153,10 @@
 /skin/frontend/base/default/js/msrp.js
 /skin/frontend/base/default/js/opcheckout.js
 !skin/frontend/base/default/js/ba.js
+!app/locale
+!app/locale/*
+app/locale/*/*
+!app/locale/*/Boxalino.csv
 /.gitignore~
 /.htaccess
 /.htaccess.sample
