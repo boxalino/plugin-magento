@@ -232,10 +232,109 @@
                         </entity_id>
                     </fields>
                 </search>
+                <search_suggestions translate="label" module="Boxalino_CemSearch">
+                    <label>Search Suggestions Configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>52</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enable search suggestion</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enabled>
+                        <min translate="label">
+                            <label>Minimum for range</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[ Display suggestion, when quantity of products is fewer than this value ]]></comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </min>
+                        <max translate="label">
+                            <label>Maximum for range</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[ Display suggestion, when quantity of products is more than this value ]]></comment>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </max>
+                        <display translate="label">
+                            <label>Maximum number of suggestions </label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </display>
+                        <sort translate="label">
+                            <label>Sorting by products quantity</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment><![CDATA[ If no, then sort by name ]]></comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sort>
+                    </fields>
+                </search_suggestions>
+                <search_relaxation translate="label" module="Boxalino_CemSearch">
+                    <label>Search Relaxation Configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>55</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enable search relaxation</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enabled>
+                        <max translate="label">
+                            <label>Maximum for quantity of products</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[ Display relaxation, when quantity of products is less than this value ]]></comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </max>
+                        <relaxations>
+                            <label>Maximum of relaxations</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </relaxations>
+                        <products>
+                            <label>Maximum of products for relaxation</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </products>
+                    </fields>
+                </search_relaxation>
                 <filter translate="label" module="Boxalino_CemSearch">
                     <label>Filters Configuration</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>52</sort_order>
+                    <sort_order>60</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
@@ -318,7 +417,7 @@
                 <tracker translate="label" module="Boxalino_CemSearch">
                     <label>Tracking</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>60</sort_order>
+                    <sort_order>70</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -363,7 +462,7 @@
                 <jquery translate="label" module="Boxalino_CemSearch">
                     <label>jQuery Configuration</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>71</sort_order>
+                    <sort_order>80</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>

@@ -1,4 +1,10 @@
-
+<?php
+$session = Mage::getSingleton("core/session");
+$_productCollections=$session->getData("relax_products_extra");
+if(count($_productCollections) > 0){
+    return;
+}
+?>
 <?php if($this->getResultCount()): ?>
     <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
     <div class="page-title">

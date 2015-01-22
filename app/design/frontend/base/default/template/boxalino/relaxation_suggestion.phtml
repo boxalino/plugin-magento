@@ -1,5 +1,6 @@
 <?php   $session = Mage::getSingleton("core/session");
         $relax = $session->getData("relax");
+        $catalogSearchHelper =  $this->helper('catalogsearch');
 ?>
 
 <?php if(count($relax) > 0): ?>
@@ -7,7 +8,7 @@
     <div class="header"><?php echo $this->__("Did you mean"); ?>:</div>
     <ul class="suggestions">
         <?php foreach($relax as $r): ?>
-            <li><a href="<?php echo Mage::getBaseUrl().'catalogsearch/result/?q='. $r['href']; ?>"><?php echo $r['text'] .' (' . $r['hits'] . ')';?></a></li>
+            <li><a href="<?php echo $catalogSearchHelper->getResultUrl().'?q='. $r['href']; ?>"><?php echo $r['text'] .' (' . $r['hits'] . ')';?></a></li>
         <?php endforeach; ?>
     </ul>
 </div>

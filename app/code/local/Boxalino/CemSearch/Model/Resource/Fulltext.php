@@ -7,6 +7,10 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
     public function prepareResult($object, $queryText, $query)
     {
 
+        $session = Mage::getSingleton("core/session");
+        $session->unsetData('relax_products');
+        $session->unsetData('relax_products_extra');
+
         if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
             return parent::prepareResult($object, $queryText, $query);
         }
@@ -50,26 +54,35 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         //prepare suggestion
         $relaxations = array();
         $searchRelaxation = $p13n->getChoiceRelaxation();
+        $suggestionConfig = Mage::getStoreConfig('Boxalino_General/search_suggestions');
 
-        $maxHint = 0;
-        $maxName = '';
+        if($suggestionConfig['enabled'] && (count($entity_ids) <= $suggestionConfig['min'] || count($entity_ids) >= $suggestionConfig['max']) ) {
 
-        foreach($searchRelaxation->suggestionsResults as $suggestion){
+            foreach ($searchRelaxation->suggestionsResults as $suggestion) {
 
-            $relaxations[] = array(
-                'hits' => $suggestion->totalHitCount,
-                'text' => $suggestion->queryText,
-                'href' => urlencode($suggestion->queryText)
+                $relaxations[] = array(
+                    'hits' => $suggestion->totalHitCount,
+                    'text' => $suggestion->queryText,
+                    'href' => urlencode($suggestion->queryText)
                 );
 
-            if($suggestion->totalHitCount >= $maxHint){
-                $maxName = $suggestion->queryText;
-                $maxHint = $suggestion->totalHitCount;
             }
+
+            if($suggestionConfig['sort']) {
+                function cmp($a, $b)
+                {
+                    if ($a['hits'] == $b['hits']) {
+                        return 0;
+                    }
+                    return ($a['hits'] > $b['hits']) ? -1 : 1;
+                }
+
+                usort($relaxations, "cmp");
+            }
+
         }
 
 //        self::$relaxations = $relaxations;
-        $session = Mage::getSingleton("core/session");
         $session->setData("relax", $relaxations);
 
         $adapter = $this->_getWriteAdapter();
@@ -82,35 +95,42 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
         //relaxation
         // change, 3 as param from configuration
-        if(($entity_ids === null || count($entity_ids) <= 3) /*&& count($relaxations) > 0*/){
+        $relaxations_extra = array();
+        $relaxationConfig = Mage::getStoreConfig('Boxalino_General/search_relaxation');
+
+        if(($entity_ids === null || count($entity_ids) <= 3) && count($relaxations) > 0 && $relaxationConfig['enabled']){
+
 
             //display currently products
             $session = Mage::getSingleton("core/session");
             $session->setData("relax_products", $entity_ids);
 
-            $maxName = 'black';
+            for($i=0; $i<$relaxationConfig['relaxations'];$i++) {
+                //prepare new search
+                $p13n->setupInquiry(
+                    $generalConfig['quick_search'],
+                    $relaxations[$i]['text'],
+                    $lang,
+                    array($generalConfig['entity_id'], 'categories'),
+                    $p13nSort,
+                    0, $limit
+                );
 
-            //prepare new search
-            $p13n->setupInquiry(
-                $generalConfig['quick_search'],
-                $maxName,
-                $lang,
-                array($generalConfig['entity_id'], 'categories'),
-                $p13nSort,
-                0, $limit
-            );
+                $p13n->setWithRelaxation(false);
 
-            $queryText = $maxName;
-            Mage::helper('catalogsearch')->setUrlForSearch('<a href="' . Mage::getBaseUrl().'catalogsearch/result/?q=' . urlencode($queryText) . '">' . $queryText . '</a>');
+                if (isset($_GET['cat'])) {
+                    $p13n->addFilterCategory($_GET['cat']);
+                }
+                $p13n->search();
+                $entity_ids = $p13n->getEntitiesIds();
+                $p13n->prepareAdditionalDataFromP13n();
 
-            $p13n->setWithRelaxation(true);
+                $relaxations_extra[$relaxations[$i]['text']] = $entity_ids;
 
-            if (isset($_GET['cat'])) {
-                $p13n->addFilterCategory($_GET['cat']);
             }
-            $p13n->search();
-            $entity_ids = $p13n->getEntitiesIds();
-            $p13n->prepareAdditionalDataFromP13n();
+
+            //display currently products
+            $session->setData("relax_products_extra", $relaxations_extra);
 
         }
 
@@ -181,7 +201,6 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 Varien_Db_Adapter_Interface::INSERT_ON_DUPLICATE);
             $adapter->query($sql, $bind);
         }
-
 
         return $this;
 
