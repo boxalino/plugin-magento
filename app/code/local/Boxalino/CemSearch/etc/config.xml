@@ -105,7 +105,7 @@
             </Boxalino_CemSearch>
             <catalogsearch>
                 <rewrite>
-                    <data>Boxalino_CemSearch_SearchResult_Helper_Data</data>
+                    <data>Boxalino_CemSearch_CatalogSearch_Helper_Data</data>
                 </rewrite>
             </catalogsearch>
         </helpers>

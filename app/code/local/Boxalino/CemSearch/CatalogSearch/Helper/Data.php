@@ -1,6 +1,6 @@
 <?php
 
-class Boxalino_CemSearch_SearchResult_Helper_Data extends Mage_CatalogSearch_Helper_Data{
+class Boxalino_CemSearch_CatalogSearch_Helper_Data extends Mage_CatalogSearch_Helper_Data{
 
     protected $_urlForSearch;
 

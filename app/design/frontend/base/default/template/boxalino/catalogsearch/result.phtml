@@ -11,7 +11,7 @@ if(count($_productCollections) > 0){
         <?php if ($this->helper('rss/catalog')->getTagFeedUrl()): ?>
             <a href="<?php echo $this->helper('rss/catalog')->getTagFeedUrl() ?>" class="nobr link-rss"><?php echo $this->__('Subscribe to Feed') ?></a>
         <?php endif; ?>
-        <h1><?php echo ($this->getHeaderText() || $this->getHeaderText() === false) ? $this->getHeaderText() : $this->__("Search results for '%s'", $this->helper('catalogsearch')->getUrlForSearch()) ?></h1>
+        <h1><?php echo ($this->getHeaderText() || $this->getHeaderText() === false) ? $this->getHeaderText() : $this->__("Search results for '%s'", $this->helper('catalogsearch')->getEscapedQueryText()) ?></h1>
     </div>
     <?php if ($messages = $this->getNoteMessages()):?>
         <p class="note-msg">
@@ -23,7 +23,7 @@ if(count($_productCollections) > 0){
     <?php echo $this->getProductListHtml() ?>
 <?php else: ?>
     <div class="page-title">
-        <h1><?php echo ($this->getHeaderText() || $this->getHeaderText() === false) ? $this->getHeaderText() : $this->__("Search results for '%s'", $this->helper('catalogsearch')->getUrlForSearch()) ?></h1>
+        <h1><?php echo ($this->getHeaderText() || $this->getHeaderText() === false) ? $this->getHeaderText() : $this->__("Search results for '%s'", $this->helper('catalogsearch')->getEscapedQueryText()) ?></h1>
     </div>
     <p class="note-msg">
         <?php echo ($this->getNoResultText()) ? $this->getNoResultText() : $this->__('Your search returns no results.') ?>
