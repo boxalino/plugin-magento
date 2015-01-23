@@ -132,6 +132,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             //display currently products
             $session->setData("relax_products_extra", $relaxations_extra);
 
+            unset($p13n); // !!!!!
+            $this->resetSearchResults($query);
+
+            return $this;
+
         }
 
         unset($p13n); // !!!!!
