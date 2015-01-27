@@ -98,7 +98,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $relaxations_extra = array();
         $relaxationConfig = Mage::getStoreConfig('Boxalino_General/search_relaxation');
 
-        if(($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($relaxations) > 0 || count($searchRelaxation->subphrasesResults)> 0) && $relaxationConfig['enabled']){
+        if(($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($searchRelaxation->subphrasesResults)> 0) && $relaxationConfig['enabled']){
 
 
             //display currently products
@@ -106,22 +106,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             $session->setData("relax_products", $entity_ids);
 
             if(count($searchRelaxation->subphrasesResults)> 0){
-
-                $prepareSuggestions = false;
                 if(count($relaxations) == 0){
-                    $prepareSuggestions = true;
                     $relaxations_extra = array();
                 }
 
                 foreach($searchRelaxation->subphrasesResults as $subphrase){
-
-                    if($prepareSuggestions) {
-                        $relaxations[] = array(
-                            'hits' => $subphrase->totalHitCount,
-                            'text' => $subphrase->queryText,
-                            'href' => urlencode($subphrase->queryText)
-                        );
-                    }
 
                     if(count($relaxations_extra) >= $relaxationConfig['relaxations']){
                         continue;
@@ -137,34 +126,6 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
                 }
 
-                if($prepareSuggestions){
-                    $session->setData("relax", array_slice($relaxations,0, $suggestionConfig['display']));
-                }
-
-            } else if(count($relaxations) > 0) {
-                for ($i = 0; $i < $relaxationConfig['relaxations']; $i++) {
-                    //prepare new search
-                    $p13n->setupInquiry(
-                        $generalConfig['quick_search'],
-                        $relaxations[$i]['text'],
-                        $lang,
-                        array($generalConfig['entity_id'], 'categories'),
-                        $p13nSort,
-                        0, $limit
-                    );
-
-                    $p13n->setWithRelaxation(false);
-
-                    if (isset($_GET['cat'])) {
-                        $p13n->addFilterCategory($_GET['cat']);
-                    }
-                    $p13n->search();
-                    $entity_ids = $p13n->getEntitiesIds();
-                    $p13n->prepareAdditionalDataFromP13n();
-
-                    $relaxations_extra[$relaxations[$i]['text']] = array_slice($entity_ids, 0, $relaxationConfig['products']);
-
-                }
             }
 
             //display currently products
