@@ -274,6 +274,16 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $searchQuery->offset = 0;
         $searchQuery->hitCount = $products_limit;
         $searchQuery->queryText = $text;
+        $searchQuery->facetRequests = array();
+
+        //@todo: add configuration into admin
+        if(true){
+            $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+            $facet->fieldName = 'categories';
+            $facet->numerical =  false;
+            $facet->range = false;
+            $searchQuery->facetRequests[] = $facet;
+        }
 
         if($this->filterByVisibleProducts()) {
             $searchQuery->filters[] = $this->filterByVisibleProducts();
@@ -306,9 +316,34 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $suggestions = array();
 
         foreach ($this->autocompleteResponse->hits as $hit) {
-            $suggestions[] = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
+
+            $tmp = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
+            $facets = array();
+
+            foreach($hit->searchResult->facetResponses[0]->values as $facet){
+                if($this->getFacetDepth($facet) > 1){
+                    $f = array(
+                        'title' => end($facet->hierarchy),
+                        'hits' => $facet->hitCount,
+                        'href' => $facet->stringValue,
+                        'id' => substr(md5($hit->suggestion . '_' . $facet->stringValue), 0, 10)
+                    );
+
+                    $facets[] = $f;
+                }
+            }
+
+            $tmp['facets'] = $facets;
+
+            $suggestions[] = $tmp;
         }
         return $suggestions;
+    }
+
+    protected function getFacetDepth($facet){
+
+        return substr_count($facet->stringValue, '/');
+
     }
 
     private function filterByVisibleProducts()

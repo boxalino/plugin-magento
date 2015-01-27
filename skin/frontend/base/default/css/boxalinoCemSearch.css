@@ -68,6 +68,23 @@
 	border-top-right-radius: 0px !important;
 }
 
+.search-autocomplete .facets{
+	border: none !important;
+	padding-left: 10px;
+}
+.search-autocomplete .facets li:hover{
+	background-color: #3399FF;
+	color: #ffffff;
+}
+
+.search-autocomplete .facets li:hover span{
+	color: #ffffff !important;
+}
+
+.search-autocomplete .facets span{
+	color: rgb(138, 148, 175) !important;
+}
+
 .suggest {
 	display: block;
 	height: 100px;

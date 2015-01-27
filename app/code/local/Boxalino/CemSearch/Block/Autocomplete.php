@@ -55,6 +55,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         }
 
         $count--;
+        $catalogSearchHelper =  Mage::helper('catalogsearch');
 
         $html = '<ul class="queries"><li style="display:none"></li>';
         foreach ($suggestData as $index => $item) {
@@ -66,8 +67,29 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $item['row_class'] .= ' last';
             }
 
-            $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
-                . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
+            //@todo add from config
+            if(true && count($item['facets'])>0 && $index == 0){
+                $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
+                    . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
+
+
+                $html .= '<ul class="facets">';
+
+                $c = 0;
+                foreach($item['facets'] as $facet){
+                    //@todo add as param from config
+                    if($c++ >= 3){break;}
+
+                    $html .= '<a href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '" data-word="' . $facet['id'] . '" title="' . $this->escapeHtml($facet['title']) . '" "><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
+
+                }
+
+                $html .= '</ul>';
+            }
+            else {
+                $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
+                    . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
+            }
         }
         $html .= '</ul><ul class="products">';
 
@@ -117,6 +139,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             );
             $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
+
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
             if ($query) {
@@ -136,7 +159,8 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     'id' => substr(md5($item['text']), 0, 10),
                     'title' => $item['text'],
                     'row_class' => (++$counter) % 2 ? 'odd' : 'even',
-                    'num_of_results' => $item['hits']
+                    'num_of_results' => $item['hits'],
+                    'facets' => $item['facets']
                 );
 
                 if ($item['text'] == $query) {
@@ -145,6 +169,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     $data[] = $_data;
                 }
             }
+
             $this->_suggestData = $data;
             $this->_suggestDataProducts = $p13n->getAutocompleteProducts();
         }
