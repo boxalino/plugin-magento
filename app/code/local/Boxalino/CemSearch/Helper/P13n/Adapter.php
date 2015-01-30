@@ -304,6 +304,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Query', $text);
         Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Request', $this->autocompleteRequest);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Request_serialized', serialize($this->autocompleteRequest));
 
         $this->autocompleteResponse = $this->p13n->autocomplete($this->autocompleteRequest);
 
@@ -377,7 +378,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $filter = new \com\boxalino\p13n\api\thrift\Filter();
         $filter->fieldName = 'products_visibility';
         $filter->negative = true;
-        $filter->stringValues = array("not_visible_individually");
+        $filter->stringValues = array(Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE);
         return $filter;
     }
 
@@ -385,7 +386,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     {
         $filter = new \com\boxalino\p13n\api\thrift\Filter();
         $filter->fieldName = 'products_status';
-        $filter->stringValues = array("enabled");
+        $filter->stringValues = array(Mage_Catalog_Model_Product_Status::STATUS_ENABLED);
         return $filter;
     }
 
@@ -421,6 +422,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->choiceRequest->inquiries = array($this->inquiry);
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request', $this->choiceRequest);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request_serialized', serialize($this->choiceRequest));
 
         self::$choiceResponse = $this->p13n->choose($this->choiceRequest);
 
