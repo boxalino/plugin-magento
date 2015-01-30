@@ -180,6 +180,12 @@
                 <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>id</entity_id>
             </search>
+            <autocomplete_extra>
+                <enabled>1</enabled>
+                <items>4</items>
+                <enabled_for_all>1</enabled_for_all>
+                <sort>1</sort>
+            </autocomplete_extra>
             <search_suggestions>
                 <enabled>1</enabled>
                 <min>3</min>

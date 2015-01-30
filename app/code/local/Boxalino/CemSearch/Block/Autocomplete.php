@@ -56,6 +56,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
         $count--;
         $catalogSearchHelper =  Mage::helper('catalogsearch');
+        $autocompleteConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
 
         $html = '<ul class="queries"><li style="display:none"></li>';
         foreach ($suggestData as $index => $item) {
@@ -66,25 +67,27 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             if ($index == $count) {
                 $item['row_class'] .= ' last';
             }
+            $all = false;
+            if($autocompleteConfig['enabled_for_all']){
+                $all = true;
+            }
 
-            //@todo add from config
-            if(true && count($item['facets'])>0 && $index == 0){
+            if($autocompleteConfig['enabled'] && count($item['facets'])>0 && (($all == false && $index == 0) || ($all && $index >= 0))){
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
                     . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
 
 
-                $html .= '<ul class="facets">';
+//                $html .= '<ul class="facets">';
 
                 $c = 0;
                 foreach($item['facets'] as $facet){
-                    //@todo add as param from config
-                    if($c++ >= 3){break;}
+                    if($c++ >= $autocompleteConfig['items']){break;}
 
-                    $html .= '<a href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '" data-word="' . $facet['id'] . '" title="' . $this->escapeHtml($facet['title']) . '" "><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
+                    $html .= '<a class="facet" title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '" data-word="' . $item['id'] . '" title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
 
                 }
 
-                $html .= '</ul>';
+//                $html .= '</ul>';
             }
             else {
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'

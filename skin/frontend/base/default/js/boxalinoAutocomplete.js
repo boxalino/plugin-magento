@@ -3,7 +3,12 @@ Autocompleter.Base.prototype.onKeyPress = function(event) {
 		switch(event.keyCode) {
 			case Event.KEY_TAB:
 			case Event.KEY_RETURN:
-				this.selectEntry();
+				$a = jQuery('a.selected');
+				if(typeof $a[0] != 'undefined'){
+					window.location = $a.attr('href');
+				} else{
+					this.selectEntry();
+				}
 				Event.stop(event);
 			case Event.KEY_ESC:
 				this.hide();
@@ -34,7 +39,7 @@ Autocompleter.Base.prototype.onKeyPress = function(event) {
 	if(this.observer) clearTimeout(this.observer);
 	this.observer =
 		setTimeout(this.onObserverEvent.bind(this), this.options.frequency*1000);
-}
+};
 
 var originalAddClassMethod = Autocompleter.Base.prototype.render;
 Autocompleter.Base.prototype.render = function(key){
@@ -56,7 +61,7 @@ Autocompleter.Base.prototype.render = function(key){
 	}
 
 	return result;
-}
+};
 
 
 

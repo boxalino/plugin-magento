@@ -320,20 +320,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $tmp = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
             $facets = array();
 
-            foreach($hit->searchResult->facetResponses[0]->values as $facet){
-                if($this->getFacetDepth($facet) > 1){
-                    $f = array(
-                        'title' => end($facet->hierarchy),
-                        'hits' => $facet->hitCount,
-                        'href' => $facet->stringValue,
-                        'id' => substr(md5($hit->suggestion . '_' . $facet->stringValue), 0, 10)
-                    );
-
-                    $facets[] = $f;
-                }
+            $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
+            if($config['enabled']) {
+                $tmp['facets'] = $this->getFacetLeafs($hit->searchResult->facetResponses[0]->values, $hit, $config);
             }
-
-            $tmp['facets'] = $facets;
 
             $suggestions[] = $tmp;
         }
@@ -344,6 +334,42 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         return substr_count($facet->stringValue, '/');
 
+    }
+
+    protected function getFacetLeafs($facets, $hit, $config){
+        $tmp = array();
+
+        foreach($facets as $facet){
+
+            foreach($facet->hierarchy as $h){
+                if(array_key_exists($h, $tmp)){
+                    unset($tmp[$h]);
+                }
+            }
+
+            $tmp[end($facet->hierarchy)] = array(
+                'title' => end($facet->hierarchy),
+                'hits' => $facet->hitCount,
+                'href' => $facet->stringValue,
+                'id' => substr(md5($hit->suggestion . '_' . $facet->stringValue), 0, 10)
+            );
+        }
+
+        if($config['sort']) {
+            if(!function_exists("cmpFacets")){
+                function cmpFacets($a, $b)
+                {
+                    if ($a['hits'] == $b['hits']) {
+                        return 0;
+                    }
+                    return ($a['hits'] > $b['hits']) ? -1 : 1;
+                }
+            }
+
+            usort($tmp, "cmpFacets");
+        }
+
+        return $tmp;
     }
 
     private function filterByVisibleProducts()
