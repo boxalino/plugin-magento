@@ -46,7 +46,7 @@ Autocompleter.Base.prototype.render = function(key){
 	var result = originalAddClassMethod.apply( this, arguments );
 	if(typeof key != 'undefined' && key == true){
 		element = jQuery('#search_autocomplete .selected');
-		word = element.data('word')
+		word = element.data('word');
 
 		jQuery('#search_autocomplete .product-autocomplete').each(function(){
 			if(jQuery(this).data('word') == word){

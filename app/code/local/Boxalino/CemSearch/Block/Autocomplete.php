@@ -83,7 +83,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 foreach($item['facets'] as $facet){
                     if($c++ >= $autocompleteConfig['items']){break;}
 
-                    $html .= '<a class="facet" title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '" data-word="' . $item['id'] . '" title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
+                    $html .= '<a class="facet" data-word="' . $facet['id'] . '" title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '"  title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
 
                 }
 

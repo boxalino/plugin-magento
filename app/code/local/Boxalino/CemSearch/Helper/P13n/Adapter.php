@@ -276,8 +276,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $searchQuery->queryText = $text;
         $searchQuery->facetRequests = array();
 
-        //@todo: add configuration into admin
-        if(true){
+        $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
+        if($config['enabled']){
             $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
             $facet->fieldName = 'categories';
             $facet->numerical =  false;
@@ -403,7 +403,64 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     'score' => $productsHit->values['score'][0],
                 );
             }
+
+            //facets
+            $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+
+            $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
+                $storeConfig['host'],
+                Mage::helper('Boxalino_CemSearch')->getAccount(),
+                $storeConfig['p13n_username'],
+                $storeConfig['p13n_password'],
+                $storeConfig['domain']
+            );
+            $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
+            $p13nSort->push('score', true);   // score / discountedPrice / title_en
+
+
+            $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
+            $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
+
+
+
+            foreach($hit->searchResult->facetResponses[0]->values as $f){
+
+                $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+                $p13n->setupInquiry(
+                    $generalConfig['quick_search'],
+                    $this->autocompleteResponse->queryText,
+                    $lang,
+                    array($generalConfig['entity_id'], 'categories'),
+                    $p13nSort,
+                    0, 4
+                );
+                $p13n->setWithRelaxation(false);
+
+                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                $facet->fieldName = 'categories';
+                $facet->numerical =  false;
+                $facet->range = false;
+                $facet->selectedValues = array();
+
+                $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
+                $tmp->stringValue = $f->stringValue;
+                $facet->selectedValues[] = $tmp;
+
+                $p13n->searchQuery->facetRequests[] = $facet;
+                $p13n->search();
+
+                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+                    $products[$id] = array();
+                    foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $ph) {
+                        $products[$id][] = array(
+                            'id' => $ph->values[Mage::getStoreConfig('Boxalino_General/search/entity_id')][0],
+                            'score' => $ph->values['score'][0],
+                        );
+                    }
+            }
+
         }
+
         return $products;
     }
 
