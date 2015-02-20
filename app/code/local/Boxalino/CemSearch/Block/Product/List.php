@@ -13,10 +13,10 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
         	return parent::_getProductCollection();
         }
 
-        $entity_ids = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getEntityIds();
+        $entity_ids = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getEntitiesIds();
 
         $this->_productCollection = Mage::getResourceModel('catalog/product_collection')
-             ->addFieldToFilter('entity_id', $entityIds)
+             ->addFieldToFilter('entity_id', $entity_ids)
              ->addAttributeToSelect('*');
 
         if (Mage::helper('catalog')->isModuleEnabled('Mage_Checkout')) {

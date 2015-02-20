@@ -340,7 +340,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
                     $categoryPath .= '/' . $categoryName;
                 }
                 $_REQUEST['bx_categories'][0] = $categoryPath;
-                $this->searchAdapter->addFilter('categories', $categoryPath);
             }
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');

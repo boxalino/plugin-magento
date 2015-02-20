@@ -37,6 +37,9 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     {
         $multioption = Mage::getStoreConfig('Boxalino_General/filter/top_filters_multioption');
         $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+        if (strpos($currentUrl, '?') === FALSE) {
+            $currentUrl .= '?';
+        }
         if ($multioption == true) {
             if ($selected === false) {
                 $url = $currentUrl . '&bx_' . $name . '[0]' . '=' . $value;
@@ -180,6 +183,9 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     {
         $multioption = Mage::getStoreConfig('Boxalino_General/filter/left_filters_multioption');
         $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+        if (strpos($currentUrl, '?') === FALSE) {
+            $currentUrl .= '?';
+        }
         if (!$ranged) {
             if ($multioption == true && $hierarchical == null) {
                 if ($selected === false) {
