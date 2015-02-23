@@ -675,10 +675,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             case 'short_description':
                             case 'name':
                             case 'status':
-                                $productParam[$attr . '_' . $lang] = $this->_helperSearch->escapeString($val);
+                                $productParam[$attr . '_' . $lang] = $val;
                                 break;
                             default:
-                                $productParam[$attr] = $this->_helperSearch->escapeString($val);
+                                $productParam[$attr] = $val;
                                 break;
                         }
                         self::logMem('Products - end attributes transform');
@@ -699,7 +699,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $productParam['entity_id'] = $id;
                         $this->_transformedProducts['products'][$id] = $productParam;
 
-                        //Add categories
+                        // Add categories
                         if (isset($product['categories']) && count($product['categories']) > 0) {
                             foreach ($product['categories'] as $cat) {
 
