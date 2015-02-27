@@ -40,7 +40,7 @@ class Boxalino_CemSearch_Model_Logger
             print_r($data);
             print_r('</pre>');
 
-            print_r($separator ? "<br/>========================================================<br/>":"");
+            print_r($separator ? "<br/>========================================================<br/>":"<br/>");
         }
 
         $day = date('Y-m-d_H:i');

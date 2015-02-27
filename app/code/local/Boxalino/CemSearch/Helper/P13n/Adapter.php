@@ -815,7 +815,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $choiceRequest->inquiries[] = $inquiry;
         }
         $choiceRequest = $this->p13n->addRequestContext($choiceRequest);
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_product_id', $productId);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_Request', $choiceRequest);
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_Request_serialized', serialize($choiceRequest));
+
         $choiceResponse = $this->p13n->choose($choiceRequest);
+
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_Response', $choiceResponse, 1);
         $results = array();
         /** @var \com\boxalino\p13n\api\thrift\Variant $variant */
         foreach ($choiceResponse->variants as $variantId => $variant) {
