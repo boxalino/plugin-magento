@@ -74,7 +74,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
             if($autocompleteConfig['enabled'] && count($item['facets'])>0 && (($all == false && $index == 0) || ($all && $index >= 0))){
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
-                    . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
+                    . '<span class="query-title">' . $item['html'] . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
 
 
 //                $html .= '<ul class="facets">';
@@ -91,7 +91,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             }
             else {
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
-                    . '<span class="query-title">' . $this->escapeHtml($item['title']) . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
+                    . '<span class="query-title">' . $item['html'] . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
             }
         }
         $html .= '</ul><ul class="products">';
@@ -146,7 +146,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
             if ($query) {
-                $p13n->autocomplete('*' . $query . '*', $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);
+                $p13n->autocomplete($query, $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit']);
                 $collection = $p13n->getAutocompleteEntities();
             } else {
                 $collection = array();
@@ -161,6 +161,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $_data = array(
                     'id' => substr(md5($item['text']), 0, 10),
                     'title' => $item['text'],
+                    'html' => $item['html'],
                     'row_class' => (++$counter) % 2 ? 'odd' : 'even',
                     'num_of_results' => $item['hits'],
                     'facets' => $item['facets']

@@ -296,6 +296,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $autocompleteQuery->language = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
         $autocompleteQuery->queryText = $text;
         $autocompleteQuery->suggestionsHitCount = $limit;
+        $autocompleteQuery->highlight = true;
+        $autocompleteQuery->highlightPre = '<em>';
+        $autocompleteQuery->highlightPost = '</em>';
 
         $this->autocompleteRequest->choiceId = $choiceId;
         $this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
@@ -318,7 +321,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         foreach ($this->autocompleteResponse->hits as $hit) {
 
-            $tmp = array('text' => $hit->suggestion, 'hits' => $hit->searchResult->totalHitCount);
+            $tmp = array('text' => $hit->suggestion, 'html' => (strlen($hit->highlighted) ? $hit->highlighted : $hit->suggestion), 'hits' => $hit->searchResult->totalHitCount);
             $facets = array();
 
             $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
