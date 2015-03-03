@@ -360,20 +360,18 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
 
         if($config['sort']) {
-            if(!function_exists("cmpFacets")){
-                function cmpFacets($a, $b)
-                {
-                    if ($a['hits'] == $b['hits']) {
-                        return 0;
-                    }
-                    return ($a['hits'] > $b['hits']) ? -1 : 1;
-                }
-            }
-
-            usort($tmp, "cmpFacets");
+            usort($tmp, array($this, 'cmpFacets'));
         }
 
         return $tmp;
+    }
+
+    private function cmpFacets($a, $b)
+    {
+        if ($a['hits'] == $b['hits']) {
+            return 0;
+        }
+        return ($a['hits'] > $b['hits']) ? -1 : 1;
     }
 
     private function filterByVisibleProducts()
@@ -560,7 +558,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                         $selectedFacet->rangeToExclusive = $rangedValue[1];
                     }
                 } else {
-                    $selectedFacet->stringValue = urldecode($value);
+                    $selectedFacet->stringValue = $value;
                 }
                 $selectedFacets[] = $selectedFacet;
 

@@ -9,7 +9,7 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
      */
     protected function _getProductCollection()
     {
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::_getProductCollection();
         }
 

@@ -18,7 +18,7 @@ class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_P
     protected function _prepareData()
     {
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0 || Mage::getStoreConfig('Boxalino_Recommendation/related/status', 0) == 0) {
             return parent::_prepareData();
         }
         $name = Mage::getStoreConfig('Boxalino_Recommendation/related/widget');

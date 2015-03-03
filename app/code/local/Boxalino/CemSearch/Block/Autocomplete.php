@@ -39,7 +39,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return null;
         }
 
@@ -122,7 +122,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     public function getSuggestData()
     {
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::getSuggestData();
         }
 
