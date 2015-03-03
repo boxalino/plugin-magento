@@ -237,7 +237,14 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             foreach ($vals as $val) {
                 $key = array_search($val, $_REQUEST['bx_' . $filter]);
                 if ($key !== false) {
-                    $url = str_replace('&bx_' . $filter . '[' . $key . ']=' . $vals[$key], '', $url);
+                    $filterKey = 'bx_' . $filter . '[' . $key . ']';
+
+                    // remove filter from url
+                    $url = str_replace($filterKey . '=' . $vals[$key], '', $url);
+                    $url = str_replace(urlencode($filterKey) . '=' . urlencode($vals[$key]), '', $url);
+
+                    // remove resulting duplicate ampersands
+                    $url = str_replace(array('?&', '&&'), array('?', '&'), $url);
                 }
             }
         }
