@@ -116,7 +116,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             } else {
                 $level = $level - 1;
                 foreach ($parents['values'][$level] as $value) {
-                    if($value['selected'] == true) {
+                    if ($value['selected'] == true) {
                         $parentId = $value['parentId'];
                         $value['level'] = $level;
                         $highestChild[] = $value;
@@ -124,7 +124,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                 }
 
                 foreach ($parents['values'][$level] as $value) {
-                    if($parentId == $value['parentId'] && $value['selected'] == false) {
+                    if ($parentId == $value['parentId'] && $value['selected'] == false) {
                         $value['level'] = $level;
                         $highestChild[] = $value;
                     }
@@ -244,7 +244,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                     $url = str_replace(urlencode($filterKey) . '=' . urlencode($vals[$key]), '', $url);
 
                     // remove resulting duplicate ampersands
-                    $url = str_replace(array('?&', '&&'), array('?', '&'), $url);
+                    $url = trim(str_replace(array('?&', '&&'), array('?', '&'), $url), ' ?&');
                 }
             }
         }
@@ -265,9 +265,10 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     public function getMaxLevel($filter)
     {
-        if(isset($this->maxLevel[$filter])) {
+        if (isset($this->maxLevel[$filter])) {
             return $this->maxLevel[$filter];
         }
+
         return 0;
     }
 }
