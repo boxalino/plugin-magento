@@ -76,18 +76,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
                     . '<span class="query-title">' . $item['html'] . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
 
-
-//                $html .= '<ul class="facets">';
-
                 $c = 0;
                 foreach($item['facets'] as $facet){
                     if($c++ >= $autocompleteConfig['items']){break;}
-
                     $html .= '<a class="facet" data-word="' . $facet['id'] . '" title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $catalogSearchHelper->getResultUrl() .'?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li class="facet ' . $item['row_class'] . '"  title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
-
                 }
-
-//                $html .= '</ul>';
             }
             else {
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
@@ -96,22 +89,14 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         }
         $html .= '</ul><ul class="products">';
 
-        $first_word = true;
-        foreach ($this->_suggestDataProducts as $key => $word) {
-            foreach ($word as $product) {
-                $product = Mage::getModel('catalog/product')->load($product['id']);
-                $class = '';
-                if (!$first_word) {
-                    $class = 'hide';
-                }
-                $html .= '<li data-word="' . $key . '" class="product-autocomplete ' . $class . '" title="' . $this->escapeHtml($product->getName()) . '">';
-                $html .= '<a href="' . $product->getProductUrl() . '" >';
-                $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
-                $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
-                $html .= '</a>';
-                $html .= '</li>';
-            }
-            $first_word = false;
+        foreach ($this->_suggestDataProducts as $prod) {
+            $product = Mage::getModel('catalog/product')->load($prod['id']);
+            $html .= '<li data-word="' . $key . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
+            $html .= '<a href="' . $product->getProductUrl() . '" >';
+            $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
+            $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
+            $html .= '</a>';
+            $html .= '</li>';
         }
 
         $html .= '</ul>';
