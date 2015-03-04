@@ -30,7 +30,7 @@ class Boxalino_CemSearch_Model_Observer
     {
         try {
             $orders = Mage::getModel('sales/order')->getCollection()
-                ->setOrder('entity_id','DESC')
+                ->setOrder('entity_id', 'DESC')
                 ->setPageSize(1)
                 ->setCurPage(1);
             $order = $orders->getFirstItem();

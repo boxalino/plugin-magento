@@ -1,8 +1,10 @@
 <?php
+
 class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 {
     private $additionalFields = null;
     private $searchAdapter = null;
+
     public function __construct()
     {
         include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/Thrift/HttpP13n.php');
@@ -11,7 +13,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
     public static function __loadClass($name)
     {
-        if(strpos($name, 'Thrift\\') !== false){
+        if (strpos($name, 'Thrift\\') !== false) {
             try {
                 include_once(Mage::getModuleDir('', 'Boxalino_CemSearch') . '/Lib/vendor/' . str_replace('\\', '/', $name) . '.php');
             } catch (Exception $e) {
@@ -219,35 +221,35 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
     public function getFiltersValues($params)
     {
         $filters = new stdClass();
-        if(isset($params['cat'])) {
+        if (isset($params['cat'])) {
             $filters->filter_hc_category = '';
             $category = Mage::getModel('catalog/category')->load($params['cat']);
             $categories = explode('/', $category->getPath());
             foreach ($categories as $cat) {
                 $name = $category = Mage::getModel('catalog/category')->load($cat)->getName();
-                if(strpos($name, '/') !== false) {
+                if (strpos($name, '/') !== false) {
                     $name = str_replace('/', '\/', $name);
                 }
-                $filters->filter_hc_category .= '/'.$name;
+                $filters->filter_hc_category .= '/' . $name;
 
             }
             unset($params['cat']);
         }
 
-        if(isset($params['price'])) {
+        if (isset($params['price'])) {
             $prices = explode('-', $params['price']);
-            if(!empty($prices[0])) {
+            if (!empty($prices[0])) {
                 $filters->filter_from_incl_price = $prices[0];
             }
-            if(!empty($prices[1])) {
+            if (!empty($prices[1])) {
                 $filters->filter_to_incl_price = $prices[1];
             }
             unset($params['price']);
         }
-        if(isset($params)) {
+        if (isset($params)) {
             foreach ($params as $param => $values) {
                 $getAttribute = Mage::getModel('catalog/product')->getResource()->getAttribute($param);
-                if($getAttribute !== false) {
+                if ($getAttribute !== false) {
                     $values = html_entity_decode($values);
                     preg_match_all('!\d+!', $values, $matches);
                     if (is_array($matches[0])) {
@@ -281,8 +283,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         $text = trim($text, $delimiter);
 
         // transliterate
-        if (function_exists('iconv'))
-        {
+        if (function_exists('iconv')) {
             $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
         }
 
@@ -292,8 +293,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         // remove unwanted characters
         $text = preg_replace('~[^_\w]+~', '', $text);
 
-        if (empty($text))
-        {
+        if (empty($text)) {
             return null;
         }
 
@@ -306,8 +306,8 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
     public function getAdditionalFieldsFromP13n()
     {
-        if($this->additionalFields == null) {
-            $this->additionalFields = explode(',',Mage::getStoreConfig('Boxalino_General/general/additional_fields'));
+        if ($this->additionalFields == null) {
+            $this->additionalFields = explode(',', Mage::getStoreConfig('Boxalino_General/general/additional_fields'));
         }
         return !empty($this->additionalFields) ? $this->additionalFields : array();
     }
@@ -325,7 +325,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
                 $storeConfig['domain']
             );
             $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
-            $p13nSort->push('score', true);   // score / discountedPrice / title_en
+            $p13nSort->push('score', true); // score / discountedPrice / title_en
             $this->searchAdapter = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
             /* @var $category Mage_Catalog_Model_Category */
