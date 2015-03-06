@@ -45,6 +45,8 @@
         <boxalinoexporter>
             <export_data>
                 <export_server>http://di1.bx-cloud.com</export_server>
+                <export_product_url>1</export_product_url>
+                <export_product_images>1</export_product_images>
                 <maximum_population>0</maximum_population>
                 <language>en</language>
                 <export_categories>1</export_categories>

@@ -31,6 +31,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     protected $_attributesValuesByName = array();
 
+    protected $_productsImages = array();
+
     protected $_files = array();
 
     protected $_count = 0;
@@ -47,6 +49,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     protected $_helperExporter = null;
     protected $_helperSearch = null;
+    protected $_helperImage = null;
 
     protected $_entityIds = null;
 
@@ -71,6 +74,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         $this->_helperExporter = Mage::helper('boxalinoexporter');
         $this->_helperSearch = Mage::helper('boxalinoexporter');
+        $this->_helperImage = Mage::helper('catalog/image');
+
         self::logMem('Helpers init');
         foreach (Mage::app()->getWebsites() as $website) {
 
@@ -412,6 +417,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         foreach ($this->group->getStores() as $store){
 
             $stores[$store->getId()]['id'] = $store->getId();
+            $stores[$store->getId()]['base_url'] = $store->getBaseUrl();
+            $stores[$store->getId()]['code'] = $store->getCode();
             $stores[$store->getId()]['lang'] = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
 
         }
@@ -445,7 +452,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $filesMtM[$attr] = $fh;
 
         }
-        $tmp = null;
+
+        if($this->_storeConfig['export_product_images']) {
+            $file = 'product_cache_image_url.csv';
+            if (!in_array($file, $this->_files)) {
+                $this->_files[] = $file;
+            }
+            $fh = fopen($this->_dir . '/' . $file, 'a');
+            $h = array('entity_id', 'cache_image_url');
+            fputcsv($fh, $h, $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
+        }
 
         while($count >= $limit) {
             if ($countMax > 0 && $this->_count >= $countMax) {
@@ -716,8 +732,37 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $this->_count++;
                         $localeCount++;
 
+                        /**
+                         * Add special fields
+                         */
+                        //Add url to image cache
+                        if($this->_storeConfig['export_product_images']) {
+                            $_product = Mage::getModel('catalog/product')->load($id);
+                            $media_gallery = $_product->getMediaGallery();
+                            foreach ($media_gallery['images'] as $_image) {
+                                $url = $this->_helperImage->init($_product, 'image', $_image['file'])->__toString();
+
+                                $this->_productsImages[] = array($id, $url);
+
+                            }
+                        }
+
                     } elseif (isset($this->_transformedProducts['products'][$id])) {
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
+                    }
+
+                    /**
+                     * Add special fields
+                     */
+                    //Add url to product for each languages
+                    if($this->_storeConfig['export_product_url']) {
+                        $this->_transformedProducts['products'][$id] =
+                            array_merge(
+                                $this->_transformedProducts['products'][$id],
+                                array(
+                                    'default_url_' . $store['lang'] => $store['base_url'] . $this->_helperExporter->rewrittenProductUrl($id, null, $store['id']) . '?___store=' . $store['code']
+                                )
+                            );
                     }
 
                     $productParam = null;
@@ -744,6 +789,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $data = null;
                 $this->_transformedProducts['products'] = null;
                 $this->_transformedProducts['products'] = array();
+
+                if($this->_storeConfig['export_product_images']) {
+                    self::logMem('Products - save images');
+
+                    $d = $this->_productsImages;
+                    $this->savePartToCsv('product_cache_image_url.csv', $d);
+                    $d = null;
+                    $this->_productsImages = array();
+                }
 
             }
 
@@ -1456,6 +1510,22 @@ XML;
         }
         //#########################################################################
 
+        //########################################################################
+        // IMAGES
+        if($this->_storeConfig['export_product_images']) {
+
+            //categories & products images
+            $source = $sources->addChild('source');
+            $source->addAttribute('type', 'item_data_file');
+            $source->addAttribute('id', 'item_cache_image_url');
+
+            $source->addChild('file')->addAttribute('value', 'product_cache_image_url.csv');
+            $source->addChild('itemIdColumn')->addAttribute('value', 'entity_id');
+
+            $this->sxml_append_options($source);
+        }
+        //#########################################################################
+
         //property
         $properties = $products->addChild('properties');
         $props = $this->prepareProperties($withTag);
@@ -1548,6 +1618,10 @@ XML;
 
         $attrs = $this->_listOfAttributes;
 
+        if($this->_storeConfig['export_product_url']) {
+            $attrs[] = 'default_url';
+        }
+
         foreach ($attrs as $attr) {
             $ptype = 'string';
             // set property type
@@ -1602,6 +1676,7 @@ XML;
                     case 'visibility':
                     case 'status':
                     case 'name':
+                    case 'default_url':
                         $lang = true;
                         break;
                     default:
@@ -1644,6 +1719,19 @@ XML;
                 'reference' => 'categories'
             );
         }
+
+        //images
+        if($this->_storeConfig['export_product_images']) {
+            $properties[] = array(
+                'id'        => 'cache_image_url',
+                'name'      => 'cache_image_url',   //property id
+                'ptype'     => 'string', //property type
+                'type'      => 'direct',    //logic type
+                'field'     => 'cache_image_url',  //field colummn
+                'has_lang'  => false,
+            );
+        }
+
         $properties[] = array(
             'id'        => 'product_entity_id',
             'name'      => null,
