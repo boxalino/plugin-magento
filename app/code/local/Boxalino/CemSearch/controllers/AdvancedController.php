@@ -28,7 +28,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         $queryAttribute = array();
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::resultAction();
         }
 

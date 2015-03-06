@@ -7,11 +7,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
     public function prepareResult($object, $queryText, $query)
     {
 
-        $session = Mage::getSingleton("core/session");
+        $session = Mage::getSingleton('core/session');
         $session->unsetData('relax_products');
         $session->unsetData('relax_products_extra');
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::prepareResult($object, $queryText, $query);
         }
 
@@ -42,12 +42,12 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     return ($a['hits'] > $b['hits']) ? -1 : 1;
                 }
 
-                usort($relaxations, "cmp");
+                usort($relaxations, 'cmp');
             }
 
         }
 
-        $session->setData("relax", array_slice($relaxations,0, $suggestionConfig['display']));
+        $session->setData('relax', array_slice($relaxations,0, $suggestionConfig['display']));
 
         $adapter = $this->_getWriteAdapter();
 

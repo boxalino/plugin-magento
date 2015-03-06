@@ -164,3 +164,4 @@ app/locale/*/*
 /app/code/local/Boxalino/Cem
 /.settings
 /.project
+/.buildpath

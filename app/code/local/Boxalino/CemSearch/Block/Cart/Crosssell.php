@@ -22,7 +22,7 @@ class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_C
     public function getItems()
     {
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled', 0) == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::getItems();
         }
         $name = Mage::getStoreConfig('Boxalino_Recommendation/cart/widget');

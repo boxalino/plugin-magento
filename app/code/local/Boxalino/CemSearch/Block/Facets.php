@@ -116,7 +116,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             } else {
                 $level = $level - 1;
                 foreach ($parents['values'][$level] as $value) {
-                    if($value['selected'] == true) {
+                    if ($value['selected'] == true) {
                         $parentId = $value['parentId'];
                         $value['level'] = $level;
                         $highestChild[] = $value;
@@ -124,7 +124,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                 }
 
                 foreach ($parents['values'][$level] as $value) {
-                    if($parentId == $value['parentId'] && $value['selected'] == false) {
+                    if ($parentId == $value['parentId'] && $value['selected'] == false) {
                         $value['level'] = $level;
                         $highestChild[] = $value;
                     }
@@ -237,7 +237,14 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             foreach ($vals as $val) {
                 $key = array_search($val, $_REQUEST['bx_' . $filter]);
                 if ($key !== false) {
-                    $url = str_replace('&bx_' . $filter . '[' . $key . ']=' . $vals[$key], '', $url);
+                    $filterKey = 'bx_' . $filter . '[' . $key . ']';
+
+                    // remove filter from url
+                    $url = str_replace($filterKey . '=' . $vals[$key], '', $url);
+                    $url = str_replace(urlencode($filterKey) . '=' . urlencode($vals[$key]), '', $url);
+
+                    // remove resulting duplicate ampersands
+                    $url = trim(str_replace(array('?&', '&&'), array('?', '&'), $url), ' ?&');
                 }
             }
         }
@@ -258,9 +265,10 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     public function getMaxLevel($filter)
     {
-        if(isset($this->maxLevel[$filter])) {
+        if (isset($this->maxLevel[$filter])) {
             return $this->maxLevel[$filter];
         }
+
         return 0;
     }
 }
