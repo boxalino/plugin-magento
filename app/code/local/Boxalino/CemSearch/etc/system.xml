@@ -408,7 +408,7 @@
                             <label>Normal filters (left side)</label>
                             <frontend_type>text</frontend_type>
                             <comment><![CDATA[ Write here comma-separated names of fields which you want to use as filters (for example: manufacturer)<br />
-                        Colon separate name of field (left) from option (right)]]></comment>
+                        Colon separate name of field (left) from option (middle), and order (right). <br/> For order: 0 - alphabetical, 1 - count ]]></comment>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

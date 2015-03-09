@@ -461,6 +461,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     $facet->numerical = $filter[1] == 'ranged' ? true : $filter[1] == 'numerical' ? true : false;
                     $facet->range = $filter[1] == 'ranged' ? true : false;
                     $facet->selectedValues = $this->facetSelectedValue($filter[0], $filter[1]);
+                    $facet->sortOrder = isset($filter[2])&&$filter[2]==1?1:2;
                     $facets[] = $facet;
                 }
             }
