@@ -423,6 +423,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $this->searchQuery->filters[] = $this->filterByStatusProducts();
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
+
+        if(Mage::getStoreConfig('Boxalino_General/search_relaxation/enabled') == 1){
+            $this->inquiry->withRelaxation = 1;
+        }
+
         $this->choiceRequest->inquiries = array($this->inquiry);
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('choice_Request', $this->choiceRequest);
