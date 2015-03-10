@@ -91,6 +91,16 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
             return $this;
 
+        } elseif(count($entity_ids) == 0 && count($searchRelaxation->subphrasesResults) == 0 && count($relaxations) > 0){
+
+            $q = $relaxations[0];
+            Mage::helper('catalogsearch')->setQueryText($q['text']);
+
+            Mage::helper('Boxalino_CemSearch')->resetSearchAdapter();
+
+            $searchAdapter = Mage::helper('Boxalino_CemSearch')->getSearchAdapter();
+            $entity_ids = $searchAdapter->getEntitiesIds();
+
         }
 
         $this->resetSearchResults($query);

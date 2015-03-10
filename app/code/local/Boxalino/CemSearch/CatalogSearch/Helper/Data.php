@@ -19,4 +19,8 @@ class Boxalino_CemSearch_CatalogSearch_Helper_Data extends Mage_CatalogSearch_He
 
         return $this->_urlForSearch;
     }
+
+    public function setQueryText($text){
+        $this->_queryText = $text;
+    }
 }
