@@ -8,6 +8,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
     {
 
         $session = Mage::getSingleton('core/session');
+        $session->unsetData('relax');
         $session->unsetData('relax_products');
         $session->unsetData('relax_products_extra');
 
@@ -100,6 +101,10 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
             $searchAdapter = Mage::helper('Boxalino_CemSearch')->getSearchAdapter();
             $entity_ids = $searchAdapter->getEntitiesIds();
+
+            $session->unsetData('relax');
+            $session->unsetData('relax_products');
+            $session->unsetData('relax_products_extra');
 
         }
 
