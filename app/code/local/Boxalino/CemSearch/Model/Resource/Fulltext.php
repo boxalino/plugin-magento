@@ -23,7 +23,14 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $searchRelaxation = $searchAdapter->getChoiceRelaxation();
         $suggestionConfig = Mage::getStoreConfig('Boxalino_General/search_suggestions');
 
-        if($suggestionConfig['enabled'] && (count($entity_ids) <= $suggestionConfig['min'] || count($entity_ids) >= $suggestionConfig['max']) ) {
+        if (
+            $suggestionConfig['enabled'] &&
+            is_object($searchRelaxation) &&
+            (
+                count($entity_ids) <= $suggestionConfig['min'] ||
+                count($entity_ids) >= $suggestionConfig['max']
+            )
+        ) {
 
             foreach ($searchRelaxation->suggestionsResults as $suggestion) {
                 $relaxations[] = array(
@@ -33,18 +40,9 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 );
             }
 
-            if($suggestionConfig['sort']) {
-                function cmp($a, $b)
-                {
-                    if ($a['hits'] == $b['hits']) {
-                        return 0;
-                    }
-                    return ($a['hits'] > $b['hits']) ? -1 : 1;
-                }
-
-                usort($relaxations, 'cmp');
+            if ($suggestionConfig['sort']) {
+                usort($relaxations, array($this, 'cmp'));
             }
-
         }
 
         $session->setData('relax', array_slice($relaxations,0, $suggestionConfig['display']));
@@ -188,5 +186,13 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         Mage::dispatchEvent('catalogsearch_reset_search_result');
 
         return $this;
+    }
+
+    private function cmp($a, $b)
+    {
+        if ($a['hits'] == $b['hits']) {
+            return 0;
+        }
+        return ($a['hits'] > $b['hits']) ? -1 : 1;
     }
 }

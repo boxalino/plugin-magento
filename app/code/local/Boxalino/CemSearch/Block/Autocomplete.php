@@ -90,7 +90,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         $html .= '</ul><ul class="products">';
 
         foreach ($this->_suggestDataProducts as $prod) {
-            $product = Mage::getModel('catalog/product')->load($prod['id']);
+            $product = Mage::getModel('catalog/product')->load($prod);
             $html .= '<li data-word="' . $key . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
             $html .= '<a href="' . $product->getProductUrl() . '" >';
             $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
