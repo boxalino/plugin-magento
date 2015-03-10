@@ -45,7 +45,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             }
         }
 
-        $session->setData('relax', array_slice($relaxations,0, $suggestionConfig['display']));
+        $session->setData('relax', array_slice($relaxations, 0, $suggestionConfig['display']));
 
         $adapter = $this->_getWriteAdapter();
 
@@ -55,27 +55,27 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $relaxations_extra = array();
         $relaxationConfig = Mage::getStoreConfig('Boxalino_General/search_relaxation');
 
-        if(($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($searchRelaxation->subphrasesResults)> 0) && $relaxationConfig['enabled']){
+        if (($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($searchRelaxation->subphrasesResults) > 0) && $relaxationConfig['enabled']) {
 
             //display current products
             $session = Mage::getSingleton("core/session");
             $session->setData("relax_products", $entity_ids);
 
-            if(count($searchRelaxation->subphrasesResults)> 0){
-                if(count($relaxations) == 0){
+            if (count($searchRelaxation->subphrasesResults) > 0) {
+                if (count($relaxations) == 0) {
                     $relaxations_extra = array();
                 }
 
-                foreach($searchRelaxation->subphrasesResults as $subphrase){
+                foreach ($searchRelaxation->subphrasesResults as $subphrase) {
 
-                    if(count($relaxations_extra) >= $relaxationConfig['relaxations']){
+                    if (count($relaxations_extra) >= $relaxationConfig['relaxations']) {
                         continue;
                     }
 
-                    $relaxations_extra[$subphrase->queryText] =  array();
+                    $relaxations_extra[$subphrase->queryText] = array();
                     foreach ($subphrase->hits as $hit) {
                         $relaxations_extra[$subphrase->queryText][] = $hit->values['id'][0];
-                        if(count($relaxations_extra[$subphrase->queryText]) >= $relaxationConfig['products']){
+                        if (count($relaxations_extra[$subphrase->queryText]) >= $relaxationConfig['products']) {
                             break;
                         }
                     }
@@ -95,7 +95,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
         $this->resetSearchResults($query);
 
-        if($entity_ids === null || count($entity_ids) < 1){
+        if ($entity_ids === null || count($entity_ids) < 1) {
             return $this;
         }
 

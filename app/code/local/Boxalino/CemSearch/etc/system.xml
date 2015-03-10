@@ -250,7 +250,7 @@
                             <show_in_store>0</show_in_store>
                         </enabled>
                         <items translate="label">
-                            <label>Number of categories for term </label>
+                            <label>Number of categories for term</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -315,7 +315,7 @@
                             <show_in_store>0</show_in_store>
                         </max>
                         <display translate="label">
-                            <label>Maximum number of suggestions </label>
+                            <label>Maximum number of suggestions</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>

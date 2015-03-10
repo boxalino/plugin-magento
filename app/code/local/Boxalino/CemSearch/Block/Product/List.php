@@ -19,7 +19,7 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
             $this->_productCollection = Mage::getResourceModel('catalog/product_collection');
 
             // Added check if there are any entity ids
-            if(count($entity_ids) > 0){
+            if (count($entity_ids) > 0) {
                 $this->_productCollection->addFieldToFilter('entity_id', $entity_ids)
                     ->addAttributeToSelect('*');
             }

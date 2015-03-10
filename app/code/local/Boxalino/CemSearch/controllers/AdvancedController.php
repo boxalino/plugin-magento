@@ -48,7 +48,7 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
             );
         }
 
-        foreach($tmp->getAttributes() as $at){
+        foreach ($tmp->getAttributes() as $at) {
             $queryAttribute[$at->getStoreLabel()] = $at->getAttributeCode();
         }
 

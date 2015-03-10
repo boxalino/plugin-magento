@@ -1,10 +1,10 @@
 <?php
+
 /**
  * User: Michal Sordyl
  * Mail: michal.sordyl@codete.co
  * Date: 28.05.14
  */
-
 class Boxalino_CemSearch_Helper_P13n_Adapter
 {
     private $config = null;
@@ -30,7 +30,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     private function getChoiceResponse()
     {
-        if(empty(self::$choiceResponse)) {
+        if (empty(self::$choiceResponse)) {
             $this->search();
         }
         return self::$choiceResponse;
@@ -74,11 +74,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     }
 
-    public function setWithRelaxation($value){
+    public function setWithRelaxation($value)
+    {
         $this->inquiry->withRelaxation = $value;
     }
 
-    public function getChoiceRelaxation(){
+    public function getChoiceRelaxation()
+    {
         return self::$choiceResponse->variants[0]->searchRelaxation;
     }
 
@@ -156,12 +158,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     /**
      * @param $categoryId
      */
-    public function addFilterCategory($categoryId){
+    public function addFilterCategory($categoryId)
+    {
 
-        if (isset($categoryId) && $categoryId > 0){
+        if (isset($categoryId) && $categoryId > 0) {
             $category = Mage::getModel('catalog/category')->load($categoryId);
 
-            if($category != null){
+            if ($category != null) {
                 $filter = new \com\boxalino\p13n\api\thrift\Filter();
 
                 $filter->fieldName = 'categories';
@@ -277,18 +280,18 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $searchQuery->facetRequests = array();
 
         $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
-        if($config['enabled']){
+        if ($config['enabled']) {
             $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
             $facet->fieldName = 'categories';
-            $facet->numerical =  false;
+            $facet->numerical = false;
             $facet->range = false;
             $searchQuery->facetRequests[] = $facet;
         }
 
-        if($this->filterByVisibleProducts()) {
+        if ($this->filterByVisibleProducts()) {
             $searchQuery->filters[] = $this->filterByVisibleProducts();
         }
-        if($this->filterByStatusProducts()) {
+        if ($this->filterByStatusProducts()) {
             $searchQuery->filters[] = $this->filterByStatusProducts();
         }
         $autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
@@ -325,7 +328,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $facets = array();
 
             $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
-            if($config['enabled']) {
+            if ($config['enabled']) {
                 $tmp['facets'] = $this->getFacetLeafs($hit->searchResult->facetResponses[0]->values, $hit, $config);
             }
 
@@ -334,19 +337,21 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $suggestions;
     }
 
-    protected function getFacetDepth($facet){
+    protected function getFacetDepth($facet)
+    {
 
         return substr_count($facet->stringValue, '/');
 
     }
 
-    protected function getFacetLeafs($facets, $hit, $config){
+    protected function getFacetLeafs($facets, $hit, $config)
+    {
         $tmp = array();
 
-        foreach($facets as $facet){
+        foreach ($facets as $facet) {
 
-            foreach($facet->hierarchy as $h){
-                if(array_key_exists($h, $tmp)){
+            foreach ($facet->hierarchy as $h) {
+                if (array_key_exists($h, $tmp)) {
                     unset($tmp[$h]);
                 }
             }
@@ -359,7 +364,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             );
         }
 
-        if($config['sort']) {
+        if ($config['sort']) {
             usort($tmp, array($this, 'cmpFacets'));
         }
 
@@ -416,10 +421,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         if (!empty($this->filters)) {
             $this->searchQuery->filters = $this->filters;
         }
-        if($this->filterByVisibleProducts()) {
+        if ($this->filterByVisibleProducts()) {
             $this->searchQuery->filters[] = $this->filterByVisibleProducts();
         }
-        if($this->filterByStatusProducts()) {
+        if ($this->filterByStatusProducts()) {
             $this->searchQuery->filters[] = $this->filterByStatusProducts();
         }
         $this->inquiry->simpleSearchQuery = $this->searchQuery;
@@ -446,13 +451,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/filter/left_filters_enable');
         $enableTopFilters = Mage::getStoreConfig('Boxalino_General/filter/top_filters_enable');
 
-        if($enableLeftFilters == 1) {
-            $normalFilters = explode(',',Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal'));
+        if ($enableLeftFilters == 1) {
+            $normalFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/left_filters_normal'));
         }
-        if($enableTopFilters == 1) {
+        if ($enableTopFilters == 1) {
             $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         }
-        if(!empty($normalFilters)) {
+        if (!empty($normalFilters)) {
             foreach ($normalFilters as $filterString) {
                 $filter = explode(':', $filterString);
                 if ($filter[0] != '') {
@@ -466,7 +471,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 }
             }
         }
-        if($topFilters) {
+        if ($topFilters) {
             foreach ($topFilters as $filter) {
                 if ($filter != '') {
                     $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
@@ -483,26 +488,26 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     private function facetSelectedValue($name, $option)
     {
-        if(empty($this->selectedFacets)) {
-            foreach($_REQUEST as $key => $values) {
-                if(strpos($key, 'bx_') !== false) {
+        if (empty($this->selectedFacets)) {
+            foreach ($_REQUEST as $key => $values) {
+                if (strpos($key, 'bx_') !== false) {
                     $fieldName = substr($key, 3);
-                    foreach($values as $value) {
+                    foreach ($values as $value) {
                         $this->selectedFacets[$fieldName][] = $value;
                     }
                 }
             }
         }
         $selectedFacets = array();
-        if(isset($this->selectedFacets[$name])) {
+        if (isset($this->selectedFacets[$name])) {
             foreach ($this->selectedFacets[$name] as $value) {
                 $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
-                if($option == 'ranged') {
+                if ($option == 'ranged') {
                     $rangedValue = explode('-', $value);
-                    if($rangedValue[0] != '*') {
+                    if ($rangedValue[0] != '*') {
                         $selectedFacet->rangeFromInclusive = $rangedValue[0];
                     }
-                    if($rangedValue[1] != '*') {
+                    if ($rangedValue[1] != '*') {
                         $selectedFacet->rangeToExclusive = $rangedValue[1];
                     }
                 } else {
@@ -536,14 +541,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $result = array();
         $response = self::getChoiceResponse();
         $additionalFields = Mage::helper('Boxalino_CemSearch')->getAdditionalFieldsFromP13n();
-        if(!empty($response->variants)) {
+        if (!empty($response->variants)) {
             foreach ($response->variants as $variant) {
                 /** @var \com\boxalino\p13n\api\thrift\SearchResult $searchResult */
                 $searchResult = $variant->searchResult;
                 foreach ($searchResult->hits as $item) {
-                    foreach($additionalFields as $field) {
-                        if(isset($item->values[$field])) {
-                            if(!empty($item->values[$field])) {
+                    foreach ($additionalFields as $field) {
+                        if (isset($item->values[$field])) {
+                            if (!empty($item->values[$field])) {
                                 $result[$item->values['id'][0]][$field] = $item->values[$field];
                             }
                         }
@@ -558,12 +563,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     {
         $preparedFacets = array();
         $response = self::getChoiceResponse();
-        foreach($response->variants as $variant) {
+        foreach ($response->variants as $variant) {
             $facets = $variant->searchResult->facetResponses;
-            foreach($facets as $facet) {
-                if(!empty($facet->values)) {
+            foreach ($facets as $facet) {
+                if (!empty($facet->values)) {
                     $filter[$facet->fieldName] = array();
-                    foreach($facet->values as $value) {
+                    foreach ($facet->values as $value) {
                         $param['stringValue'] = $value->stringValue;
                         $param['hitCount'] = $value->hitCount;
                         $param['rangeFromInclusive'] = $value->rangeFromInclusive;
@@ -681,6 +686,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     protected $password;
     protected $language;
     protected $isDevelopment = false;
+
     /**
      * @param string $name
      * @param array $returnFields
@@ -693,11 +699,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     {
         $variantNames = array();
         $choiceRequest = $this->createRecommendationChoiceRequest();
-        foreach($widgets as $widget) {
+        foreach ($widgets as $widget) {
             $name = $widget['name'];
             $variantNames[] = $name;
-            $minimumRecommendations = (float) $widget['min_recs'];
-            $maximumRecommendations = (float) $widget['max_recs'];
+            $minimumRecommendations = (float)$widget['min_recs'];
+            $maximumRecommendations = (float)$widget['max_recs'];
             if ($maximumRecommendations === null) {
                 $maximumRecommendations = 5;
             }
@@ -755,10 +761,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 $contextItem->role = 'mainProduct';
                 $inquiry->contextItems = array($contextItem);
             }
-            if($this->filterByVisibleProducts()) {
+            if ($this->filterByVisibleProducts()) {
                 $inquiry->simpleSearchQuery->filters[] = $this->filterByVisibleProducts();
             }
-            if($this->filterByStatusProducts()) {
+            if ($this->filterByStatusProducts()) {
                 $inquiry->simpleSearchQuery->filters[] = $this->filterByStatusProducts();
             }
             $choiceRequest->inquiries[] = $inquiry;

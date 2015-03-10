@@ -59,7 +59,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     public function reindexAll()
     {
         self::logMem('Indexer init');
-        if(!file_exists($this->_mainDir)){
+        if (!file_exists($this->_mainDir)) {
             mkdir($this->_mainDir);
         }
         $this->_websiteExport();
@@ -84,7 +84,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             $this->_dir = $this->_mainDir . '/' . $website->getConfig('Boxalino_General/general/di_username');
-            if(file_exists($this->_dir)){
+            if (file_exists($this->_dir)) {
                 $this->_helperExporter->delTree($this->_dir);
             }
             self::logMem('After delTree');
@@ -391,9 +391,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         self::logMem('Products - connected to DB, built attribute info query');
 
         $attrsFromDb = array(
-            'int'     => array(),
+            'int' => array(),
             'varchar' => array(),
-            'text'    => array(),
+            'text' => array(),
             'decimal' => array(),
         );
 
@@ -414,7 +414,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $header = true;
 
         $stores = array();
-        foreach ($this->group->getStores() as $store){
+        foreach ($this->group->getStores() as $store) {
 
             $stores[$store->getId()]['id'] = $store->getId();
             $stores[$store->getId()]['base_url'] = $store->getBaseUrl();
@@ -425,9 +425,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         //prepare files
         $filesMtM = array();
-        $tmp =array_keys($this->_attributesValuesByName);
+        $tmp = array_keys($this->_attributesValuesByName);
         $tmp[] = 'categories';
-        foreach($tmp as $attr){
+        foreach ($tmp as $attr) {
 
             $key = $attr;
 
@@ -463,7 +463,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             fputcsv($fh, $h, $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
         }
 
-        while($count >= $limit) {
+        while ($count >= $limit) {
             if ($countMax > 0 && $this->_count >= $countMax) {
                 break;
             }
@@ -814,7 +814,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $db = null;
 
         //close file
-        foreach($filesMtM as $f){
+        foreach ($filesMtM as $f) {
             fclose($f);
         }
 
@@ -920,21 +920,21 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $selects = array();
 
-            if(count($attrsFromDb['varchar']) > 0){
+            if (count($attrsFromDb['varchar']) > 0) {
                 $select1 = clone $select;
                 $select1->from(array('ce' => 'customer_entity_varchar'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $selects[] = $select1;
             }
 
-            if(count($attrsFromDb['int']) > 0){
+            if (count($attrsFromDb['int']) > 0) {
                 $select2 = clone $select;
                 $select2->from(array('ce' => 'customer_entity_int'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['int']);
                 $selects[] = $select2;
             }
 
-            if(count($attrsFromDb['datetime']) > 0){
+            if (count($attrsFromDb['datetime']) > 0) {
                 $select3 = clone $select;
                 $select3->from(array('ce' => 'customer_entity_datetime'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['datetime']);
@@ -1161,18 +1161,18 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 }
 
                 $transactions_to_save[] = array(
-                    'order_id'          => $transaction['entity_id'],
-                    'entity_id'         => $transaction['product_id'],
-                    'customer_id'       => array_key_exists('customer_id', $transaction) ? $transaction['customer_id'] : '',
-                    'price'             => $transaction['original_price'],
-                    'discounted_price'  => $transaction['price'],
-                    'quantity'          => $transaction['qty_ordered'],
+                    'order_id' => $transaction['entity_id'],
+                    'entity_id' => $transaction['product_id'],
+                    'customer_id' => array_key_exists('customer_id', $transaction) ? $transaction['customer_id'] : '',
+                    'price' => $transaction['original_price'],
+                    'discounted_price' => $transaction['price'],
+                    'quantity' => $transaction['qty_ordered'],
                     'total_order_value' => ($transaction['base_subtotal'] + $transaction['shipping_amount']),
-                    'shipping_costs'    => $transaction['shipping_amount'],
-                    'order_date'        => $transaction['created_at'],
+                    'shipping_costs' => $transaction['shipping_amount'],
+                    'order_date' => $transaction['created_at'],
                     'confirmation_date' => $status == 1 ? $transaction['updated_at'] : null,
-                    'shipping_date'     => $status == 2 ? $transaction['updated_at'] : null,
-                    'status'            => $transaction['status'],
+                    'shipping_date' => $status == 2 ? $transaction['updated_at'] : null,
+                    'status' => $transaction['status'],
                 );
             }
 
@@ -1441,7 +1441,7 @@ XML;
         }
 
         foreach ($attrs as $attr) {
-            if($attr == 'visibility' || $attr == 'status') {
+            if ($attr == 'visibility' || $attr == 'status') {
                 continue;
             }
             $attr = $this->_helperSearch->sanitizeFieldName($attr);
@@ -1656,12 +1656,12 @@ XML;
 
             if (isset($this->_attributesValuesByName[$attr]) && $attr != 'visibility' && $attr != 'status') {
                 $properties[] = array(
-                    'id'        => $attr,
-                    'name'      => $attr,
-                    'ptype'     => 'text',
-                    'type'      => 'reference',
-                    'field'     => $attr . '_id',
-                    'has_lang'  => false,
+                    'id' => $attr,
+                    'name' => $attr,
+                    'ptype' => 'text',
+                    'type' => 'reference',
+                    'field' => $attr . '_id',
+                    'has_lang' => false,
                     'reference' => $attr
                 );
             } elseif ($attr == 'category_ids') {
@@ -1684,12 +1684,12 @@ XML;
                         break;
                 }
                 $properties[] = array(
-                    'id'        => $attr,
-                    'name'      => null,
-                    'ptype'     => $ptype,
-                    'type'      => $type,
-                    'field'     => $field,
-                    'has_lang'  => $lang,
+                    'id' => $attr,
+                    'name' => null,
+                    'ptype' => $ptype,
+                    'type' => $type,
+                    'field' => $field,
+                    'has_lang' => $lang,
                     'reference' => $ref
                 );
             }
@@ -1697,12 +1697,12 @@ XML;
         //tag
         if ($this->_storeConfig['export_tags'] && $withTag) {
             $properties[] = array(
-                'id'        => 'tag',
-                'name'      => 'tag',
-                'ptype'     => 'text',
-                'type'      => 'reference',
-                'field'     => 'tag_id',
-                'has_lang'  => false,
+                'id' => 'tag',
+                'name' => 'tag',
+                'ptype' => 'text',
+                'type' => 'reference',
+                'field' => 'tag_id',
+                'has_lang' => false,
                 'reference' => 'tag'
             );
         }
@@ -1710,12 +1710,12 @@ XML;
         //categories
         if ($this->_storeConfig['export_categories']) {
             $properties[] = array(
-                'id'        => 'category',
-                'name'      => 'categories',   //property id
-                'ptype'     => 'hierarchical', //property type
-                'type'      => 'reference',    //logic type
-                'field'     => 'category_id',  //field colummn
-                'has_lang'  => false,
+                'id' => 'category',
+                'name' => 'categories', //property id
+                'ptype' => 'hierarchical', //property type
+                'type' => 'reference', //logic type
+                'field' => 'category_id', //field colummn
+                'has_lang' => false,
                 'reference' => 'categories'
             );
         }
@@ -1733,12 +1733,12 @@ XML;
         }
 
         $properties[] = array(
-            'id'        => 'product_entity_id',
-            'name'      => null,
-            'ptype'     => 'string',
-            'type'      => 'direct',
-            'field'     => 'entity_id',
-            'has_lang'  => false,
+            'id' => 'product_entity_id',
+            'name' => null,
+            'ptype' => 'string',
+            'type' => 'direct',
+            'field' => 'entity_id',
+            'has_lang' => false,
             'reference' => null
         );
 
@@ -1782,9 +1782,9 @@ XML;
         $fields = array(
             'username' => $this->_storeConfig['di_username'],
             'password' => $this->_storeConfig['di_password'],
-            'account'  => $this->_storeConfig['di_account'],
+            'account' => $this->_storeConfig['di_account'],
             'template' => 'standard_source',
-            'xml'      => file_get_contents($file . '.xml')
+            'xml' => file_get_contents($file . '.xml')
         );
 
         $url = $this->_helperExporter->getXMLSyncUrl($this->_storeConfig['account_dev']);
@@ -1794,7 +1794,7 @@ XML;
 
     protected function pushFile($fields, $url, $type)
     {
-        self::logMem($type.' push');
+        self::logMem($type . ' push');
         $s = curl_init();
 
         curl_setopt($s, CURLOPT_URL, $url);
@@ -1807,10 +1807,10 @@ XML;
         $responseBody = curl_exec($s);
         curl_close($s);
         if (strpos($responseBody, 'Internal Server Error') !== false) {
-            self::logMem($type.' push error: '.$responseBody);
+            self::logMem($type . ' push error: ' . $responseBody);
             Mage::throwException($this->_helperExporter->getError($responseBody));;
         }
-        self::logMem($type.' pushed. Response: '.$responseBody);
+        self::logMem($type . ' pushed. Response: ' . $responseBody);
         return $responseBody;
     }
 
@@ -1822,10 +1822,10 @@ XML;
         $fields = array(
             'username' => $this->_storeConfig['di_username'],
             'password' => $this->_storeConfig['di_password'],
-            'account'  => $this->_storeConfig['di_account'],
-            'dev'      => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
-            'delta'    => $this->_getIndexType() == 'delta' ? 'true' : 'false', // I know...
-            'data'     => "@$file.zip;type=application/zip",
+            'account' => $this->_storeConfig['di_account'],
+            'dev' => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
+            'delta' => $this->_getIndexType() == 'delta' ? 'true' : 'false', // I know...
+            'data' => "@$file.zip;type=application/zip",
         );
 
         $url = $this->_helperExporter->getZIPSyncUrl($this->_storeConfig['account_dev']);
