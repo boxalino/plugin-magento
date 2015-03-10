@@ -1,10 +1,10 @@
-<?php $filters = $this->getTopFilters();?>
-<?php if(!empty($filters)): ?>
-<div class="top_filters" style="width:100%;">
-<?php foreach($filters as $key => $filter): ?>
-    <div class="value" style="width:33%; float:left;">
-        <a href="<?php echo $filter['url'] ?>"><?php echo $filter['title'].' ('. $filter['hitCount'] .')' ?></a>
+<?php $filters = $this->getTopFilters(); ?>
+<?php if (!empty($filters)): ?>
+    <div class="top_filters" style="width:100%;">
+        <?php foreach ($filters as $key => $filter): ?>
+            <div class="value" style="width:33%; float:left;">
+                <a href="<?php echo $filter['url'] ?>"><?php echo $filter['title'] . ' (' . $filter['hitCount'] . ')' ?></a>
+            </div>
+        <?php endforeach; ?>
     </div>
-<?php endforeach; ?>
-</div>
 <?php endif; ?>

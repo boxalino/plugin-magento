@@ -42,7 +42,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     public function getExportServer()
     {
-        if(empty($this->exportServer)) {
+        if (empty($this->exportServer)) {
             $this->exportServer = Mage::getStoreConfig('boxalinoexporter/export_data/export_server');
         }
 
@@ -92,9 +92,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     {
         $exportServer = $this->getExportServer();
         if ($dev) {
-            return $exportServer.self::URL_ZIP_DEV;
+            return $exportServer . self::URL_ZIP_DEV;
         } else {
-            return $exportServer.self::URL_ZIP;
+            return $exportServer . self::URL_ZIP;
         }
     }
 
@@ -106,9 +106,9 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     {
         $exportServer = $this->getExportServer();
         if ($dev) {
-            return $exportServer.self::URL_XML_DEV;
+            return $exportServer . self::URL_XML_DEV;
         } else {
-            return $exportServer.self::URL_XML;
+            return $exportServer . self::URL_XML;
         }
 
     }
@@ -128,7 +128,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     public function getCountry($countryCode)
     {
 
-        if(!isset($this->_countries[$countryCode])) {
+        if (!isset($this->_countries[$countryCode])) {
             $country = Mage::getModel('directory/country')->loadByCode($countryCode);
             $this->_countries[$countryCode] = $country;
         }
@@ -152,8 +152,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         $text = trim($text, $delimiter);
 
         // transliterate
-        if (function_exists('iconv'))
-        {
+        if (function_exists('iconv')) {
             $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
         }
 
@@ -163,8 +162,7 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
         // remove unwanted characters
         $text = preg_replace('~[^_\w]+~', '', $text);
 
-        if (empty($text))
-        {
+        if (empty($text)) {
             return null;
         }
 
@@ -182,14 +180,14 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
 
     public function delTree($dir)
     {
-        if(!file_exists($dir)){
+        if (!file_exists($dir)) {
             return;
         }
-        $files = array_diff(scandir($dir), array('.','..'));
+        $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
-            if(is_dir("$dir/$file")){
+            if (is_dir("$dir/$file")) {
                 self::delTree("$dir/$file");
-            } else if(file_exists("$dir/$file")){
+            } else if (file_exists("$dir/$file")) {
                 @unlink("$dir/$file");
             }
         }
