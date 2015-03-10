@@ -362,7 +362,8 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         return $this->searchAdapter;
     }
 
-    public function resetSearchAdapter(){
+    public function resetSearchAdapter()
+    {
         $this->searchAdapter = null;
     }
 }
