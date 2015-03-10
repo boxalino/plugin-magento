@@ -2,12 +2,35 @@
 
 class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 {
+    /** @var array */
     private $_allFilters = array();
+
+    /** @var array */
     public $maxLevel = array();
 
     public function __construct()
     {
         $this->_allFilters = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getFacetsData();
+    }
+
+    /**
+     * Gets the current URL without filters
+     *
+     * @return string
+     */
+    public function getResetUrl()
+    {
+        /** @var $helper Mage_Core_Helper_Url */
+        $helper = Mage::helper('core/url');
+
+        // get current url
+        $url = $helper->getCurrentUrl();
+
+        // parse url
+        $parsedUrl = parse_url($url);
+
+        // return built url
+        return $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
     }
 
     public function getTopFilters()
