@@ -13,6 +13,13 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
             return parent::_getProductCollection();
         }
 
+        // make sure to only use products which are in the current category
+        if ($category = Mage::registry('current_category')) {
+            if (!$category->getIsAnchor()){
+                return parent::_getProductCollection();
+            }
+        }
+
         if (is_null($this->_productCollection)) {
             $entity_ids = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getEntitiesIds();
 
