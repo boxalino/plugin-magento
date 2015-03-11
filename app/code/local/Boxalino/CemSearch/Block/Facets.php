@@ -50,7 +50,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         }
 
         // return url
-        echo $url;
+        return $url;
     }
 
     public function getTopFilters()
