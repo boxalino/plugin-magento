@@ -29,8 +29,28 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         // parse url
         $parsedUrl = parse_url($url);
 
-        // return built url
-        return $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+        // build url
+        $url = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+
+        // get query parameters
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $q);
+
+            // remove bx filters
+            foreach ($q as $k => $v) {
+                if (strpos($k, 'bx_') === 0) {
+                    unset($q[$k]);
+                }
+            }
+
+            // append query string
+            if ($q) {
+                $url .= '?' . http_build_query($q);
+            }
+        }
+
+        // return url
+        echo $url;
     }
 
     public function getTopFilters()
