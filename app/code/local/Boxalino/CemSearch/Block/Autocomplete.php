@@ -50,8 +50,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         }
 
         $suggestData = $this->getSuggestData();
-        if (!($count = count($suggestData))) {
+        if (!($count = count($suggestData)) && !count($this->_suggestDataProducts)) {
             return '<ul><li>' . $this->helper('catalogsearch')->getQueryText() . '</li></ul>';
+        } elseif(!($count = count($suggestData)) && $this->_suggestDataProducts){
+            return '<ul class="queries"><li style="display:none"></li></ul>' . $this->prepareDataProducts();
         }
 
         $count--;
@@ -88,11 +90,19 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     . '<span class="query-title">' . $item['html'] . '</span><span class="amount">(' . $item['num_of_results'] . ')</span></li>';
             }
         }
-        $html .= '</ul><ul class="products">';
+        $html .= '</ul>';
+
+        $html .= $this->prepareDataProducts();
+
+        return $html;
+    }
+
+    public function prepareDataProducts(){
+        $html = '<ul class="products">';
 
         foreach ($this->_suggestDataProducts as $prod) {
             $product = Mage::getModel('catalog/product')->load($prod);
-            $html .= '<li data-word="' . $key . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
+            $html .= '<li data-word="' . md5($prod) . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
             $html .= '<a href="' . $product->getProductUrl() . '" >';
             $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
             $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
@@ -103,6 +113,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         $html .= '</ul>';
 
         return $html;
+
     }
 
     public function getSuggestData()
