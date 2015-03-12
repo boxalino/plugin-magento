@@ -68,7 +68,6 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
             $storeConfig['domain']
         );
         $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
-        $p13nSort->push('score', true);
 
         $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 

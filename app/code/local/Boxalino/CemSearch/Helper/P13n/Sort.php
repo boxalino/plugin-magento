@@ -20,7 +20,7 @@ class Boxalino_CemSearch_Helper_P13n_Sort
     }
 
     /**
-     * @param $field name od field to sort by
+     * @param $field name od field to sort by (i.e. discountedPrice / title)
      * @param $reverse true for ASC, false for DESC
      */
     public function push($field, $reverse)

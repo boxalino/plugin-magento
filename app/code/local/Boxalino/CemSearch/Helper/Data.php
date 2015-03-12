@@ -325,7 +325,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
                 $storeConfig['domain']
             );
             $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
-            $p13nSort->push('score', true); // score / discountedPrice / title_en
             $this->searchAdapter = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
             /* @var $category Mage_Catalog_Model_Category */
