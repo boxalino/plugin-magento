@@ -32,6 +32,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 count($entity_ids) >= $suggestionConfig['max']
             )
         ) {
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'suggestions detected');
 
             foreach ($searchRelaxation->suggestionsResults as $suggestion) {
                 $relaxations[] = array(
@@ -47,6 +48,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         }
 
         $session->setData('relax', array_slice($relaxations, 0, $suggestionConfig['display']));
+        Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult relax', $session->getData('relax'));
 
         $adapter = $this->_getWriteAdapter();
 
@@ -57,6 +59,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $relaxationConfig = Mage::getStoreConfig('Boxalino_General/search_relaxation');
 
         if (($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($searchRelaxation->subphrasesResults) > 0) && $relaxationConfig['enabled']) {
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'relaxations detected');
 
             //display current products
             $session = Mage::getSingleton("core/session");
@@ -86,13 +89,15 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             }
 
             //display currently products
-            $session->setData("relax_products_extra", $relaxations_extra);
+            $session->setData('relax_products_extra', $relaxations_extra);
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult relax_products_extra', $session->getData('relax_products_extra'));
 
             $this->resetSearchResults($query);
 
             return $this;
 
         } elseif (count($entity_ids) == 0 && count($searchRelaxation->subphrasesResults) == 0 && count($relaxations) > 0) {
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'no relaxations');
 
             $q = $relaxations[0];
             Mage::helper('catalogsearch')->setQueryText($q['text']);
