@@ -73,20 +73,9 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         return ($trackSales == 1);
     }
 
-    public function reportPageView()
-    {
-        if ($this->isAnalyticsEnabled()) {
-            $script = "_bxq.push(['trackPageView']);" . PHP_EOL;
-            return $script;
-        } else {
-            return '';
-        }
-    }
-
     public function isAnalyticsEnabled()
     {
-        $trackSales = Mage::getStoreConfig('Boxalino_General/tracker/analytics');
-        return ($trackSales == 1);
+        return (bool)Mage::getStoreConfig('Boxalino_General/tracker/analytics');
     }
 
     public function reportSearch($term, $filters = null)
@@ -140,7 +129,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
         }
     }
 
-
     /**
      * @param $products array example:
      *      <code>
@@ -191,31 +179,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             return $account . '_dev';
         }
         return $account;
-    }
-
-    public function scriptBegin()
-    {
-        $account = Mage::getStoreConfig('Boxalino_General/general/di_account');
-
-        $script = '<script type="text/javascript">' . PHP_EOL;
-        $script .= 'var _bxq = _bxq || [];' . PHP_EOL;
-        $script .= "_bxq.push(['setAccount', '" . $account . "']);" . PHP_EOL;
-
-        echo $script;
-    }
-
-    public function scriptEnd()
-    {
-        $script = "(function(){
-                    var s = document.createElement('script');
-                    s.async = 1;
-                    s.src = '//cdn.bx-cloud.com/frontend/rc/js/ba.min.js';
-                    document.getElementsByTagName('head')[0].appendChild(s);
-                    })();" . PHP_EOL;
-
-        $script .= '</script>' . PHP_EOL;
-
-        echo $script;
     }
 
     public function getFiltersValues($params)
@@ -272,7 +235,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
      */
     public function sanitizeFieldName($text)
     {
-
         $maxLength = 50;
         $delimiter = "_";
 

@@ -19,13 +19,14 @@
                 <type>skin_js</type>
                 <name>js/jquery-noConflict.js</name>
             </action>
-
-            <block type="boxalino/head" name="boxalino_head" as="boxalino_head" template="boxalino/head.phtml"/>
         </reference>
         <reference name="top.search">
             <action method="setTemplate">
                 <template>boxalino/catalogsearch/form.mini.phtml</template>
             </action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="boxalino/script" name="boxalino_script" template="boxalino/script.phtml"/>
         </reference>
     </default>
     <catalogsearch_result_index>
