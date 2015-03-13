@@ -52,12 +52,17 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected $_helperImage = null;
 
     protected $_entityIds = null;
+    protected $_prefix = '';
 
     /**
      * @description Start of reindex
      */
     public function reindexAll()
     {
+
+        $prefix = Mage::getConfig()->getTablePrefix();
+        $this->_prefix = $prefix;
+
         self::logMem('Indexer init');
         if (!file_exists($this->_mainDir)) {
             mkdir($this->_mainDir);
@@ -374,7 +379,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $db = $this->_getReadAdapter();
         $select = $db->select()
             ->from(
-                array('main_table' => 'eav_attribute'),
+                array('main_table' => $this->_prefix . 'eav_attribute'),
                 array(
                     'attribute_id',
                     'attribute_code',
@@ -382,7 +387,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 )
             )
             ->joinInner(
-                array('additional_table' => 'catalog_eav_attribute'),
+                array('additional_table' => $this->_prefix . 'catalog_eav_attribute'),
                 'additional_table.attribute_id = main_table.attribute_id'
             )
             ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('catalog_product'))
@@ -476,7 +481,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - fetch products - before');
                 $select = $db->select()
                     ->from(
-                        array('e' => 'catalog_product_entity')
+                        array('e' => $this->_prefix . 'catalog_product_entity')
                     )
                     ->limit($limit, ($page - 1) * $limit);
 
@@ -504,7 +509,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $joinColumns = array('value' => 'IF(t_s.value_id IS NULL, t_d.value, t_s.value)');
 
                 $select1 = $db->select()
-                    ->joinLeft(array('ea' => 'eav_attribute'), 't_d.attribute_id = ea.attribute_id', 'ea.attribute_code')
+                    ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 't_d.attribute_id = ea.attribute_id', 'ea.attribute_code')
                     ->where('t_d.store_id = ?', 0)
                     ->where('t_d.entity_type_id = ?', $this->getEntityIdFor('catalog_product'))
                     ->where('t_d.entity_id IN(?)', $ids);
@@ -513,41 +518,41 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select4 = clone $select1;
 
                 $select1->from(
-                    array('t_d' => 'catalog_product_entity_varchar'),
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
                     $columns
                 )
                     ->joinLeft(
-                        array('t_s' => 'catalog_product_entity_varchar'),
+                        array('t_s' => $this->_prefix . 'catalog_product_entity_varchar'),
                         $joinCondition,
                         $joinColumns
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $select2->from(
-                    array('t_d' => 'catalog_product_entity_text'),
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
                     $columns
                 )
                     ->joinLeft(
-                        array('t_s' => 'catalog_product_entity_text'),
+                        array('t_s' => $this->_prefix . 'catalog_product_entity_text'),
                         $joinCondition,
                         $joinColumns
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['text']);
                 $select3->from(
-                    array('t_d' => 'catalog_product_entity_decimal'),
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
                     $columns
                 )
                     ->joinLeft(
-                        array('t_s' => 'catalog_product_entity_decimal'),
+                        array('t_s' => $this->_prefix . 'catalog_product_entity_decimal'),
                         $joinCondition,
                         $joinColumns
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['decimal']);
                 $select4->from(
-                    array('t_d' => 'catalog_product_entity_int'),
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
                     $columns
                 )
                     ->joinLeft(
-                        array('t_s' => 'catalog_product_entity_int'),
+                        array('t_s' => $this->_prefix . 'catalog_product_entity_int'),
                         $joinCondition,
                         $joinColumns
                     )
@@ -571,7 +576,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - get stock  - before');
                 $select = $db->select()
                     ->from(
-                        'cataloginventory_stock_status',
+                        $this->_prefix . 'cataloginventory_stock_status',
                         array(
                             'product_id',
                             'stock_status',
@@ -588,7 +593,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - get products from website - before');
                 $select = $db->select()
                     ->from(
-                        'catalog_product_website',
+                        $this->_prefix . 'catalog_product_website',
                         array(
                             'product_id',
                             'website_id',
@@ -603,7 +608,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - get products connections - before');
                 $select = $db->select()
                     ->from(
-                        'catalog_product_super_link',
+                        $this->_prefix . 'catalog_product_super_link',
                         array(
                             'product_id',
                             'parent_id',
@@ -618,7 +623,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - get categories - before');
                 $select = $db->select()
                     ->from(
-                        'catalog_category_product',
+                        $this->_prefix . 'catalog_category_product',
                         array(
                             'product_id',
                             'category_id',
@@ -858,7 +863,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $db = $this->_getReadAdapter();
         $select = $db->select()
             ->from(
-                array('main_table' => 'eav_attribute'),
+                array('main_table' => $this->_prefix . 'eav_attribute'),
                 array(
                     'aid' => 'attribute_id',
                     'attribute_code',
@@ -866,11 +871,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 )
             )
             ->joinInner(
-                array('additional_table' => 'customer_eav_attribute'),
+                array('additional_table' => $this->_prefix . 'customer_eav_attribute'),
                 'additional_table.attribute_id = main_table.attribute_id'
             )
             ->joinLeft( // @todo is this left join still necessary?
-                array('scope_table' => 'customer_eav_attribute_website'),
+                array('scope_table' => $this->_prefix . 'customer_eav_attribute_website'),
                 'scope_table.attribute_id = main_table.attribute_id AND ' .
                 'scope_table.website_id = ' . $this->group->getWebsiteId()
             )
@@ -891,7 +896,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $select = $db->select()
                 ->from(
-                    'customer_entity',
+                    $this->_prefix . 'customer_entity',
                     array('entity_id', 'created_at', 'updated_at')
                 )
                 ->where('entity_type_id = ?', '1')->limit($limit, ($page - 1) * $limit);
@@ -910,7 +915,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             );
 
             $select = $db->select()
-                ->joinLeft(array('ea' => 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
+                ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
                 ->where('ce.entity_type_id = ?', 1)
                 ->where('ce.entity_id IN(?)', $ids);
 
@@ -922,21 +927,21 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             if (count($attrsFromDb['varchar']) > 0) {
                 $select1 = clone $select;
-                $select1->from(array('ce' => 'customer_entity_varchar'), $columns)
+                $select1->from(array('ce' => $this->_prefix . 'customer_entity_varchar'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $selects[] = $select1;
             }
 
             if (count($attrsFromDb['int']) > 0) {
                 $select2 = clone $select;
-                $select2->from(array('ce' => 'customer_entity_int'), $columns)
+                $select2->from(array('ce' => $this->_prefix . 'customer_entity_int'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['int']);
                 $selects[] = $select2;
             }
 
             if (count($attrsFromDb['datetime']) > 0) {
                 $select3 = clone $select;
-                $select3->from(array('ce' => 'customer_entity_datetime'), $columns)
+                $select3->from(array('ce' => $this->_prefix . 'customer_entity_datetime'), $columns)
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['datetime']);
                 $selects[] = $select3;
             }
@@ -959,7 +964,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             $select = $db->select()
                 ->from(
-                    'eav_attribute',
+                    $this->_prefix . 'eav_attribute',
                     array(
                         'attribute_id',
                         'attribute_code',
@@ -982,7 +987,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $select = $db->select()
                     ->from(
-                        'customer_address_entity',
+                        $this->_prefix . 'customer_address_entity',
                         array('entity_id')
                     )
                     ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
@@ -992,7 +997,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $select = $db->select()
                     ->from(
-                        'customer_address_entity_varchar',
+                        $this->_prefix . 'customer_address_entity_varchar',
                         array('attribute_id', 'value')
                     )
                     ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
@@ -1080,7 +1085,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $select = $db
                 ->select()
                 ->from(
-                    array('order' => 'sales_flat_order'),
+                    array('order' => $this->_prefix . 'sales_flat_order'),
                     array(
                         'entity_id',
                         'status',
@@ -1092,7 +1097,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                 )
                 ->joinLeft(
-                    array('item' => 'sales_flat_order_item'),
+                    array('item' => $this->_prefix . 'sales_flat_order_item'),
                     'order.entity_id = item.order_id',
                     array(
                         'product_id',
@@ -1824,13 +1829,21 @@ XML;
             'password' => $this->_storeConfig['di_password'],
             'account' => $this->_storeConfig['di_account'],
             'dev' => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
-            'delta' => $this->_getIndexType() == 'delta' ? 'true' : 'false', // I know...
-            'data' => "@$file.zip;type=application/zip",
+            'delta' => $this->_getIndexType() == 'delta' ? 'true' : 'false',
+            'data' => $this->getCurlFile("@$file.zip;type=application/zip"),
         );
 
         $url = $this->_helperExporter->getZIPSyncUrl($this->_storeConfig['account_dev']);
 
         return $this->pushFile($fields, $url, 'zip');
+    }
+
+    protected function getCurlFile($filename)
+    {
+        if (class_exists('CURLFile')) {
+            return new CURLFile(substr($filename, 1));
+        }
+        return $filename;
     }
 
     protected function savePartToCsv($file, &$data)
