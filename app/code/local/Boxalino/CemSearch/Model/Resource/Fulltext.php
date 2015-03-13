@@ -62,8 +62,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'relaxations detected');
 
             //display current products
-            $session = Mage::getSingleton("core/session");
-            $session->setData("relax_products", $entity_ids);
+            $session = Mage::getSingleton('core/session');
+            $session->setData('relax_products', $entity_ids);
 
             if (count($searchRelaxation->subphrasesResults) > 0) {
                 if (count($relaxations) == 0) {
@@ -128,19 +128,6 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
             $bind = array();
             $like = array();
-            $likeCond = '';
-            if ($searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE
-                || $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_COMBINE
-            ) {
-                $helper = Mage::getResourceHelper('core');
-                $words = Mage::helper('core/string')->splitWords($queryText, true, $query->getMaxQueryWords());
-                foreach ($words as $word) {
-                    $like[] = $helper->getCILike('s.data_index', $word, array('position' => 'any'));
-                }
-                if ($like) {
-                    $likeCond = '(' . join(' OR ', $like) . ')';
-                }
-            }
             $mainTableAlias = 's';
             $fields = array(
                 'query_id' => new Zend_Db_Expr($query->getId()),
@@ -157,20 +144,30 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 || $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_COMBINE
             ) {
                 $bind[':query'] = implode(' ', $preparedTerms[0]);
-                $where = Mage::getResourceHelper('catalogsearch')
-                    ->chooseFulltext($this->getMainTable(), $mainTableAlias, $select);
             }
 
-            if ($likeCond != '' && $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_COMBINE) {
-                $where .= ($where ? ' OR ' : '') . $likeCond;
-            } elseif ($likeCond != '' && $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE) {
-                $select->columns(array('relevance' => new Zend_Db_Expr(0)));
-                $where = $likeCond;
-            }
-
-            $where = '( `e`.`entity_id` IN (' . implode(',', $entity_ids) . ') )';
             if (count($entity_ids) > 0) {
-                $select->where($where);
+                $select->where('(e.entity_id IN (' . implode(',', $entity_ids) . '))');
+            }
+
+            // enforce boxalino ranking
+            $select->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids).')'));
+
+            if ($searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE) {
+                $innerSelect = (string) $select;
+                $select = $adapter->select()
+                    ->from(array(
+                        'a' => new Zend_Db_Expr('(' . $innerSelect . ')')
+                    ), array(
+                        'query_id',
+                        'product_id'
+                    ))
+                    ->join(array(
+                        'b' => new Zend_Db_Expr('(SELECT @s:= 0)')
+                    ), '', array(
+                        'relevance' => new Zend_Db_Expr('@s:=@s+1')
+                    ))
+                    ->where('1=1'); // added to avoid collision with appended ON DUPLICATE
             }
 
             Boxalino_CemSearch_Model_Logger::saveFrontActions('Fulltext_PrepareResult', 'storing catalogsearch/result for entities with id: ' . implode(', ', $entity_ids));
@@ -179,6 +176,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 array(),
                 Varien_Db_Adapter_Interface::INSERT_ON_DUPLICATE);
             $adapter->query($sql, $bind);
+
+            $query->setIsProcessed(1);
         }
 
         return $this;

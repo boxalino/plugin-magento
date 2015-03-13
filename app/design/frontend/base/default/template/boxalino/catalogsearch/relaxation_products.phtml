@@ -7,8 +7,8 @@
 /* @var $this Mage_Catalog_Block_Product_List */
 ?>
 <?php
-$session = Mage::getSingleton("core/session");
-$_productCollections = $session->getData("relax_products_extra");
+$session = Mage::getSingleton('core/session');
+$_productCollections = $session->getData('relax_products_extra');
 $catalogSearchHelper = $this->helper('catalogsearch');
 $_helper = $this->helper('catalog/output');
 if (count($_productCollections) == 0) {
@@ -194,14 +194,3 @@ if (count($_productCollections) == 0) {
         </div>
     <?php endif; ?>
 <?php endforeach; ?>
-
-<?php
-////set product collection on after blocks
-//$_afterChildren = $this->getChild('after')->getSortedChildren();
-//foreach($_afterChildren as $_afterChildName):
-//    $_afterChild = $this->getChild('after')->getChild($_afterChildName);
-//    $_afterChild->setProductCollection($_productCollection);
-//
-?>
-<!--    --><?php //echo $_afterChild->toHtml(); ?>
-<?php //endforeach; ?>
