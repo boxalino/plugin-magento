@@ -1830,7 +1830,7 @@ XML;
             'account' => $this->_storeConfig['di_account'],
             'dev' => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
             'delta' => $this->_getIndexType() == 'delta' ? 'true' : 'false',
-            'data' => $this->getCurlFile("@$file.zip;type=application/zip"),
+            'data' => $this->getCurlFile("@$file.zip", "application/zip"),
         );
 
         $url = $this->_helperExporter->getZIPSyncUrl($this->_storeConfig['account_dev']);
@@ -1838,12 +1838,12 @@ XML;
         return $this->pushFile($fields, $url, 'zip');
     }
 
-    protected function getCurlFile($filename)
+    protected function getCurlFile($filename, $type)
     {
         if (class_exists('CURLFile')) {
-            return new CURLFile(substr($filename, 1));
+            return new CURLFile(substr($filename, 1), $type);
         }
-        return $filename;
+        return $filename . ";type=$type";
     }
 
     protected function savePartToCsv($file, &$data)
