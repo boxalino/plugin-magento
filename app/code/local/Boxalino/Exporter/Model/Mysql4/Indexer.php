@@ -1897,7 +1897,7 @@ XML;
             $db = $this->_getReadAdapter();
             $select = $db->select()
                 ->from(
-                    'eav_entity_type',
+                    $this->_prefix . 'eav_entity_type',
                     array('entity_type_id', 'entity_type_code')
                 );
             $this->_entityIds = array();
