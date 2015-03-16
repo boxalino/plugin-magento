@@ -276,6 +276,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
     public function getSearchAdapter()
     {
+
         if ($this->searchAdapter === null) {
             $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
 
@@ -287,6 +288,26 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
                 $storeConfig['domain']
             );
             $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
+
+            $field = '';
+            $dir = '';
+            if(isset($_REQUEST['order'])){
+                if($_REQUEST['order'] == 'name'){
+                    $field = 'sortable_title';
+                } elseif($_REQUEST['order'] == 'price'){
+                    $field = 'discountedPrice';
+                }
+            }
+            if(isset($_REQUEST['dir'])){
+                $dir = $_REQUEST['dir']=='asc'?false:true;
+            } else{
+                $dir = false;
+            }
+
+            if($field !== '' && $dir !== ''){
+                $p13nSort->push($field, $dir);
+            }
+
             $this->searchAdapter = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
             /* @var $category Mage_Catalog_Model_Category */
