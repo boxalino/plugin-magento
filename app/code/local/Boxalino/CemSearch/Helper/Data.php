@@ -293,7 +293,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             $dir = '';
             if(isset($_REQUEST['order'])){
                 if($_REQUEST['order'] == 'name'){
-                    $field = 'sortable_title';
+                    $field = 'title';
                 } elseif($_REQUEST['order'] == 'price'){
                     $field = 'discountedPrice';
                 }
