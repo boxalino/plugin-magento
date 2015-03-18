@@ -50,7 +50,6 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $session->setData('relax', array_slice($relaxations, 0, $suggestionConfig['display']));
         Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult relax', $session->getData('relax'));
 
-        $adapter = $this->_getWriteAdapter();
 
         $this->resetSearchResults($query);
 
@@ -100,9 +99,29 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'no relaxations');
 
             $q = $relaxations[0];
-            Mage::helper('catalogsearch')->setQueryText($q['text']);
+            $this->resetSearchResults($query);
+
+            /**
+             * Magento EE works peculiarly.
+             * Magento EE loads facets before execute search one more time.
+             * Magento CE works correctly.
+             */
+            if(method_exists(Mage, 'getEdition') && Mage::getEdition() != 'Community'){
+
+                $params = $_GET;
+                $params['q'] = $q['text'];
+                $paramString = http_build_query($params);
+
+                $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+                $currentUrl = substr($currentUrl, 0, strpos($currentUrl, '?'));
+
+                header('Location: ' . $currentUrl . '?' . $paramString);
+                exit();
+            }
 
             Mage::helper('Boxalino_CemSearch')->resetSearchAdapter();
+
+            Mage::helper('catalogsearch')->setQueryText($q['text']);
 
             $searchAdapter = Mage::helper('Boxalino_CemSearch')->getSearchAdapter();
             $entity_ids = $searchAdapter->getEntitiesIds();
@@ -118,6 +137,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         if ($entity_ids === null || count($entity_ids) < 1) {
             return $this;
         }
+
+        $adapter = $this->_getWriteAdapter();
 
         if (!$query->getIsProcessed() || true) {
 

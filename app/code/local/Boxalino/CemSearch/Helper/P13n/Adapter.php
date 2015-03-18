@@ -917,4 +917,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $this->p13nServerHost;
     }
 
+    public function getSearchQuery(){
+        return $this->searchQuery;
+    }
+
 }
