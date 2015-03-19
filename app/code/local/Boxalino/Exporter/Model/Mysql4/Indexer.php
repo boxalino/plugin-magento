@@ -1649,6 +1649,7 @@ XML;
                 case 'short_description':
                 case 'status':
                 case 'visibility':
+                case 'default_url':
                     $ptype = 'text';
                     break;
                 case 'weight':

@@ -160,6 +160,12 @@
                     <product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</product_list_upsell>
                 </rewrite>
             </catalog>
+            <!--<enterprise_targetrule>-->
+                <!--<rewrite>-->
+                    <!--<catalog_product_list_related>Boxalino_CemSearch_Block_Product_List_Related</catalog_product_list_related>-->
+                    <!--<catalog_product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</catalog_product_list_upsell>-->
+                <!--</rewrite>-->
+            <!--</enterprise_targetrule>-->
         </blocks>
     </global>
     <default>
@@ -186,6 +192,10 @@
                 <enabled_for_all>1</enabled_for_all>
                 <sort>1</sort>
             </autocomplete_extra>
+            <autocomplete_html>
+                <enabled>0</enabled>
+                <items>title:title,url:products_default_url,image:products_cache_image_url</items>
+            </autocomplete_html>
             <search_suggestions>
                 <enabled>1</enabled>
                 <min>3</min>

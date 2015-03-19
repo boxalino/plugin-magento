@@ -263,10 +263,12 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->filters[] = $filter;
     }
 
-    public function autocomplete($text, $limit, $products_limit = 0)
+    public function autocomplete($text, $limit, $products_limit = 0, $fields = null)
     {
         $choiceId = 'autocomplete';
-        $fields = array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
+        if($fields == null){
+            array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
+        }
         $this->autocompleteRequest = $this->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
         $this->autocompleteRequest = $this->p13n->addRequestContext($this->autocompleteRequest);
 
@@ -321,13 +323,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     public function getAutocompleteEntities()
     {
         $suggestions = array();
+        $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
 
         foreach ($this->autocompleteResponse->hits as $hit) {
 
             $tmp = array('text' => $hit->suggestion, 'html' => (strlen($hit->highlighted) ? $hit->highlighted : $hit->suggestion), 'hits' => $hit->searchResult->totalHitCount);
             $facets = array();
 
-            $config = Mage::getStoreConfig('Boxalino_General/autocomplete_extra');
             if ($config['enabled']) {
                 $tmp['facets'] = $this->getFacetLeafs($hit->searchResult->facetResponses[0]->values, $hit, $config);
             }
@@ -411,6 +413,33 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     }
                 }
             }
+        }
+
+        return $products;
+    }
+
+    public function getAutocompleteProductsAll($map){
+        $products = array();
+        $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
+
+        foreach ($this->autocompleteResponse->prefixSearchResult->hits as $item) {
+            $tmp = array();
+            $id = '';
+            foreach ($item->values as $key => $value) {
+                if ($key == $entity_id) {
+                    $id = $value;
+                } else{
+                    if (is_array($value)) {
+                        $tmp[$map[$key]] = end($value);
+                    } else {
+                        $tmp[$map[$key]] = $value;
+                    }
+                }
+
+            }
+
+            $products[$id[0]] = $tmp;
+
         }
 
         return $products;
