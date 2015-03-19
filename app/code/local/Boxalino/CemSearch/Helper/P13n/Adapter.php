@@ -800,7 +800,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         }
         $choiceRequest = $this->p13n->addRequestContext($choiceRequest);
 
-        Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_product_id', $productId);
+        if(isset($_REQUEST['productId'])){
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_product_id', $_REQUEST['productId']);
+        } elseif(isset($_REQUEST['basketContent'])){
+            Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_basket_content', $_REQUEST['basketContent']);
+        }
         Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_Request', $choiceRequest);
         Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_Request_serialized', serialize($choiceRequest));
 

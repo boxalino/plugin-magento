@@ -27,6 +27,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         if (
             $suggestionConfig['enabled'] &&
             is_object($searchRelaxation) &&
+            is_array($searchRelaxation->suggestionsResults) &&
+            count($searchRelaxation->suggestionsResults) > 0 &&
             (
                 count($entity_ids) <= $suggestionConfig['min'] ||
                 count($entity_ids) >= $suggestionConfig['max']
