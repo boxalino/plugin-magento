@@ -108,18 +108,23 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
              * Magento EE loads facets before execute search one more time.
              * Magento CE works correctly.
              */
-            if(method_exists(Mage, 'getEdition') && Mage::getEdition() != 'Community'){
+            try {
+                if (Mage::getEdition() != 'Community') {
 
-                $params = $_GET;
-                $params['q'] = $q['text'];
-                $paramString = http_build_query($params);
+                    $params = $_GET;
+                    $params['q'] = $q['text'];
+                    $paramString = http_build_query($params);
 
-                $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
-                $currentUrl = substr($currentUrl, 0, strpos($currentUrl, '?'));
+                    $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+                    $currentUrl = substr($currentUrl, 0, strpos($currentUrl, '?'));
 
-                header('Location: ' . $currentUrl . '?' . $paramString);
-                exit();
+                    header('Location: ' . $currentUrl . '?' . $paramString);
+                    exit();
+                }
+            }catch (Exception $e){
+
             }
+
 
             Mage::helper('Boxalino_CemSearch')->resetSearchAdapter();
 
