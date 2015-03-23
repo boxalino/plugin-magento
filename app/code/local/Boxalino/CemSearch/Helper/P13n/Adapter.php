@@ -418,11 +418,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $products;
     }
 
-    public function getAutocompleteProductsAll($map){
+    public function getAutocompleteProductsAll($map, $fields){
         $products = array();
         $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
 
-        foreach ($this->autocompleteResponse->prefixSearchResult->hits as $item) {
+        /*foreach ($this->autocompleteResponse->prefixSearchResult->hits as $item) {
             $tmp = array();
             $id = '';
             foreach ($item->values as $key => $value) {
@@ -440,8 +440,100 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
             $products[$id[0]] = $tmp;
 
+        }*/
+
+        //facets
+        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+
+        $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
+            $storeConfig['host'],
+            Mage::helper('Boxalino_CemSearch')->getAccount(),
+            $storeConfig['p13n_username'],
+            $storeConfig['p13n_password'],
+            $storeConfig['domain']
+        );
+        $p13nSort = new Boxalino_CemSearch_Helper_P13n_Sort();
+
+
+        $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
+        $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
+
+        foreach ($this->autocompleteResponse->hits as $hit) {
+//            var_dump($hit->suggestion);
+            $id = substr(md5($hit->suggestion), 0, 10);
+            $products[$id] = array();
+            foreach ($hit->searchResult->hits as $productsHit) {
+
+//                $products[$id] = array();
+                $tmp['hash'] = $id;
+
+                foreach($productsHit->values as $k => $v){
+                    if(is_array($v)){
+                        $tmp[$map[$k]] = array_shift($v);
+                    } else{
+                        $tmp[$map[$k]] = $v;
+                    }
+
+                }
+
+                $products[$id][] = $tmp;
+
+//                $products[$id][] = array(
+//                    'id' => $productsHit->values[$entity_id][0]
+//                );
+            }
+
+            foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+
+                $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+                $p13n->setupInquiry(
+                    $generalConfig['quick_search'],
+                    $this->autocompleteResponse->prefixSearchResult->queryText,
+                    $lang,
+                    $fields,
+                    $p13nSort,
+                    0, 4
+                );
+                $p13n->setWithRelaxation(false);
+
+                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                $facet->fieldName = 'categories';
+                $facet->numerical = false;
+                $facet->range = false;
+                $facet->selectedValues = array();
+
+                $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
+                $tmp->stringValue = $f->stringValue;
+                $facet->selectedValues[] = $tmp;
+
+                $p13n->searchQuery->facetRequests[] = $facet;
+                $p13n->search();
+
+                $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+//                var_dump($id);
+
+                $products[$id] = array();
+                foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $productsHit) {
+
+                    $tmp = array();
+                    $tmp['hash'] = $id;
+
+                    foreach($productsHit->values as $k => $v){
+                        if(is_array($v)){
+                            $tmp[$map[$k]] = array_shift($v);
+                        } else{
+                            $tmp[$map[$k]] = $v;
+                        }
+
+                    }
+
+                    $products[$id][] = $tmp;
+                }
+
+            }
         }
 
+//        var_dump($products);die();
         return $products;
     }
 

@@ -49,10 +49,10 @@ Autocompleter.Base.prototype.render = function (key) {
 
         jQuery('#search_autocomplete .product-autocomplete').each(function () {
             if (jQuery(this).data('word') == word) {
-                jQuery(this).removeClass('hide')
+                jQuery(this).removeClass('hide');
                 jQuery(this).show();
             } else {
-                jQuery(this).addClass('hide')
+                jQuery(this).addClass('hide');
                 jQuery(this).hide();
             }
         })
@@ -61,3 +61,53 @@ Autocompleter.Base.prototype.render = function (key) {
 
     return result;
 };
+
+var element = null;
+var x,y;
+Autocompleter.Base.prototype.onHover = function(event){
+
+    element = event;
+    jQuery('*[data-word]').removeClass('selected');
+    jQuery(event.srcElement).closest('*[data-word]').addClass('selected');
+
+    setTimeout(function(){
+        if(event == element){
+            el = jQuery(event.srcElement).closest('*[data-word]');
+            $el = jQuery(el);
+
+            console.log(event.pageX, x, event.pageY, y);
+            if(Math.abs(event.pageX - x) > 50 || Math.abs(event.pageY - y) > 25){
+                return;
+            }
+
+            word = el.data('word');
+
+            jQuery('#search_autocomplete .product-autocomplete').each(function () {
+                if (jQuery(this).data('word') == word) {
+                    jQuery(this).removeClass('hide');
+                    jQuery(this).show();
+                } else {
+                    jQuery(this).addClass('hide');
+                    jQuery(this).hide();
+                }
+            });
+
+            jQuery('*[data-word]').removeClass('selected');
+
+        }
+    }, 1000);
+};
+
+
+
+
+//
+jQuery(document).ready(function() {
+
+    jQuery('body').on('mousemove', function (e) {
+        x = e.pageX;
+        y = e.pageY;
+        //console.log(x,y);
+    });
+
+});
