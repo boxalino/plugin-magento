@@ -613,6 +613,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             foreach ($_REQUEST as $key => $values) {
                 if (strpos($key, 'bx_') !== false) {
                     $fieldName = substr($key, 3);
+                    $values = !is_array($values)?array($values):$values;
                     foreach ($values as $value) {
                         $this->selectedFacets[$fieldName][] = $value;
                     }

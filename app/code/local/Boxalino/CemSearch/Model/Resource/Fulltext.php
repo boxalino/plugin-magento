@@ -64,6 +64,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 $entity_ids === null ||
                 count($entity_ids) <= $relaxationConfig['max']
             ) &&
+            is_object($searchRelaxation) &&
             ( count($searchRelaxation->subphrasesResults) > 0) &&
             $relaxationConfig['enabled']
         ) {
@@ -105,7 +106,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
 
             return $this;
 
-        } elseif (count($entity_ids) == 0 && count($searchRelaxation->subphrasesResults) == 0 && count($relaxations) > 0) {
+        } elseif (
+            count($entity_ids) == 0 &&
+            is_object($searchRelaxation) &&
+            count($searchRelaxation->subphrasesResults) == 0 &&
+            count($relaxations) > 0) {
             Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'no relaxations');
 
             $q = $relaxations[0];
