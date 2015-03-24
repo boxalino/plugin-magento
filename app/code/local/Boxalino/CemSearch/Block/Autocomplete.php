@@ -105,16 +105,19 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
         foreach ($this->_suggestDataProducts as $prods) {
 
-            foreach ($prods as $prod) {
-                if(Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
-                    $product = Mage::getModel('catalog/product')->load($prod);
-                    $html .= '<li data-word="' . md5($prod) . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
-                    $html .= '<a href="' . $product->getProductUrl() . '" >';
-                    $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
-                    $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
-                    $html .= '</a>';
-                    $html .= '</li>';
-                } else{
+            if(Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
+
+                $prod = $prods;
+
+                $product = Mage::getModel('catalog/product')->load($prod);
+                $html .= '<li data-word="' . md5($prod) . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
+                $html .= '<a href="' . $product->getProductUrl() . '" >';
+                $html .= '<div class="product-image"><img src="' . $product->getThumbnailUrl() . '" alt="' . $product->getName() . '" /></div>';
+                $html .= '<div class="product-title"><span>' . $product->getName() . '</span></div>';
+                $html .= '</a>';
+                $html .= '</li>';
+            } else {
+                foreach ($prods as $prod) {
                     $html .= $this->prepareProductView($prod);
                 }
             }

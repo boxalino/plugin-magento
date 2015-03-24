@@ -193,7 +193,7 @@
                 <sort>1</sort>
             </autocomplete_extra>
             <autocomplete_html>
-                <enabled>0</enabled>
+                <enabled>1</enabled>
                 <items>title:title,url:products_default_url,image:products_cache_image_url</items>
             </autocomplete_html>
             <search_suggestions>
