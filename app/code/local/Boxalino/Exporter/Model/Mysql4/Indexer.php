@@ -32,6 +32,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected $_attributesValuesByName = array();
 
     protected $_productsImages = array();
+    protected $_productsThumbnails = array();
 
     protected $_files = array();
 
@@ -468,6 +469,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             fputcsv($fh, $h, $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
         }
 
+        if ($this->_storeConfig['export_product_images_thumbnail']) {
+            $file = 'product_cache_image_thumbnail_url.csv';
+            if (!in_array($file, $this->_files)) {
+                $this->_files[] = $file;
+            }
+            $fh = fopen($this->_dir . '/' . $file, 'a');
+            $h = array('entity_id', 'cache_image_thumbnail_url');
+            fputcsv($fh, $h, $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
+        }
+
         while ($count >= $limit) {
             if ($countMax > 0 && $this->_count >= $countMax) {
                 break;
@@ -746,8 +757,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             $media_gallery = $_product->getMediaGallery();
                             foreach ($media_gallery['images'] as $_image) {
                                 $url = $this->_helperImage->init($_product, 'image', $_image['file'])->__toString();
+                                $url_tbm = $this->_helperImage->init($_product, 'thumbnail', $_image['file'])->resize(100)->__toString();
 
                                 $this->_productsImages[] = array($id, $url);
+                                $this->_productsThumbnails[] = array($id, $url_tbm);
 
                             }
                         }
@@ -801,7 +814,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $d = $this->_productsImages;
                     $this->savePartToCsv('product_cache_image_url.csv', $d);
                     $d = null;
+
+                    $d = $this->_productsThumbnails;
+                    $this->savePartToCsv('product_cache_image_thumbnail_url.csv', $d);
+                    $d = null;
                     $this->_productsImages = array();
+                    $this->_productsThumbnails = array();
                 }
 
             }
@@ -1529,6 +1547,18 @@ XML;
 
             $this->sxml_append_options($source);
         }
+        if ($this->_storeConfig['export_product_images_thumbnail']) {
+
+            //categories & products images
+            $source = $sources->addChild('source');
+            $source->addAttribute('type', 'item_data_file');
+            $source->addAttribute('id', 'item_cache_image_thumbnail_url');
+
+            $source->addChild('file')->addAttribute('value', 'product_cache_image_thumbnail_url.csv');
+            $source->addChild('itemIdColumn')->addAttribute('value', 'entity_id');
+
+            $this->sxml_append_options($source);
+        }
         //#########################################################################
 
         //property
@@ -1738,6 +1768,19 @@ XML;
             );
         }
 
+        //images
+        if ($this->_storeConfig['export_product_images_thumbnail']) {
+            $properties[] = array(
+                'id' => 'cache_image_thumbnail_url',
+                'name' => 'cache_image_thumbnail_url', //property id
+                'ptype' => 'string', //property type
+                'type' => 'direct', //logic type
+                'field' => 'cache_image_thumbnail_url', //field colummn
+                'has_lang' => false,
+            );
+        }
+
+
         $properties[] = array(
             'id' => 'product_entity_id',
             'name' => null,
@@ -1841,8 +1884,12 @@ XML;
 
     protected function getCurlFile($filename, $type)
     {
-        if (class_exists('CURLFile')) {
-            return new CURLFile(substr($filename, 1), $type);
+        try {
+            if (class_exists('CURLFile')) {
+                return new CURLFile(substr($filename, 1), $type);
+            }
+        } catch(Exception $e){
+            return $filename . ";type=$type";
         }
         return $filename . ";type=$type";
     }

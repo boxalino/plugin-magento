@@ -59,7 +59,15 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
         $relaxations_extra = array();
         $relaxationConfig = Mage::getStoreConfig('Boxalino_General/search_relaxation');
 
-        if (($entity_ids === null || count($entity_ids) <= $relaxationConfig['max']) && (count($searchRelaxation->subphrasesResults) > 0) && $relaxationConfig['enabled']) {
+        if (
+            (
+                $entity_ids === null ||
+                count($entity_ids) <= $relaxationConfig['max']
+            ) &&
+            ( count($searchRelaxation->subphrasesResults) > 0) &&
+            $relaxationConfig['enabled']
+        ) {
+
             Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'relaxations detected');
 
             //display current products

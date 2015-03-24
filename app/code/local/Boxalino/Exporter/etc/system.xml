@@ -72,6 +72,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </export_product_images>
+                        <export_product_images_thumbnail translate="label">
+                            <label>Export products thumbnail url</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>17</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </export_product_images_thumbnail>
                         <maximum_population translate="label">
                             <label>Maximum amount of product to export</label>
                             <comment>0=all</comment>
