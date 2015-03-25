@@ -194,7 +194,11 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             // enforce boxalino ranking
             $select->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids).')'));
 
-            if ($searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE) {
+            if (
+                $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE ||
+                $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_FULLTEXT ||
+                $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_COMBINE
+            ) {
                 $innerSelect = (string) $select;
                 $select = $adapter->select()
                     ->from(array(
@@ -206,8 +210,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     ->join(array(
                         'b' => new Zend_Db_Expr('(SELECT @s:= 0)')
                     ), '', array(
-//                        'relevance' => new Zend_Db_Expr('@s:=@s+1')
-                        'relevance' => new Zend_Db_Expr(0)
+                        'relevance' => new Zend_Db_Expr('@s:=@s+1')
                     ))
                     ->where('1=1'); // added to avoid collision with appended ON DUPLICATE
             }
