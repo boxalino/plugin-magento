@@ -135,7 +135,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     exit();
                 }
             }catch (Exception $e){
-
+                var_dump('asd');
             }
 
 
@@ -206,7 +206,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     ->join(array(
                         'b' => new Zend_Db_Expr('(SELECT @s:= 0)')
                     ), '', array(
-                        'relevance' => new Zend_Db_Expr('@s:=@s+1')
+//                        'relevance' => new Zend_Db_Expr('@s:=@s+1')
+                        'relevance' => new Zend_Db_Expr(0)
                     ))
                     ->where('1=1'); // added to avoid collision with appended ON DUPLICATE
             }
@@ -216,6 +217,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 $this->getTable('catalogsearch/result'),
                 array(),
                 Varien_Db_Adapter_Interface::INSERT_ON_DUPLICATE);
+
             $adapter->query($sql, $bind);
 
             $query->setIsProcessed(1);
