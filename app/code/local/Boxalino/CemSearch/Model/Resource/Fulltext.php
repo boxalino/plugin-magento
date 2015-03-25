@@ -135,7 +135,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     exit();
                 }
             }catch (Exception $e){
-                var_dump('asd');
+
             }
 
 
