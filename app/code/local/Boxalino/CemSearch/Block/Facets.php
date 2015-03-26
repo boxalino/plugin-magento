@@ -10,7 +10,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     public function __construct()
     {
-        if(!isset($_GET['q'])){
+        if(!isset($_GET['q']) || (isset($_GET['q']) && strlen($_GET['q']) == 0)){
             return;
         }
         $this->_allFilters = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getFacetsData();

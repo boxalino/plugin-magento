@@ -458,6 +458,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
         $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
+        $i = 0;
+
         foreach ($this->autocompleteResponse->hits as $hit) {
 //            var_dump($hit->suggestion);
             $id = substr(md5($hit->suggestion), 0, 10);
@@ -483,54 +485,61 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 //                );
             }
 
-            foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+            if($i == 0) {
 
-                $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
-                $p13n->setupInquiry(
-                    $generalConfig['quick_search'],
-                    $this->autocompleteResponse->prefixSearchResult->queryText,
-                    $lang,
-                    $fields,
-                    $p13nSort,
-                    0, 4
-                );
-                $p13n->setWithRelaxation(false);
+                foreach ($hit->searchResult->facetResponses[0]->values as $f) {
 
-                $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                $facet->fieldName = 'categories';
-                $facet->numerical = false;
-                $facet->range = false;
-                $facet->selectedValues = array();
+                    $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+                    $p13n->setupInquiry(
+                        $generalConfig['quick_search'],
+                        $this->autocompleteResponse->prefixSearchResult->queryText,
+                        $lang,
+                        $fields,
+                        $p13nSort,
+                        0, 4
+                    );
+                    $p13n->setWithRelaxation(false);
 
-                $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
-                $tmp->stringValue = $f->stringValue;
-                $facet->selectedValues[] = $tmp;
+                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                    $facet->fieldName = 'categories';
+                    $facet->numerical = false;
+                    $facet->range = false;
+                    $facet->selectedValues = array();
 
-                $p13n->searchQuery->facetRequests[] = $facet;
-                $p13n->search();
+                    $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
+                    $tmp->stringValue = $f->stringValue;
+                    $facet->selectedValues[] = $tmp;
 
-                $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+                    $p13n->searchQuery->facetRequests[] = $facet;
+                    $p13n->search();
+
+                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
 //                var_dump($id);
 
-                $products[$id] = array();
-                foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $productsHit) {
+                    $products[$id] = array();
+                    foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $productsHit) {
 
-                    $tmp = array();
-                    $tmp['hash'] = $id;
+                        $tmp = array();
+                        $tmp['hash'] = $id;
 
-                    foreach($productsHit->values as $k => $v){
-                        if(is_array($v)){
-                            $tmp[$map[$k]] = array_shift($v);
-                        } else{
-                            $tmp[$map[$k]] = $v;
+                        foreach ($productsHit->values as $k => $v) {
+                            if (is_array($v)) {
+                                $tmp[$map[$k]] = array_shift($v);
+                            } else {
+                                $tmp[$map[$k]] = $v;
+                            }
+
                         }
 
+                        $products[$id][] = $tmp;
                     }
 
-                    $products[$id][] = $tmp;
                 }
+            } else{
 
             }
+
+            $i++;
         }
 
 //        var_dump($products);die();

@@ -16,6 +16,10 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             return parent::prepareResult($object, $queryText, $query);
         }
 
+        if($queryText == ''){
+            return $this;
+        }
+
         $searchAdapter = Mage::helper('Boxalino_CemSearch')->getSearchAdapter();
         $entity_ids = $searchAdapter->getEntitiesIds();
 
