@@ -414,7 +414,7 @@
                     <sort_order>60</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <left_filters_enable translate="label">
                             <label>Enable filters (left side)</label>
@@ -451,7 +451,7 @@
                             <sort_order>51</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </left_filters_normal_title>
                         <top_filters_enable translate="label">
                             <label>Enable top filters</label>
@@ -487,7 +487,7 @@
                             <sort_order>61</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </top_filters_title>
                     </fields>
                 </filter>
