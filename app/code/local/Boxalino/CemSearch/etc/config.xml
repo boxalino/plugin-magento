@@ -189,7 +189,7 @@
             <autocomplete_extra>
                 <enabled>1</enabled>
                 <items>4</items>
-                <enabled_for_all>1</enabled_for_all>
+                <enabled_for_all>0</enabled_for_all>
                 <sort>1</sort>
             </autocomplete_extra>
             <autocomplete_html>

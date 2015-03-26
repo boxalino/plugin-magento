@@ -432,8 +432,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
         $i = 0;
-
+        $iMax = Mage::getStoreConfig('Boxalino_General/search/autocomplete_limit');
         foreach ($this->autocompleteResponse->hits as $hit) {
+            if($i >= $iMax){
+                break;
+            }
 //            var_dump($hit->suggestion);
             $id = substr(md5($hit->suggestion), 0, 10);
             $products[$id] = array();
@@ -461,7 +464,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
             if($i == 0) {
 
+                $j = 0;
+                $jMax = Mage::getStoreConfig('Boxalino_General/autocomplete_extra/items');
                 foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+
+                    if($j++ >= $jMax){
+                        break;
+                    }
 
                     $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
                     $p13n->setupInquiry(
@@ -561,8 +570,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
         $i = 0;
+        $iMax = Mage::getStoreConfig('Boxalino_General/search/autocomplete_limit');
 
         foreach ($this->autocompleteResponse->hits as $hit) {
+
+            if($i >= $iMax){
+                break;
+            }
+
 //            var_dump($hit->suggestion);
             $id = substr(md5($hit->suggestion), 0, 10);
             $products[$id] = array();
@@ -589,7 +604,13 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
             if($i == 0) {
 
+                $j = 0;
+                $jMax = Mage::getStoreConfig('Boxalino_General/autocomplete_extra/items');
                 foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+
+                    if($j++ >= $jMax){
+                        break;
+                    }
 
                     $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
                     $p13n->setupInquiry(
