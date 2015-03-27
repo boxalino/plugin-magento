@@ -331,7 +331,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $facets = array();
 
             if ($config['enabled']) {
-                $tmp['facets'] = $this->getFacetLeafs($hit->searchResult->facetResponses[0]->values, $hit, $config);
+                $tmp['facets'] = array_slice($this->getFacetLeafs($hit->searchResult->facetResponses[0]->values, $hit, $config), 0, Mage::getStoreConfig('Boxalino_General/autocomplete_extra/items'));
             }
 
             $suggestions[] = $tmp;
@@ -398,8 +398,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $filter;
     }
 
-    public function getAutocompleteProducts()
+    public function getAutocompleteProducts($facets)
     {
+
+        $fs = array();
+        foreach($facets as $f){
+            $fs[] = $f['id'];
+        }
+
         $products = array();
         $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
 
@@ -437,9 +443,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             if($i >= $iMax){
                 break;
             }
-//            var_dump($hit->suggestion);
+
             $id = substr(md5($hit->suggestion), 0, 10);
             $products[$id] = array();
+            $tmp = array();
             foreach ($hit->searchResult->hits as $productsHit) {
 
 //                $products[$id] = array();
@@ -456,6 +463,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 }
 
                 $products[$id][] = $tmp;
+                $tmp = array();
 
 //                $products[$id][] = array(
 //                    'id' => $productsHit->values[$entity_id][0]
@@ -467,6 +475,17 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 $j = 0;
                 $jMax = Mage::getStoreConfig('Boxalino_General/autocomplete_extra/items');
                 foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+
+                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+
+                    if(!in_array($id, $fs)){
+
+                        if($j >= $jMax){
+                            break;
+                        }
+
+                        continue;
+                    }
 
                     if($j++ >= $jMax){
                         break;
@@ -496,7 +515,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     $p13n->searchQuery->facetRequests[] = $facet;
                     $p13n->search();
 
-                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+
 
                     $products[$id] = array();
                     foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $productsHit) {
@@ -529,29 +548,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $products;
     }
 
-    public function getAutocompleteProductsAll($map, $fields){
+    public function getAutocompleteProductsAll($map, $fields, $facets){
         $products = array();
         $entity_id = Mage::getStoreConfig('Boxalino_General/search/entity_id');
 
-        /*foreach ($this->autocompleteResponse->prefixSearchResult->hits as $item) {
-            $tmp = array();
-            $id = '';
-            foreach ($item->values as $key => $value) {
-                if ($key == $entity_id) {
-                    $id = $value;
-                } else{
-                    if (is_array($value)) {
-                        $tmp[$map[$key]] = end($value);
-                    } else {
-                        $tmp[$map[$key]] = $value;
-                    }
-                }
-
-            }
-
-            $products[$id[0]] = $tmp;
-
-        }*/
+        $fs = array();
+        foreach($facets as $f){
+            $fs[] = $f['id'];
+        }
 
         //facets
         $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
@@ -608,6 +612,17 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 $jMax = Mage::getStoreConfig('Boxalino_General/autocomplete_extra/items');
                 foreach ($hit->searchResult->facetResponses[0]->values as $f) {
 
+                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+
+                    if(!in_array($id, $fs)){
+
+                        if($j >= $jMax){
+                            break;
+                        }
+
+                        continue;
+                    }
+
                     if($j++ >= $jMax){
                         break;
                     }
@@ -636,13 +651,14 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                     $p13n->searchQuery->facetRequests[] = $facet;
                     $p13n->search();
 
-                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+//                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
 //                var_dump($id);
 
                     $products[$id] = array();
+                    $tmp = array();
                     foreach ($p13n->getChoiceResponse()->variants[0]->searchResult->hits as $productsHit) {
 
-                        $tmp = array();
+
                         $tmp['hash'] = $id;
 
                         foreach ($productsHit->values as $k => $v) {
@@ -655,6 +671,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                         }
 
                         $products[$id][] = $tmp;
+                        $tmp = array();
                     }
 
                 }

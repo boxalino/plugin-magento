@@ -239,11 +239,16 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 }
             }
 
+
             $this->_suggestData = $data;
-            if(Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
-                $this->_suggestDataProducts = $p13n->getAutocompleteProducts();
+            if(count($data) > 0) {
+                if (Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
+                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
+                } else {
+                    $this->_suggestDataProducts = $p13n->getAutocompleteProductsAll($map, $fields, $data[0]['facets']);
+                }
             } else{
-                $this->_suggestDataProducts = $p13n->getAutocompleteProductsAll($map, $fields);
+                $this->_suggestDataProducts = array();
             }
 
         }
