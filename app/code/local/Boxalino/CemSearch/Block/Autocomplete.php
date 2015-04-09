@@ -40,7 +40,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     protected function _toHtml()
     {
 
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
+        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == '0') {
             return null;
         }
 
@@ -53,7 +53,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         $suggestData = $this->getSuggestData();
         if (!($count = count($suggestData)) && !count($this->_suggestDataProducts)) {
             return '<ul><li>' . $this->helper('catalogsearch')->getQueryText() . '</li></ul>';
-        } elseif(!($count = count($suggestData)) && $this->_suggestDataProducts){
+        } elseif (!($count = count($suggestData)) && $this->_suggestDataProducts) {
             return '<ul class="queries"><li style="display:none"></li></ul>' . $this->prepareDataProducts();
         }
 
@@ -73,7 +73,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $item['row_class'] .= ' last';
             }
             $all = false;
-            if ($autocompleteConfig['enabled_for_all']) {
+            if ($autocompleteConfig['enabled_for_all'] == '1') {
                 $all = true;
             }
 
@@ -100,21 +100,18 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         return $html;
     }
 
-    public function prepareDataProducts(){
+    public function prepareDataProducts()
+    {
         $html = '<ul class="products">';
 
         foreach ($this->_suggestDataProducts as $prods) {
 
-//            var_dump($prods);
-
             foreach ($prods as $prod) {
 
-                if (Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
-
-//                    $prod = $prods;
+                if (Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled') == '1') {
 
                     $product = Mage::getModel('catalog/product')->load($prod['id']);
-                    if ($prod['hash'] == $this->_first){
+                    if ($prod['hash'] == $this->_first) {
                         $html .= '<li data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
                     } else{
                         $html .= '<li style="display:none" data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
@@ -137,11 +134,12 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
     }
 
-    private function prepareProductView($product){
+    private function prepareProductView($product)
+    {
 
         $html = '';
 
-        if($product['hash'] == $this->_first){
+        if ($product['hash'] == $this->_first) {
             $html .= '<li style="display:block" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
         } else{
             $html .= '<li style="display:none" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
@@ -152,10 +150,10 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         unset($product['hash']);
         unset($product[Mage::getStoreConfig('Boxalino_General/search/entity_id')]);
 
-        foreach($this->_order as $f){
-            if($f == 'image'){
+        foreach($this->_order as $f) {
+            if ($f == 'image') {
                 $html .= '<div class="product-' . $f . '"><img src="' . $product[$f] . '" alt="' . $product['title'] . '" style="max-height:75px; max-width:75px;" /></div>';
-            } elseif(isset($product[$f])){
+            } elseif (isset($product[$f])) {
                 $html .= '<div class="product-' . $f . '"><span>' . $product[$f] . '</span></div>';
             }
         }
@@ -170,18 +168,15 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
     public function getSuggestData()
     {
-
-        if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
+        $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+        if ($storeConfig['enabled'] == '0') {
             return parent::getSuggestData();
         }
 
         if (!$this->_suggestData) {
             $query = $this->helper('catalogsearch')->getQueryText();
-            $counter = 0;
-            $data = array();
 
-            $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
-
+            $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
             $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
                 $storeConfig['host'],
                 Mage::helper('Boxalino_CemSearch')->getAccount(),
@@ -192,22 +187,20 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
 
-            $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
-            $map = array();
             if ($query) {
-                $fi = explode(',', Mage::getStoreConfig('Boxalino_General/autocomplete_html/items'));
-
-                if(Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')){
-                    $fields = array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
+                $htmlConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_html');
+                if ($htmlConfig['enabled'] == '1') {
+                    $fields = array($generalConfig['entity_id'], 'title', 'score');
                 } else{
-                    $fields = array(Mage::getStoreConfig('Boxalino_General/search/entity_id'));
-                    $map[Mage::getStoreConfig('Boxalino_General/search/entity_id')] = Mage::getStoreConfig('Boxalino_General/search/entity_id');
-                    foreach($fi as $f){
-                        $tmp = explode(':', $f);
-                        $fields[] = $tmp[1];
-                        $map[$tmp[1]] = $tmp[0];
-                        $this->_order[] = $tmp[0];
+                    $fields = array($generalConfig['entity_id']);
+                    $map = array($generalConfig['entity_id'] => $generalConfig['entity_id']);
+                    $fi = explode(',', $htmlConfig['items']);
+                    foreach($fi as $f) {
+                        list($attribute, $fieldname) = explode(':', $f);
+                        $fields[] = $fieldname;
+                        $map[$fieldname] = $attribute;
+                        $this->_order[] = $attribute;
                     }
                 }
 
@@ -217,8 +210,9 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $collection = array();
             }
 
+            $counter = 0;
+            $data = array();
             foreach ($collection as $item) {
-
                 if ($item['hits'] <= 0) {
                     continue;
                 }
@@ -241,11 +235,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
 
             $this->_suggestData = $data;
-            if(count($data) > 0) {
-                if (Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled')) {
+            if (count($data) > 0) {
+                if ($htmlConfig['enabled'] == '1') {
                     $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
                 } else {
-                    $this->_suggestDataProducts = $p13n->getAutocompleteProductsAll($map, $fields, $data[0]['facets']);
+                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
                 }
             } else{
                 $this->_suggestDataProducts = array();
@@ -256,5 +250,5 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
     }
     /*
      *
-    */
+     */
 }

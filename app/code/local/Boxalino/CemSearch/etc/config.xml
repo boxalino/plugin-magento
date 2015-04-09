@@ -186,16 +186,17 @@
                 <autocomplete_products_limit>3</autocomplete_products_limit>
                 <entity_id>id</entity_id>
             </search>
-            <autocomplete_extra>
-                <enabled>1</enabled>
-                <items>4</items>
-                <enabled_for_all>0</enabled_for_all>
-                <sort>1</sort>
-            </autocomplete_extra>
             <autocomplete_html>
                 <enabled>1</enabled>
                 <items>title:title,url:products_default_url,image:products_cache_image_url</items>
             </autocomplete_html>
+            <autocomplete_extra>
+                <enabled>1</enabled>
+                <enabled_for_all>0</enabled_for_all>
+                <items>4</items>
+                <sort>1</sort>
+                <products>1</products>
+            </autocomplete_extra>
             <search_suggestions>
                 <enabled>1</enabled>
                 <min>3</min>
