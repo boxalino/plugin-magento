@@ -265,8 +265,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     public function autocomplete($text, $limit, $products_limit = 0, $fields = null)
     {
+        $searchConfig = Mage::getStoreConfig('Boxalino_General/search');
         if ($fields == null) {
-            array(Mage::getStoreConfig('Boxalino_General/search/entity_id'), 'title', 'score');
+            array($searchConfig['entity_id'], 'title', 'score');
         }
         $this->autocompleteRequest = $this->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
         $this->autocompleteRequest = $this->p13n->addRequestContext($this->autocompleteRequest);
@@ -304,9 +305,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $autocompleteQuery->highlightPre = '<em>';
         $autocompleteQuery->highlightPost = '</em>';
 
-        $this->autocompleteRequest->choiceId = Mage::getStoreConfig('Boxalino_General/search/quick_search');
+        $this->autocompleteRequest->choiceId = $searchConfig['autocomplete'];
         $this->autocompleteRequest->autocompleteQuery = $autocompleteQuery;
-        $this->autocompleteRequest->searchChoiceId = Mage::getStoreConfig('Boxalino_General/search/autocomplete');
+        $this->autocompleteRequest->searchChoiceId = $searchConfig['quick_search'];
         $this->autocompleteRequest->searchQuery = $searchQuery;
 
         Boxalino_CemSearch_Model_Logger::saveFrontActions('autocomplete_Query', $text);
