@@ -51,10 +51,12 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         }
 
         $suggestData = $this->getSuggestData();
-        if (!($count = count($suggestData)) && !count($this->_suggestDataProducts)) {
-            return '<ul><li>' . $this->helper('catalogsearch')->getQueryText() . '</li></ul>';
-        } elseif (!($count = count($suggestData)) && $this->_suggestDataProducts) {
-            return '<ul class="queries"><li style="display:none"></li></ul>' . $this->prepareDataProducts();
+        if (!($count = count($suggestData))) {
+            $html .= '<ul class="queries"><li>' . $this->helper('catalogsearch')->getQueryText() . '</li></ul>';
+            if (count($this->_suggestDataProducts)) {
+                $html .= $this->prepareDataProducts();
+            }
+            return $html;
         }
 
         $count--;
@@ -111,7 +113,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 if (Mage::getStoreConfig('Boxalino_General/autocomplete_html/enabled') == '1') {
 
                     $product = Mage::getModel('catalog/product')->load($prod['id']);
-                    if ($prod['hash'] == $this->_first) {
+                    if ($prod['hash'] == $this->_first || empty($this->_first)) {
                         $html .= '<li data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
                     } else{
                         $html .= '<li style="display:none" data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
@@ -139,7 +141,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
         $html = '';
 
-        if ($product['hash'] == $this->_first) {
+        if ($product['hash'] == $this->_first || empty($this->_first)) {
             $html .= '<li style="display:block" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
         } else{
             $html .= '<li style="display:none" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
@@ -233,18 +235,12 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 }
             }
 
-
             $this->_suggestData = $data;
-            if (count($data) > 0) {
-                if ($htmlConfig['enabled'] == '1') {
-                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
-                } else {
-                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
-                }
-            } else{
-                $this->_suggestDataProducts = array();
+            if ($htmlConfig['enabled'] == '1') {
+                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
+            } else {
+                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
             }
-
         }
         return $this->_suggestData;
     }
