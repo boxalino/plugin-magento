@@ -419,7 +419,11 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     }
 
     public function getPrefixSearchHash() {
-        return substr(md5($this->autocompleteResponse->prefixSearchResult->queryText), 0, 10);
+        if ($this->autocompleteResponse->prefixSearchResult->totalHitCount > 0) {
+            return substr(md5($this->autocompleteResponse->prefixSearchResult->queryText), 0, 10);
+        } else {
+            return null;
+        }
     }
 
     public function getAutocompleteProducts($facets, $map = null, $fields = null)
@@ -443,7 +447,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
         // prefix search result
         $products = array();
-        $id = $this->getPrefixSearchHash();
+        $id = substr(md5($this->autocompleteResponse->prefixSearchResult->queryText), 0, 10);
         $products[$id] = $this->extractItemsFromHits($this->autocompleteResponse->prefixSearchResult->hits, $id, $entity_id, $map);
 
         // facets

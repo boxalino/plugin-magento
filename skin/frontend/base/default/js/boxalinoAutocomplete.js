@@ -47,15 +47,17 @@ Autocompleter.Base.prototype.render = function (key) {
         var element = jQuery('#search_autocomplete .selected');
         var word = element.data('word');
 
-        jQuery('#search_autocomplete .product-autocomplete').each(function () {
-            if (jQuery(this).data('word') == word) {
-                jQuery(this).removeClass('hide');
-                jQuery(this).show();
-            } else {
-                jQuery(this).addClass('hide');
-                jQuery(this).hide();
-            }
-        });
+        if (word) {
+            jQuery('#search_autocomplete .product-autocomplete').each(function () {
+                if (jQuery(this).data('word') == word) {
+                    jQuery(this).removeClass('hide');
+                    jQuery(this).show();
+                } else {
+                    jQuery(this).addClass('hide');
+                    jQuery(this).hide();
+                }
+            });
+        }
     }
 
     return result;
@@ -63,7 +65,7 @@ Autocompleter.Base.prototype.render = function (key) {
 
 var element = null;
 var x,y;
-Autocompleter.Base.prototype.onHover = function(event){
+Autocompleter.Base.prototype.onHover = function (event) {
 
     element = event;
 
@@ -76,25 +78,25 @@ Autocompleter.Base.prototype.onHover = function(event){
                 return;
             }
 
-            word = el.data('word');
-
-            jQuery('#search_autocomplete .product-autocomplete').each(function () {
-                if (jQuery(this).data('word') == word) {
-                    jQuery(this).removeClass('hide');
-                    jQuery(this).show();
-                } else {
-                    jQuery(this).addClass('hide');
-                    jQuery(this).hide();
-                }
-            });
-
-            jQuery('*[data-word]').removeClass('selected');
-
+            var word = el.data('word');
+            if (word) {
+                jQuery('#search_autocomplete .product-autocomplete').each(function () {
+                    if (jQuery(this).data('word') == word) {
+                        jQuery(this).removeClass('hide');
+                        jQuery(this).show();
+                    } else {
+                        jQuery(this).addClass('hide');
+                        jQuery(this).hide();
+                    }
+                });
+                jQuery('*[data-word]').removeClass('selected');
+                jQuery(event.target).addClass('selected');
+            }
         }
     }, 1000);
 };
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
 
     jQuery('body').on('mousemove', function (e) {
         x = e.pageX;
