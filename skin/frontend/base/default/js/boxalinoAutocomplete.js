@@ -44,8 +44,8 @@ var originalAddClassMethod = Autocompleter.Base.prototype.render;
 Autocompleter.Base.prototype.render = function (key) {
     var result = originalAddClassMethod.apply(this, arguments);
     if (typeof key != 'undefined' && key == true) {
-        element = jQuery('#search_autocomplete .selected');
-        word = element.data('word');
+        var element = jQuery('#search_autocomplete .selected');
+        var word = element.data('word');
 
         jQuery('#search_autocomplete .product-autocomplete').each(function () {
             if (jQuery(this).data('word') == word) {
@@ -55,8 +55,7 @@ Autocompleter.Base.prototype.render = function (key) {
                 jQuery(this).addClass('hide');
                 jQuery(this).hide();
             }
-        })
-
+        });
     }
 
     return result;
@@ -67,15 +66,12 @@ var x,y;
 Autocompleter.Base.prototype.onHover = function(event){
 
     element = event;
-    jQuery('*[data-word]').removeClass('selected');
-    jQuery(event.srcElement).closest('*[data-word]').addClass('selected');
 
     setTimeout(function(){
         if(event == element){
-            el = jQuery(event.srcElement).closest('*[data-word]');
+            el = jQuery(event.target).closest('*[data-word]');
             $el = jQuery(el);
 
-            console.log(event.pageX, x, event.pageY, y);
             if(Math.abs(event.pageX - x) > 50 || Math.abs(event.pageY - y) > 25){
                 return;
             }
@@ -98,16 +94,11 @@ Autocompleter.Base.prototype.onHover = function(event){
     }, 1000);
 };
 
-
-
-
-//
 jQuery(document).ready(function() {
 
     jQuery('body').on('mousemove', function (e) {
         x = e.pageX;
         y = e.pageY;
-        //console.log(x,y);
     });
 
 });

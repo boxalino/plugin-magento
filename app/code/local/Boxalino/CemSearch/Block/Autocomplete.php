@@ -68,7 +68,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         foreach ($suggestData as $index => $item) {
             if ($index == 0) {
                 $item['row_class'] .= ' first';
-                $this->_first = $item['id'];
             }
 
             if ($index == $count) {
@@ -88,7 +87,8 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     if ($c++ >= $autocompleteConfig['items']) {
                         break;
                     }
-                    $html .= '<a class="facet" data-word="' . $facet['id'] . '" title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $resultUrl . '?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li data-word="' . $facet['id'] . '" class="facet ' . $item['row_class'] . '"  title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
+                    $dataWord = ($autocompleteConfig['products'] == '1') ? ' data-word="' . $facet['id'] . '"' : '';
+                    $html .= '<a class="facet" ' . $dataWord . 'title="' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '" href="' . $resultUrl . '?q=' . $this->escapeHtml($item['title']) . '&bx_categories[0]=' . urlencode($facet['href']) . '"><li data-word="' . $facet['id'] . '" class="facet ' . $item['row_class'] . '"  title="' . $this->escapeHtml($facet['title']) . '" ><span class="query-title">' . $this->escapeHtml($facet['title']) . '</span><span class="amount">(' . $facet['hits'] . ')</span></li></a>';
                 }
             } else {
                 $html .= '<li data-word="' . $item['id'] . '" title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
@@ -188,8 +188,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             );
             $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
-
-
             if ($query) {
                 $htmlConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_html');
                 if ($htmlConfig['enabled'] == '1') {
@@ -208,6 +206,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
                 $p13n->autocomplete($query, $generalConfig['autocomplete_limit'], $generalConfig['autocomplete_products_limit'], $fields);
                 $collection = $p13n->getAutocompleteEntities();
+                $this->_first = $p13n->getPrefixSearchHash();
             } else {
                 $collection = array();
             }
