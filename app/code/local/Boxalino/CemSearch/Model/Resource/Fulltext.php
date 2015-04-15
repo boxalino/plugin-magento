@@ -1,5 +1,6 @@
 <?php
-require_once "Mage/CatalogSearch/Model/Resource/Fulltext.php";
+
+require_once 'Mage/CatalogSearch/Model/Resource/Fulltext.php';
 
 class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Model_Resource_Fulltext
 {

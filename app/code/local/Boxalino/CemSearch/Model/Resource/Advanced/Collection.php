@@ -7,9 +7,9 @@
 /**
  * Collection Advanced
  *
- * @category    Mage
- * @package     Mage_CatalogSearch
- * @author      Magento Core Team <core@magentocommerce.com>
+ * @category    Boxalino
+ * @package     Boxalino_CemSearch
+ * @author      Szymon Nosal <szymon.nosal@codete.com>
  */
 class Boxalino_CemSearch_Model_Resource_Advanced_Collection extends Mage_Catalog_Model_Resource_Product_Collection
 {

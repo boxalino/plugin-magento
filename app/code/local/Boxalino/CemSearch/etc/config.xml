@@ -121,12 +121,16 @@
                     <advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
                 </rewrite>
             </catalogsearch_resource>
-
             <catalogsearch>
                 <rewrite>
                     <advanced>Boxalino_CemSearch_Model_Advanced</advanced>
                 </rewrite>
             </catalogsearch>
+            <catalog>
+                <rewrite>
+                    <category>Boxalino_CemSearch_Model_Category</category>
+                </rewrite>
+            </catalog>
         </models>
         <resources>
             <test_write>
