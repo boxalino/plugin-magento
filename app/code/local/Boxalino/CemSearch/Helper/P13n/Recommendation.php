@@ -18,10 +18,17 @@ class Boxalino_CemSearch_Helper_P13n_Recommendation
         return $inst;
     }
 
-    public function getRecommendation($widgetType, $widgetName)
+    public function getRecommendation($widgetType, $widgetName, $amount = 3)
     {
         if (empty($this->results)) {
-            $widgets = $this->prepareWidgets($widgetType);
+            if ($widgetType == '') {
+                $widgets = array(array(
+                    'name' => $widgetName, 'min_recs' => 0, 'max_recs' => $amount
+                ));
+                $widgetType = 'product';
+            } else {
+                $widgets = $this->prepareWidgets($widgetType);
+            }
             if (empty($widgets)) {
                 return null;
             }

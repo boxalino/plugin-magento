@@ -1,4 +1,4 @@
-# boxalino Magento
+# boxalino Magento plugin
 
 ## Installation
 
@@ -23,8 +23,10 @@ chmod 755 skin/frontend/base/default/js/jquery-noConflict.js
    * System > Cache Management - Flush Cache Storage
 6. Update the administrator role:
   * System > Permissions > Roles > Administrators - Save Role
+7. Follow the documentation to create your first product index, needed to enable the search & recommendations
+8. Set up a an indexing cronjob, running at least one full index per day. Use the delta indexer if you want to update more than once per hour.
 
 ## Documentation
 
-The latest documentation can be found at:
+The latest documentation PDF can be found at:
 https://boxalino.zendesk.com/hc/en-gb/articles/203757896-Getting-started-with-the-boxalino-plugin-for-Magento
