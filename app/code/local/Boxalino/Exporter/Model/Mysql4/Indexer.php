@@ -211,6 +211,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'sku',
             'price',
             'special_price',
+            'special_from_date',
+            'special_to_date',
             'visibility',
             'category_ids',
             'status'
@@ -401,6 +403,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'varchar' => array(),
             'text' => array(),
             'decimal' => array(),
+            'datetime' => array(),
         );
 
         foreach ($db->fetchAll($select) as $r) {
@@ -421,12 +424,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $stores = array();
         foreach ($this->group->getStores() as $store) {
-
             $stores[$store->getId()]['id'] = $store->getId();
             $stores[$store->getId()]['base_url'] = $store->getBaseUrl();
             $stores[$store->getId()]['code'] = $store->getCode();
             $stores[$store->getId()]['lang'] = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
-
+            $stores[$store->getId()]['store'] = $store;
         }
 
         //prepare files
@@ -527,11 +529,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select2 = clone $select1;
                 $select3 = clone $select1;
                 $select4 = clone $select1;
+                $select5 = clone $select1;
 
                 $select1->from(
-                    array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
-                    $columns
-                )
+                        array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
+                        $columns
+                    )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_varchar'),
                         $joinCondition,
@@ -539,9 +542,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $select2->from(
-                    array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
-                    $columns
-                )
+                        array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
+                        $columns
+                    )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_text'),
                         $joinCondition,
@@ -549,9 +552,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['text']);
                 $select3->from(
-                    array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
-                    $columns
-                )
+                        array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
+                        $columns
+                    )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_decimal'),
                         $joinCondition,
@@ -559,19 +562,29 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['decimal']);
                 $select4->from(
-                    array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
-                    $columns
-                )
+                        array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
+                        $columns
+                    )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_int'),
                         $joinCondition,
                         $joinColumns
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['int']);
+                $select5->from(
+                        array('t_d' => $this->_prefix . 'catalog_product_entity_datetime'),
+                        $columns
+                    )
+                    ->joinLeft(
+                        array('t_s' => $this->_prefix . 'catalog_product_entity_datetime'),
+                        $joinCondition,
+                        $joinColumns
+                    )
+                    ->where('t_d.attribute_id IN(?)', $attrsFromDb['datetime']);
 
                 $select = $db->select()
                     ->union(
-                        array($select1, $select2, $select3, $select4),
+                        array($select1, $select2, $select3, $select4, $select5),
                         Zend_Db_Select::SQL_UNION_ALL
                     );
 
@@ -579,6 +592,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select2 = null;
                 $select3 = null;
                 $select4 = null;
+                $select5 = null;
                 foreach ($db->fetchAll($select) as $r) {
                     $products[$r['entity_id']][$r['attribute_code']] = $r['value'];
                 }
@@ -665,6 +679,24 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $id = $product['parent_id'];
                         $haveParent = true;
                     }
+
+                    // apply special price time range
+                    if (
+                        !empty($product['special_price']) &&
+                        $product['price'] > $product['special_price'] && (
+                            !empty($product['special_from_date']) ||
+                            !empty($product['special_to_date'])
+                        )
+                    ) {
+                        $product['special_price'] = Mage_Catalog_Model_Product_Type_Price::calculateSpecialPrice(
+                            $product['price'],
+                            $product['special_price'],
+                            $product['special_from_date'],
+                            $product['special_to_date'],
+                            $stores[$storeId]['store']
+                        );
+                    }
+
                     foreach ($attrs as $attr) {
                         self::logMem('Products - start attributes transform');
 

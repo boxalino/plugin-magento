@@ -1,5 +1,12 @@
 # changelog of the boxalino magento plugin
 
+## v2.7 generic recommendation block and datetime properties
+
+* Added generic p13n recommendation block that can be added to any page.
+* Added support for datetime properties.
+* The special\_price now is exported according to the special\_from\_date and 
+  special\_to\_date properties. These two properties are now exported by default.
+
 ## v2.6 improving autocompletion
 
 Making autocompletion more configurable and supporting more autocompletion features.
