@@ -532,9 +532,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select5 = clone $select1;
 
                 $select1->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_varchar'),
                         $joinCondition,
@@ -542,9 +542,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $select2->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_text'),
                         $joinCondition,
@@ -552,9 +552,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['text']);
                 $select3->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_decimal'),
                         $joinCondition,
@@ -562,9 +562,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['decimal']);
                 $select4->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_int'),
                         $joinCondition,
@@ -572,9 +572,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['int']);
                 $select5->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_datetime'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_datetime'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_datetime'),
                         $joinCondition,
@@ -1920,7 +1920,7 @@ XML;
             if (class_exists('CURLFile')) {
                 return new CURLFile(substr($filename, 1), $type);
             }
-        } catch(Exception $e){
+        } catch (Exception $e) {
             return $filename . ";type=$type";
         }
         return $filename . ";type=$type";
