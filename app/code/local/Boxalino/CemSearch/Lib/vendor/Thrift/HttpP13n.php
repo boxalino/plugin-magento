@@ -64,7 +64,7 @@ class HttpP13n
         $choiceRequest->profileId = $profileid;
 
         // Refresh cookies
-        if(empty($cookieDomain)) {
+        if (empty($cookieDomain)) {
             setcookie('cems', $sessionid, 0);
             setcookie('cemv', $profileid, time() + 1800);
         } else {
@@ -81,7 +81,7 @@ class HttpP13n
     protected function getClient()
     {
         if ($this->client === null || $this->transport === null) {
-            if(function_exists('curl_version')) {
+            if (function_exists('curl_version')) {
                 $this->transport = new \Thrift\Transport\P13nTCurlClient($this->host, $this->port, $this->uri, $this->schema);
             } else {
                 $this->transport = new \Thrift\Transport\P13nTHttpClient($this->host, $this->port, $this->uri, $this->schema);
@@ -151,19 +151,12 @@ class HttpP13n
     {
         $requestContext = new \com\boxalino\p13n\api\thrift\RequestContext();
         $requestContext->parameters = array(
-            'User-Agent'     => array(@$_SERVER['HTTP_USER_AGENT']),
-            'User-Host'      => array($this->getIP()),
+            'User-Agent' => array(@$_SERVER['HTTP_USER_AGENT']),
+            'User-Host' => array($this->getIP()),
             'User-SessionId' => array($this->getSessionId()),
-            'User-Referer'   => array(@$_SERVER['HTTP_REFERER']),
-            'User-URL'       => array($this->getCurrentURL())
+            'User-Referer' => array(@$_SERVER['HTTP_REFERER']),
+            'User-URL' => array($this->getCurrentURL())
         );
-
-        if (isset($_REQUEST['p13nRequestContext']) && is_array($_REQUEST['p13nRequestContext'])) {
-            $requestContext->parameters = array_merge(
-                $_REQUEST['p13nRequestContext'],
-                $requestContext->parameters
-            );
-        }
 
         return $requestContext;
     }

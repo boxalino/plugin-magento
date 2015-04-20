@@ -118,7 +118,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                     $product = Mage::getModel('catalog/product')->load($prod['id']);
                     if ($prod['hash'] == $this->_first || empty($this->_first)) {
                         $html .= '<li data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
-                    } else{
+                    } else {
                         $html .= '<li style="display:none" data-word="' . $prod['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product->getName()) . '">';
                     }
                     $html .= '<a href="' . $product->getProductUrl() . '" >';
@@ -141,12 +141,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
 
     private function prepareProductView($product)
     {
-
         $html = '';
 
         if ($product['hash'] == $this->_first || empty($this->_first)) {
             $html .= '<li style="display:block" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
-        } else{
+        } else {
             $html .= '<li style="display:none" data-word="' . $product['hash'] . '" class="product-autocomplete" title="' . $this->escapeHtml($product['title']) . '">';
         }
 
@@ -155,7 +154,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         unset($product['hash']);
         unset($product[Mage::getStoreConfig('Boxalino_General/search/entity_id')]);
 
-        foreach($this->_order as $f) {
+        foreach ($this->_order as $f) {
             if ($f == 'image') {
                 $html .= '<div class="product-' . $f . '"><img src="' . $product[$f] . '" alt="' . $product['title'] . '" style="max-height:75px; max-width:75px;" /></div>';
             } elseif (isset($product[$f])) {
@@ -167,8 +166,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         $html .= '</li>';
 
         return $html;
-
-
     }
 
     public function getSuggestData()
@@ -195,11 +192,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
                 $htmlConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_html');
                 if ($htmlConfig['enabled'] == '1') {
                     $fields = array($generalConfig['entity_id'], 'title', 'score');
-                } else{
+                } else {
                     $fields = array($generalConfig['entity_id']);
                     $map = array($generalConfig['entity_id'] => $generalConfig['entity_id']);
                     $fi = explode(',', $htmlConfig['items']);
-                    foreach($fi as $f) {
+                    foreach ($fi as $f) {
                         list($attribute, $fieldname) = explode(':', $f);
                         $fields[] = $fieldname;
                         $map[$fieldname] = $attribute;
@@ -246,7 +243,4 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         }
         return $this->_suggestData;
     }
-    /*
-     *
-     */
 }

@@ -33,7 +33,7 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
                 ->addAttributeToSelect('*');
 
             // enforce boxalino ranking
-            $this->_productCollection->getSelect()->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids).')'));
+            $this->_productCollection->getSelect()->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids) . ')'));
 
             if (Mage::helper('catalog')->isModuleEnabled('Mage_Checkout')) {
                 Mage::getResourceSingleton('checkout/cart')->addExcludeProductFilter($this->_productCollection,
