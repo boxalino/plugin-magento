@@ -21,9 +21,10 @@ class Boxalino_CemSearch_Model_Category extends Mage_Catalog_Model_Category
      *
      * @return array
      */
-    public function getAvailableSortByOptions() {
+    public function getAvailableSortByOptions()
+    {
         $availableSortBy = array();
-        $defaultSortBy   = Mage::getSingleton('catalog/config')
+        $defaultSortBy = Mage::getSingleton('catalog/config')
             ->getAttributeUsedForSortByArray();
         if ($this->getAvailableSortBy()) {
             foreach ($this->getAvailableSortBy() as $sortBy) {
@@ -38,7 +39,7 @@ class Boxalino_CemSearch_Model_Category extends Mage_Catalog_Model_Category
         }
 
         // force ordering of results by position returned by p13n
-        $availableSortBy = array_merge(array('relevance'=>'Relevance'), $availableSortBy);
+        $availableSortBy = array_merge(array('relevance' => 'Relevance'), $availableSortBy);
         unset($availableSortBy['position']);
 
         return $availableSortBy;

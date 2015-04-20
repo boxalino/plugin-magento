@@ -64,17 +64,17 @@ Autocompleter.Base.prototype.render = function (key) {
 };
 
 var element = null;
-var x,y;
+var x, y;
 Autocompleter.Base.prototype.onHover = function (event) {
 
     element = event;
 
-    setTimeout(function(){
-        if(event == element){
+    setTimeout(function () {
+        if (event == element) {
             el = jQuery(event.target).closest('*[data-word]');
             $el = jQuery(el);
 
-            if(Math.abs(event.pageX - x) > 50 || Math.abs(event.pageY - y) > 25){
+            if (Math.abs(event.pageX - x) > 50 || Math.abs(event.pageY - y) > 25) {
                 return;
             }
 

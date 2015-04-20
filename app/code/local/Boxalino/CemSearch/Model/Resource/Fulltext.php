@@ -17,7 +17,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             return parent::prepareResult($object, $queryText, $query);
         }
 
-        if($queryText == ''){
+        if ($queryText == '') {
             return $this;
         }
 
@@ -70,7 +70,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                 count($entity_ids) <= $relaxationConfig['max']
             ) &&
             is_object($searchRelaxation) &&
-            ( count($searchRelaxation->subphrasesResults) > 0) &&
+            (count($searchRelaxation->subphrasesResults) > 0) &&
             $relaxationConfig['enabled']
         ) {
 
@@ -115,7 +115,8 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             count($entity_ids) == 0 &&
             is_object($searchRelaxation) &&
             count($searchRelaxation->subphrasesResults) == 0 &&
-            count($relaxations) > 0) {
+            count($relaxations) > 0
+        ) {
             Boxalino_CemSearch_Model_Logger::saveFrontActions('prepareResult', 'no relaxations');
 
             $q = $relaxations[0];
@@ -139,7 +140,7 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
                     header('Location: ' . $currentUrl . '?' . $paramString);
                     exit();
                 }
-            }catch (Exception $e){
+            } catch (Exception $e) {
 
             }
 
@@ -197,14 +198,14 @@ class Boxalino_CemSearch_Model_Resource_Fulltext extends Mage_CatalogSearch_Mode
             }
 
             // enforce boxalino ranking
-            $select->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids).')'));
+            $select->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids) . ')'));
 
             if (
                 $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_LIKE ||
                 $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_FULLTEXT ||
                 $searchType == Mage_CatalogSearch_Model_Fulltext::SEARCH_TYPE_COMBINE
             ) {
-                $innerSelect = (string) $select;
+                $innerSelect = (string)$select;
                 $select = $adapter->select()
                     ->from(array(
                         'a' => new Zend_Db_Expr('(' . $innerSelect . ')')

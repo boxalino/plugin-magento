@@ -418,7 +418,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return $items;
     }
 
-    public function getPrefixSearchHash() {
+    public function getPrefixSearchHash()
+    {
         if ($this->autocompleteResponse->prefixSearchResult->totalHitCount > 0) {
             return substr(md5($this->autocompleteResponse->prefixSearchResult->queryText), 0, 10);
         } else {
@@ -429,7 +430,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     public function getAutocompleteProducts($facets, $map = null, $fields = null)
     {
         $fs = array();
-        foreach($facets as $f) {
+        foreach ($facets as $f) {
             $fs[] = $f['id'];
         }
 
@@ -601,7 +602,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             foreach ($_REQUEST as $key => $values) {
                 if (strpos($key, 'bx_') !== false) {
                     $fieldName = substr($key, 3);
-                    $values = !is_array($values)?array($values):$values;
+                    $values = !is_array($values) ? array($values) : $values;
                     foreach ($values as $value) {
                         $this->selectedFacets[$fieldName][] = $value;
                     }

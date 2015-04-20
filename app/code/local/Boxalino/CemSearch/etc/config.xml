@@ -165,10 +165,10 @@
                 </rewrite>
             </catalog>
             <!--<enterprise_targetrule>-->
-                <!--<rewrite>-->
-                    <!--<catalog_product_list_related>Boxalino_CemSearch_Block_Product_List_Related</catalog_product_list_related>-->
-                    <!--<catalog_product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</catalog_product_list_upsell>-->
-                <!--</rewrite>-->
+            <!--<rewrite>-->
+            <!--<catalog_product_list_related>Boxalino_CemSearch_Block_Product_List_Related</catalog_product_list_related>-->
+            <!--<catalog_product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</catalog_product_list_upsell>-->
+            <!--</rewrite>-->
             <!--</enterprise_targetrule>-->
         </blocks>
     </global>

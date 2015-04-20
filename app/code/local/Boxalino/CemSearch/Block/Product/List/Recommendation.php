@@ -41,9 +41,9 @@ class Boxalino_CemSearch_Block_Product_List_Recommendation extends Mage_Catalog_
             $_REQUEST['productId'] = $this->_recommendationContext['id'];
         } elseif (count($this->_recommendationContext)) {
             $_REQUEST['p13nRequestContext'] = $this->_recommendationContext;
-            foreach($_REQUEST['p13nRequestContext'] as $k => $v) {
-                if($v == '') {
-                    switch($k) {
+            foreach ($_REQUEST['p13nRequestContext'] as $k => $v) {
+                if ($v == '') {
+                    switch ($k) {
                         case 'id':
                             $_REQUEST['p13nRequestContext'][$k] = Mage::registry('product')->getId();
                             break;
@@ -51,7 +51,7 @@ class Boxalino_CemSearch_Block_Product_List_Recommendation extends Mage_Catalog_
                             $_REQUEST['p13nRequestContext'][$k] = Mage::registry('current_category');
                             break;
                         default:
-                            if(isset($this->$_recommendationParameterValues[$k])) {
+                            if (isset($this->$_recommendationParameterValues[$k])) {
                                 $_REQUEST['p13nRequestContext'][$k] = $this->_recommendationParameterValues[$k];
                             }
                     }

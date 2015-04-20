@@ -10,7 +10,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     public function __construct()
     {
-        if(!isset($_GET['q']) || (isset($_GET['q']) && strlen($_GET['q']) == 0)){
+        if (!isset($_GET['q']) || (isset($_GET['q']) && strlen($_GET['q']) == 0)) {
             return;
         }
         $this->_allFilters = Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getFacetsData();
@@ -66,11 +66,11 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         foreach ($topFilters as $filter) {
             if (isset($allFilters[$filter])) {
                 foreach ($allFilters[$filter] as $key => $values) {
-                    $yes = strtolower($values['stringValue']) == 'yes'?true:false;
+                    $yes = strtolower($values['stringValue']) == 'yes' ? true : false;
                     if ($values['stringValue'] == 1 || $yes) {
                         $filters[$filter] = $allFilters[$filter][$key];
                         $filters[$filter]['title'] = $titles[$i];
-                        $filters[$filter]['url'] = $this->getTopFilterUrl($filter, $yes?$values['stringValue']:'1', $allFilters[$filter][$key]['selected']);
+                        $filters[$filter]['url'] = $this->getTopFilterUrl($filter, $yes ? $values['stringValue'] : '1', $allFilters[$filter][$key]['selected']);
                         $filters[$filter]['selected'] = $allFilters[$filter][$key]['selected'];
                     }
                 }

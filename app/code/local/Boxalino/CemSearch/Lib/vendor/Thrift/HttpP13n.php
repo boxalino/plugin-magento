@@ -158,13 +158,6 @@ class HttpP13n
             'User-URL'       => array($this->getCurrentURL())
         );
 
-        if (isset($_REQUEST['p13nRequestContext']) && is_array($_REQUEST['p13nRequestContext'])) {
-            $requestContext->parameters = array_merge(
-                $_REQUEST['p13nRequestContext'],
-                $requestContext->parameters
-            );
-        }
-
         return $requestContext;
     }
 

@@ -291,20 +291,20 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
             $field = '';
             $dir = '';
-            if(isset($_REQUEST['order'])){
-                if($_REQUEST['order'] == 'name'){
+            if (isset($_REQUEST['order'])) {
+                if ($_REQUEST['order'] == 'name') {
                     $field = 'title';
-                } elseif($_REQUEST['order'] == 'price'){
+                } elseif ($_REQUEST['order'] == 'price') {
                     $field = 'discountedPrice';
                 }
             }
-            if(isset($_REQUEST['dir'])){
-                $dir = $_REQUEST['dir']=='asc'?false:true;
-            } else{
+            if (isset($_REQUEST['dir'])) {
+                $dir = $_REQUEST['dir'] == 'asc' ? false : true;
+            } else {
                 $dir = false;
             }
 
-            if($field !== '' && $dir !== ''){
+            if ($field !== '' && $dir !== '') {
                 $p13nSort->push($field, $dir);
             }
 
