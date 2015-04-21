@@ -139,7 +139,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      */
     protected function _storeExport($website)
     {
-        $products = array();
         $categories = array();
         $tags = array();
         self::logMem('Preparing data for website start');
