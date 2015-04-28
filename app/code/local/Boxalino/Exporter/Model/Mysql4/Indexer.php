@@ -801,9 +801,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
 
                     /**
-                     * Add special fields
+                     * Add url to product for each languages
                      */
-                    //Add url to product for each languages
                     if ($this->_storeConfig['export_product_url']) {
                         $this->_transformedProducts['products'][$id] =
                             array_merge(
@@ -1835,6 +1834,8 @@ XML;
             @unlink($name);
         };
 
+
+
         $zip = new ZipArchive();
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
 
@@ -1874,6 +1875,10 @@ XML;
 
     protected function pushFile($fields, $url, $type)
     {
+        if ($this->_getIndexType() == 'delta' && !in_array('products.csv', $this->_files)) {
+            return 'skipped empty product delta sync';
+        }
+
         self::logMem($type . ' push');
         $s = curl_init();
 
