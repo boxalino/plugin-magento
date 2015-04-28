@@ -181,6 +181,7 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         if (!$this->_suggestData) {
             $query = $this->helper('catalogsearch')->getQueryText();
 
+            $htmlConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_html');
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
             $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
                 $storeConfig['host'],
@@ -192,7 +193,6 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
             if ($query) {
-                $htmlConfig = Mage::getStoreConfig('Boxalino_General/autocomplete_html');
                 if ($htmlConfig['enabled'] == '1') {
                     $fields = array($generalConfig['entity_id'], 'title', 'score');
                 } else{
