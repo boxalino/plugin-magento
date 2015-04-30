@@ -83,19 +83,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $this->_helperImage = Mage::helper('catalog/image');
 
         self::logMem('Helpers init');
-        foreach (Mage::app()->getWebsites() as $website) {
-
-            if (!$website->getConfig('Boxalino_General/general/enabled')) {
-                continue;
-            }
-
-            $this->_dir = $this->_mainDir . '/' . $website->getConfig('Boxalino_General/general/di_username');
+        $indexStructure = $this->_getIndexStructure();
+        foreach ($indexStructure as $index => $languages) {
+            $this->_dir = $this->_mainDir . '/' . $index;
             if (file_exists($this->_dir)) {
                 $this->_helperExporter->delTree($this->_dir);
             }
             self::logMem('After delTree');
 
-            $data = $this->_storeExport($website);
+            $data = $this->_storeExport($languages);
 
             self::logMem('something with attributes - before');
 
@@ -113,7 +109,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
 
             self::logMem('something with attributes - after');
-            $file = $this->prepareFiles($website, $data['categories'], $data['tags']);
+            $file = $this->prepareFiles($data['categories'], $data['tags']);
             self::logMem('Push files');
 
             $this->pushXML($file);
@@ -133,42 +129,29 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     }
 
     /**
-     * @description Declare what code have to do for Website scope
-     * @param $website object Object of currently working Website
+     * @description generate the data for the language scope
+     * @param array $languages Array of languages to generate for this index
      * @return array Data prepared for save to file
      */
-    protected function _storeExport($website)
+    protected function _storeExport($languages)
     {
         $categories = array();
         $tags = array();
         self::logMem('Preparing data for website start');
-        foreach ($website->getGroups() as $group) {
+        foreach ($languages as $language => $info) {
+            $storeId = $info['store']->getId();
 
-            $this->group = $group;
-
-            foreach ($group->getStores() as $store) {
-                self::logMem('Start store:' . $store->getId());
-                $this->_prepareStoreConfig($store->getId());
-                self::logMem('Configuration for store loaded');
-                if ($this->_isEnabled()) {
-                    $categories = $this->_exportCategories();
-                    $tags = $this->_exportTags();
-                    self::logMem('Without available languages');
-                    $this->_availableLanguages[] = $this->_storeConfig['language'];
-                    self::logMem('With available languages');
-
-                }
-            }
-
-            $this->_storeConfig['websiteId'] = $group->getId();
-
-            if ($this->_isEnabled()) {
-                $this->_exportCustomers();
-                $this->_exportTransactions();
-                $this->_exportProducts();
-            }
+            self::logMem('Start store:' . $storeId);
+            $this->_prepareStoreConfig($storeId, $info['config']);
+            self::logMem('Configuration for store loaded');
+            $categories = $this->_exportCategories();
+            $tags = $this->_exportTags();
+            $this->_availableLanguages[] = $language;
 
         }
+        $this->_exportCustomers($info['website']);
+        $this->_exportTransactions();
+        $this->_exportProducts($languages);
 
         return array(
             'categories' => $categories,
@@ -177,18 +160,52 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     }
 
     /**
+     * @description generate the index structure to iterate on
+     * @return array Index structure
+     */
+    protected function _getIndexStructure()
+    {
+        $indexStructure = array();
+        foreach (Mage::app()->getWebsites() as $website) {
+            foreach ($website->getGroups() as $group) {
+                foreach ($group->getStores() as $store) {
+                    $config = array_merge(
+                        $store->getConfig('boxalinoexporter/export_data'),
+                        $store->getConfig('Boxalino_General/general')
+                    );
+                    if ($config['enabled'] == '1') {
+                        $index = $config['di_account'];
+                        $lang = $config['language'];
+                        $config['groupId'] = $store->getGroupId();
+
+                        if (!array_key_exists($index, $indexStructure)) {
+                            $indexStructure[$index] = array();
+                        }
+                        if (!array_key_exists($lang, $indexStructure[$index])) {
+                            $indexStructure[$index][$lang] = array();
+                        }
+                        $indexStructure[$index][$lang] = array(
+                            'config'  => $config,
+                            'website' => $website,
+                            'store'   => $store,
+                        );
+                    }
+                }
+            }
+        }
+        return $indexStructure;
+    }
+
+    /**
      * @description Get configs for store by storeId
      * @param int $storeId
      * @return void
      */
-    protected function _prepareStoreConfig($storeId)
+    protected function _prepareStoreConfig($storeId, $config)
     {
         $this->_storeId = $storeId;
-        $this->_storeConfig = array_merge(Mage::app()->getStore($this->_storeId)->getConfig('boxalinoexporter/export_data'), Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_General/general'));
+        $this->_storeConfig = $config;
 
-        $tmp = Mage::app()->getStore($this->_storeId)->getConfig('Boxalino_CemSearch/backend');
-        $this->_storeConfig['username'] = $tmp['username'];
-        $this->_storeConfig['password'] = $tmp['password'];
         if (!$this->_helperExporter->isAvailableLanguages($this->_storeConfig['language'])) {
             Mage::throwException($this->_helperExporter->__('Language "' . $this->_storeConfig['language'] . '" is not available.'));
         }
@@ -282,21 +299,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     }
 
     /**
-     * @description check if export is enabled for website
-     * @return bool
-     */
-    protected function _isEnabled()
-    {
-        if (isset($this->_storeConfig['enabled']) && $this->_storeConfig['enabled']) {
-            return true;
-        } else if (!isset($this->_storeConfig['enabled']) && Mage::getStoreConfig('Boxalino_General/general/enabled')) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @description Preparing categories to export
      * @return array Categories
      */
@@ -370,9 +372,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     /**
      * @description Preparing products to export
+     * @param array $languages language structure
      * @return void
      */
-    protected function _exportProducts()
+    protected function _exportProducts($languages)
     {
         self::logMem('Products - start of export');
         $attrs = $this->_listOfAttributes;
@@ -420,15 +423,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $count = $limit;
         $page = 1;
         $header = true;
-
-        $stores = array();
-        foreach ($this->group->getStores() as $store) {
-            $stores[$store->getId()]['id'] = $store->getId();
-            $stores[$store->getId()]['base_url'] = $store->getBaseUrl();
-            $stores[$store->getId()]['code'] = $store->getCode();
-            $stores[$store->getId()]['lang'] = Mage::app()->getStore($store->getId())->getConfig('boxalinoexporter/export_data/language');
-            $stores[$store->getId()]['store'] = $store;
-        }
 
         //prepare files
         $filesMtM = array();
@@ -485,10 +479,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 break;
             }
 
-            foreach ($stores as $store) {
-
-                $storeId = $store['id'];
-                $lang = $store['lang'];
+            foreach ($languages as $lang => $info) {
+                $storeObject = $info['store'];
+                $storeId = $storeObject->getId();
+                $storeBaseUrl = $storeObject->getBaseUrl();
+                $storeCode = $storeObject->getCode();
 
                 self::logMem('Products - fetch products - before');
                 $select = $db->select()
@@ -664,7 +659,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 foreach ($products as $product) {
                     self::logMem('Products - start transform');
 
-                    if (count($product['website']) == 0 || !in_array($this->_storeConfig['websiteId'], $product['website'])) {
+                    if (count($product['website']) == 0 || !in_array($this->_storeConfig['groupId'], $product['website'])) {
                         $product = null;
                         continue;
                     }
@@ -692,7 +687,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             $product['special_price'],
                             $product['special_from_date'],
                             $product['special_to_date'],
-                            $stores[$storeId]['store']
+                            $storeObject
                         );
                     }
 
@@ -792,7 +787,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                                 $this->_productsImages[] = array($id, $url);
                                 $this->_productsThumbnails[] = array($id, $url_tbm);
-
                             }
                         }
 
@@ -808,7 +802,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             array_merge(
                                 $this->_transformedProducts['products'][$id],
                                 array(
-                                    'default_url_' . $store['lang'] => $store['base_url'] . $this->_helperExporter->rewrittenProductUrl($id, null, $store['id']) . '?___store=' . $store['code']
+                                    'default_url_' . $lang => $storeBaseUrl . $this->_helperExporter->rewrittenProductUrl($id, null, $storeId) . '?___store=' . $storeCode
                                 )
                             );
                     }
@@ -876,10 +870,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
     /**
      * @description Preparing customers to export
+     * @param Mage_Core_Model_Website $website
      * @return void
      *
      */
-    protected function _exportCustomers()
+    protected function _exportCustomers(Mage_Core_Model_Website $website)
     {
 
         if (!$this->_storeConfig['export_customers']) {
@@ -925,7 +920,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             ->joinLeft( // @todo is this left join still necessary?
                 array('scope_table' => $this->_prefix . 'customer_eav_attribute_website'),
                 'scope_table.attribute_id = main_table.attribute_id AND ' .
-                'scope_table.website_id = ' . $this->group->getWebsiteId()
+                'scope_table.website_id = ' . $website->getId()
             )
             ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'))
             ->where('attribute_code IN ("dob", "gender")');
@@ -1266,7 +1261,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /**
      * @description Preparing files to send
      */
-    protected function prepareFiles($website, &$categories = null, &$tags = null)
+    protected function prepareFiles(&$categories = null, &$tags = null)
     {
 
         //Prepare attributes
@@ -1841,20 +1836,34 @@ XML;
 
             foreach ($csvFiles as $f) {
                 if (!$zip->addFile($this->_dir . '/' . $f, $f)) {
-                    throw new Exception('Synchronization failure. Please try again.');
+                    throw new Exception(
+                        'Synchronization failure: Failed to add file "' .
+                        $this->_dir . '/' . $f . '" to the zip "' .
+                        $name . '". Please try again.'
+                    );
                 }
             }
 
             if (!$zip->addFile($xml, 'properties.xml')) {
-                throw new Exception('Synchronization failure. Please try again.');
+                throw new Exception(
+                    'Synchronization failure: Failed to add file "' .
+                    $xml . '" to the zip "' .
+                    $name . '". Please try again.'
+                );
             }
 
             if (!$zip->close()) {
-                throw new Exception('Synchronization failure. Please try again.');
+                throw new Exception(
+                    'Synchronization failure: Failed to close the zip "' .
+                    $name . '". Please try again.'
+                );
             }
 
         } else {
-            throw new Exception('Synchronization failure. Please try again.');
+            throw new Exception(
+                'Synchronization failure: Failed to open the zip "' .
+                $name . '" for writing. Please check the permissions and try again.'
+            );
         }
     }
 
@@ -1991,5 +2000,4 @@ XML;
         }
         return array_key_exists($entityType, $this->_entityIds) ? $this->_entityIds[$entityType] : null;
     }
-
 }
