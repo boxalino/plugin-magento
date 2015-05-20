@@ -32,8 +32,8 @@ require_once "Mage/CatalogSearch/Block/Autocomplete.php";
 
 class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete
 {
-    protected $_suggestData = null;
-    protected $_suggestDataProducts = null;
+    protected $_suggestData = array();
+    protected $_suggestDataProducts = array();
     protected $_order = array();
     protected $_first = null;
 
@@ -238,10 +238,14 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             }
 
             $this->_suggestData = $data;
-            if ($htmlConfig['enabled'] == '1') {
-                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
+            if (isset($data[0]) && $data[0]['facets']) {
+                if ($htmlConfig['enabled'] == '1') {
+                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
+                } else {
+                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
+                }
             } else {
-                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
+                $this->_suggestDataProducts = array();
             }
         }
         return $this->_suggestData;
