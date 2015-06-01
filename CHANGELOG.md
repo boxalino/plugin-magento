@@ -1,9 +1,13 @@
 # changelog of the boxalino magento plugin
 
+## v2.9 supporting configurable customer attributes
+
+* Added support to configure additional customer attributes in export.
+
 ## v2.8 supporting more complex shop structures
 
 * Added support for structures where store views map to languages in different 
-  search indexes within one website
+  search indexes within one website.
 * Improved handling of empty deltas and permission problems when creating ZIPs.
 
 ## v2.7 generic recommendation block and datetime properties
