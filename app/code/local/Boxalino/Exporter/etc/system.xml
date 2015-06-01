@@ -117,6 +117,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </export_customers>
+                        <additional_customer_attributes translate="label">
+                            <label>Additional Customer Attributes</label>
+                            <comment>Write here comma-separated names of customer attributes which you want to export</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>55</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </additional_customer_attributes>
                         <export_transactions translate="label">
                             <label>Export Transactions</label>
                             <frontend_type>select</frontend_type>

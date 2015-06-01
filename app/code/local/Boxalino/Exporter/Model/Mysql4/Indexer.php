@@ -8,6 +8,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     /** @var array Values of attributes where array('storeId' => array('attrName' => array('id' => 'value'))) */
     protected $_attributesValues = array();
 
+    /** @var array Customer attributes */
+    protected $_customerAttributes = array();
+
     /** @var array Number of stockQty for all products. Example: array('productId' => 'qty') */
     protected $productsStockQty = array();
 
@@ -245,7 +248,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             foreach ($fields as $field) {
 
                 if (!in_array($field, $attributes)) {
-                    Mage::throwException("Attribute \"$field\" not exist!");
+                    Mage::throwException("Attribute \"$field\" doesn't exist, please update your additional_attributes setting in the Boxalino Exporter settings!");
                 }
 
                 if ($field != null && strlen($field) > 0) {
@@ -256,6 +259,32 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             unset($fields);
         }
 
+    }
+
+    /**
+     * @description Merge default customer attributes with customer attributes added by user
+     * @param array $attributes optional, array to merge the user defined attributes into
+     * @return array
+     */
+    protected function _mergeCustomerAttributes($attributes = array())
+    {
+        if (isset($this->_storeConfig['additional_customer_attributes']) && $this->_storeConfig['additional_customer_attributes'] != '') {
+            if(count($this->_customerAttributes) == 0) {
+                foreach (Mage::getModel('customer/customer')->getAttributes() as $at) {
+                    $this->_customerAttributes[] = $at->getAttributeCode();
+                }
+            }
+
+            foreach (explode(',', $this->_storeConfig['additional_customer_attributes']) as $field) {
+                if (!in_array($field, $this->_customerAttributes)) {
+                    Mage::throwException("Customer attribute \"$field\" doesn't exist, please update your additional_customer_attributes setting in the Boxalino Exporter settings!");
+                }
+                if ($field != null && strlen($field) > 0 && !in_array($field, $customer_attributes)) {
+                    $attributes[] = $field;
+                }
+            }
+        }
+        return $attributes;
     }
 
     /**
@@ -899,9 +928,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
         $attrsFromDb = array(
             'int' => array(),
+            'static' => array(), // only supports email
             'varchar' => array(),
             'datetime' => array(),
         );
+        $customer_attributes = $this->_mergeCustomerAttributes(array('dob', 'gender'));
 
         $db = $this->_getReadAdapter();
         $select = $db->select()
@@ -909,21 +940,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 array('main_table' => $this->_prefix . 'eav_attribute'),
                 array(
                     'aid' => 'attribute_id',
-                    'attribute_code',
                     'backend_type',
                 )
             )
             ->joinInner(
                 array('additional_table' => $this->_prefix . 'customer_eav_attribute'),
-                'additional_table.attribute_id = main_table.attribute_id'
-            )
-            ->joinLeft( // @todo is this left join still necessary?
-                array('scope_table' => $this->_prefix . 'customer_eav_attribute_website'),
-                'scope_table.attribute_id = main_table.attribute_id AND ' .
-                'scope_table.website_id = ' . $website->getId()
+                'additional_table.attribute_id = main_table.attribute_id',
+                array()
             )
             ->where('main_table.entity_type_id = ?', $this->getEntityIdFor('customer'))
-            ->where('attribute_code IN ("dob", "gender")');
+            ->where('main_table.attribute_code IN (?)', $customer_attributes);
 
         foreach ($db->fetchAll($select) as $attr) {
             if (isset($attrsFromDb[$attr['backend_type']])) {
@@ -958,19 +984,20 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             );
 
             $select = $db->select()
-                ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
                 ->where('ce.entity_type_id = ?', 1)
-                ->where('ce.entity_id IN(?)', $ids);
+                ->where('ce.entity_id IN (?)', $ids);
 
             $select1 = null;
             $select2 = null;
             $select3 = null;
+            $select4 = null;
 
             $selects = array();
 
             if (count($attrsFromDb['varchar']) > 0) {
                 $select1 = clone $select;
                 $select1->from(array('ce' => $this->_prefix . 'customer_entity_varchar'), $columns)
+                    ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $selects[] = $select1;
             }
@@ -978,6 +1005,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if (count($attrsFromDb['int']) > 0) {
                 $select2 = clone $select;
                 $select2->from(array('ce' => $this->_prefix . 'customer_entity_int'), $columns)
+                    ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['int']);
                 $selects[] = $select2;
             }
@@ -985,8 +1013,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if (count($attrsFromDb['datetime']) > 0) {
                 $select3 = clone $select;
                 $select3->from(array('ce' => $this->_prefix . 'customer_entity_datetime'), $columns)
+                    ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ce.attribute_id = ea.attribute_id', 'ea.attribute_code')
                     ->where('ce.attribute_id IN(?)', $attrsFromDb['datetime']);
                 $selects[] = $select3;
+            }
+
+            // only supports email
+            if (count($attrsFromDb['static']) > 0) {
+                $attributeId = current($attrsFromDb['static']);
+                $select4 = clone $select
+                    ->from(array('ce' => $this->_prefix . 'customer_entity'), array(
+                        'entity_id' => 'entity_id',
+                        'attribute_id' =>  new Zend_Db_Expr($attributeId),
+                        'value' => 'email',
+                    ))
+                    ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ea.attribute_id = ' . $attributeId, 'ea.attribute_code');
+                $selects[] = $select4;
             }
 
             $select = $db->select()
@@ -1003,6 +1045,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $select1 = null;
             $select2 = null;
             $select3 = null;
+            $select4 = null;
             $selects = null;
 
             $select = $db->select()
@@ -1061,22 +1104,21 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 if (array_key_exists('gender', $customer)) {
                     if ($customer['gender'] % 2 == 0) {
-                        $gender = 'female';
+                        $customer['gender'] = 'female';
                     } else {
-                        $gender = 'male';
+                        $customer['gender'] = 'male';
                     }
-                } else {
-                    $gender = '';
                 }
 
-                $customers_to_save[] = array(
+                $customer_to_save = array(
                     'customer_id' => $id,
-                    'gender' => $gender,
-                    'dob' => array_key_exists('dob', $customer) ? $customer['dob'] : '',
                     'country' => !empty($countryCode) ? $this->_helperExporter->getCountry($countryCode)->getName() : '',
                     'zip' => array_key_exists('postcode', $billingResult) ? $billingResult['postcode'] : '',
                 );
-
+                foreach($customer_attributes as $attr) {
+                    $customer_to_save[$attr] = array_key_exists($attr, $customer) ? $customer[$attr] : '';
+                }
+                $customers_to_save[] = $customer_to_save;
             }
 
             $data = $customers_to_save;
@@ -1366,103 +1408,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $language->addAttribute('id', $lang);
         }
 
-        //customers
-        $tmp = $this->_helperExporter;
-        $customerString = <<<XML
-        <container id="customers" type="customers">
-            <sources>
-                <source type="item_data_file" id="customer_vals">
-                    <file value="customers.csv"/>
-                    <itemIdColumn value="customer_id"/>
-                    <format value="$tmp->XML_FORMAT"/>
-                    <encoding value="$tmp->XML_ENCODE"/>
-                    <delimiter value="$tmp->XML_DELIMITER"/>
-                    <enclosure value="$tmp->XML_ENCLOSURE_TEXT"/>
-                    <escape value="$tmp->XML_ESCAPE"/>
-                    <lineSeparator value="$tmp->XML_NEWLINE"/>
-                </source>
-            </sources>
-            <properties>
-                <property id="id" type="id">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="customer_id"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-                <property id="customer_id" type="string">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="customer_id"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-                <property id="gender" type="string">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="gender"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-                <property id="dob" type="date">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="dob"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-                <property id="country" type="string">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="country"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-                <property id="zip" type="string">
-                    <transform>
-                        <logic source="customer_vals" type="direct">
-                            <field column="zip"/>
-                        </logic>
-                    </transform>
-                    <params/>
-                </property>
-            </properties>
-        </container>
-XML;
-
-        //transaction
-        $transactionString = <<<XML
-        <container id="transactions" type="transactions">
-            <sources>
-                <source type="transactions" id="transactions">
-                    <file value="transactions.csv"/>
-                    <orderIdColumn value="order_id"/>
-                    <customerIdColumn value="customer_id" customer_property_id="customer_id"/>
-                    <productIdColumn value="entity_id" product_property_id="product_entity_id"/>
-                    <productListPriceColumn value="price"/>
-                    <productDiscountedPriceColumn value="discounted_price"/>
-                    <totalOrderValueColumn value="total_order_value"/>
-                    <shippingCostsColumn value="shipping_costs"/>
-                    <orderReceptionDateColumn value="order_date"/>
-                    <orderReceptionDateColumn value="confirmation_date"/>
-                    <orderShippingDateColumn value="shipping_date"/>
-                    <orderStatusColumn value="status"/>
-                    <format value="$tmp->XML_FORMAT"/>
-                    <encoding value="$tmp->XML_ENCODE"/>
-                    <delimiter value="$tmp->XML_DELIMITER"/>
-                    <enclosure value="$tmp->XML_ENCLOSURE_TEXT"/>
-                    <escape value="$tmp->XML_ESCAPE"/>
-                    <lineSeparator value="$tmp->XML_NEWLINE"/>
-                </source>
-            </sources>
-        </container>
-XML;
-
         //product
         $products = $containers->addChild('container');
         $products->addAttribute('id', 'products');
@@ -1625,33 +1570,97 @@ XML;
         //##################################
 
         if ($this->_storeConfig['export_customers']) {
-            $customer = simplexml_load_string($customerString);
-            $this->sxml_append($containers, $customer);
+            $customers = $containers->addChild('container');
+            $customers->addAttribute('id', 'customers');
+            $customers->addAttribute('type', 'customers');
+
+            $sources = $customers->addChild('sources');
+            //#########################################################################
+
+            //customer source
+            $source = $sources->addChild('source');
+            $source->addAttribute('id', 'item_vals');
+            $source->addAttribute('type', 'item_data_file');
+
+            $source->addChild('file')->addAttribute('value', 'customers.csv');
+            $source->addChild('itemIdColumn')->addAttribute('value', 'customer_id');
+
+            $this->sxml_append_options($source);
+            //#########################################################################
+
+            $properties = $customers->addChild('properties');
+            foreach (
+                $this->_mergeCustomerAttributes(
+                    array('id', 'customer_id', 'country', 'zip', 'dob', 'gender')
+                ) as $prop
+            ) {
+                $type = 'string';
+                $column = $prop;
+                switch($prop) {
+                    case 'id':
+                        $type = 'id';
+                        $column = 'customer_id';
+                        break;
+                    case 'dob':
+                        $type = 'date';
+                        break;
+                }
+
+                $property = $properties->addChild('property');
+                $property->addAttribute('id', $prop);
+                $property->addAttribute('type', $type);
+
+                $transform = $property->addChild('transform');
+
+                $logic = $transform->addChild('logic');
+                $logic->addAttribute('source', 'customer_vals');
+                $logic->addAttribute('type', 'direct');
+                $logic->addChild('field')->addAttribute('column', $column);
+
+                $property->addChild('params');
+            }
         }
 
         if ($this->_storeConfig['export_transactions']) {
-            $transaction = simplexml_load_string($transactionString);
-            $this->sxml_append($containers, $transaction);
+            $transactions = $containers->addChild('container');
+            $transactions->addAttribute('id', 'transactions');
+            $transactions->addAttribute('type', 'transactions');
+
+            $sources = $transactions->addChild('sources');
+            //#########################################################################
+
+            //transaction source
+            $source = $sources->addChild('source');
+            $source->addAttribute('id', 'transactions');
+            $source->addAttribute('type', 'transactions');
+
+            $source->addChild('file')->addAttribute('value', 'transactions.csv');
+            $source->addChild('orderIdColumn')->addAttribute('value', 'order_id');
+            $customerIdColumn = $source->addChild('customerIdColumn');
+            $customerIdColumn->addAttribute('value', 'order_id');
+            $customerIdColumn->addAttribute('customer_property_id', 'customer_id');
+            $productIdColumn = $source->addChild('productIdColumn');
+            $productIdColumn->addAttribute('value', 'entity_id');
+            $productIdColumn->addAttribute('product_property_id', 'product_entity_id');
+            $source->addChild('productListPriceColumn')->addAttribute('value', 'price');
+            $source->addChild('productDiscountedPriceColumn')->addAttribute('value', 'discounted_price');
+            $source->addChild('totalOrderValueColumn')->addAttribute('value', 'total_order_value');
+            $source->addChild('shippingCostsColumn')->addAttribute('value', 'shipping_costs');
+            $source->addChild('orderReceptionDateColumn')->addAttribute('value', 'order_date');
+            $source->addChild('orderConfirmationDateColumn')->addAttribute('value', 'confirmation_date');
+            $source->addChild('orderShippingDateColumn')->addAttribute('value', 'shipping_date');
+            $source->addChild('orderStatusColumn')->addAttribute('value', 'status');
+
+            $this->sxml_append_options($source);
+            //#########################################################################
         }
 
-        $dom = new DOMDocument("1.0");
+        $dom = new DOMDocument('1.0');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
         $saveXML = $dom->saveXML();
         file_put_contents($name, $saveXML);
-    }
-
-    /**
-     * @description add xmlElement to other xmlElement
-     * @param SimpleXMLElement $to
-     * @param SimpleXMLElement $from
-     */
-    protected function sxml_append(SimpleXMLElement $to, SimpleXMLElement $from)
-    {
-        $toDom = dom_import_simplexml($to);
-        $fromDom = dom_import_simplexml($from);
-        $toDom->appendChild($toDom->ownerDocument->importNode($fromDom, true));
     }
 
     /**
