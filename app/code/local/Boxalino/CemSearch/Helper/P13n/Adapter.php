@@ -428,6 +428,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     public function getAutocompleteProducts($facets, $map = null, $fields = null)
     {
+        if (!is_array($facets)) {
+            $facets = array();
+        }
+
         $fs = array();
         foreach($facets as $f) {
             $fs[] = $f['id'];

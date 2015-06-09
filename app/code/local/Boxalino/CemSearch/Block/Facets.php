@@ -56,14 +56,16 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     public function getTopFilters()
     {
         $filters = array();
-        $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
-        $titles = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters_title'));
+        $filterOptions = Mage::getStoreConfig('Boxalino_General/filter');
+        $topFilters = explode(',', $filterOptions['top_filters']);
+        $titles = explode(',', $filterOptions['top_filters_title']);
         $i = 0;
         $allFilters = $this->_allFilters;
         foreach ($topFilters as $filter) {
+            $filter = trim($filter);
             if (isset($allFilters[$filter])) {
                 foreach ($allFilters[$filter] as $key => $values) {
-                    $yes = strtolower($values['stringValue']) == 'yes'?true:false;
+                    $yes = (strtolower($values['stringValue']) == 'yes');
                     if ($values['stringValue'] == 1 || $yes) {
                         $filters[$filter] = $allFilters[$filter][$key];
                         $filters[$filter]['title'] = $titles[$i];
@@ -75,34 +77,6 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             $i++;
         }
         return $filters;
-    }
-
-    private function getTopFilterUrl($name, $value, $selected)
-    {
-        $multioption = Mage::getStoreConfig('Boxalino_General/filter/top_filters_multioption');
-        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
-        if (strpos($currentUrl, '?') === FALSE) {
-            $currentUrl .= '?';
-        }
-        if ($multioption == true) {
-            if ($selected === false) {
-                $url = $currentUrl . '&bx_' . $name . '[0]' . '=' . $value;
-            } else {
-                $url = str_replace('&bx_' . $name . '[0]' . '=' . $value, '', $currentUrl);
-            }
-        } else {
-            $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
-            if ($selected === false) {
-                foreach ($topFilters as $filter) {
-                    $currentUrl = str_replace('&bx_' . $filter . '[0]' . '=' . $value, '', $currentUrl);
-                }
-                $url = $currentUrl . '&bx_' . $name . '[0]' . '=' . urlencode($value);
-            } else {
-                $url = str_replace('&bx_' . $name . '[0]' . '=' . urlencode($value), '', $currentUrl);
-            }
-        }
-
-        return $url;
     }
 
     public function getLeftFilters()
@@ -118,10 +92,10 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             $filters[$filter[0]] = array('title' => $leftFiltersTitles[$i], 'values' => array());
             if (isset($allFilters[$filter[0]])) {
                 if ($filter[1] == 'hierarchical') {
-                    $filters[$filter[0]]['values'] = $this->returnTree($filter[0]);
+                    $filters[$filter[0]]['values'] = $this->_returnTree($filter[0]);
                 } else {
                     foreach ($allFilters[$filter[0]] as $key => $values) {
-                        $filters[$filter[0]]['values'][] = $this->returnImportantValues($values, $filter[1], $filter[0], $position);
+                        $filters[$filter[0]]['values'][] = $this->_returnImportantValues($values, $filter[1], $filter[0], $position);
                         $position++;
                     }
                 }
@@ -134,10 +108,167 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         return $filters;
     }
 
-    private function returnTree($filter)
+    public function removeFilterFromUrl($url, $filter, $vals)
+    {
+        $key = 'bx_' . $filter;
+        if (array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key])) {
+            foreach ($vals as $val) {
+                $position = array_search($val, $_REQUEST[$key]);
+                if ($position !== false) {
+                    $url = $this->_removeFilterFromUrl($url, $filter, $val, $position);
+                }
+            }
+        }
+        return $url;
+    }
+
+    public function getMinMaxValues($values)
+    {
+        $first = $values[0];
+        $last = end($values);
+        return array('min' => round(floor($first['stringValue']['min']), -2), 'max' => round(ceil($last['stringValue']['max'])), 1);
+    }
+
+    public function getMaxLevel($filter)
+    {
+        if (isset($this->maxLevel[$filter])) {
+            return $this->maxLevel[$filter];
+        }
+
+        return 0;
+    }
+
+    protected function _addFilterToUrl($url, $filter, $value, $position = 0)
+    {
+        return $url . (strpos($url, '?') === FALSE ? '?' : '&') .
+        'bx_' . $filter . '[' . $position . ']=' . urlencode($value);
+    }
+
+    protected function _getFilterUrl($name, $value, $selected, $ranged = false, $position = 0, $hierarchical = null)
+    {
+        $multioption = Mage::getStoreConfig('Boxalino_General/filter/left_filters_multioption');
+        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+        if (!$ranged) {
+            if ($multioption == true && $hierarchical == null) {
+                if ($selected === false) {
+                    $url = $this->_addFilterToUrl($currentUrl, $name, $value, $position);
+                } else {
+                    $url = $this->_removeFilterFromUrl($currentUrl, $name, $value, $position);
+                }
+            } else {
+                $position = 0;
+                if ($selected === false) {
+                    if (array_key_exists('bx_' . $name, $_REQUEST) && is_array($_REQUEST['bx_' . $name])) {
+                        foreach ($_REQUEST['bx_' . $name] as $val) {
+                            $currentUrl = $this->_removeFilterFromUrl($currentUrl, $name, $val, $position);
+                        }
+                    }
+                    $url = $this->_addFilterToUrl($currentUrl, $name, $value, $position);
+                } else {
+                    $url = $this->_removeFilterFromUrl($currentUrl, $name, $value, $position);
+                }
+            }
+        } else {
+            if ($selected === false) {
+                $url = $this->_addFilterToUrl($currentUrl, $name, $value['from'] . '-' . $value['to'], $position);
+            } else {
+                $url = $this->_removeFilterFromUrl($currentUrl, $name, $value['from'] . '-' . $value['to'], $position);
+            }
+        }
+        return $url;
+    }
+
+    protected function _getTopFilterUrl($name, $value, $selected)
+    {
+        $filterOptions = Mage::getStoreConfig('Boxalino_General/filter');
+        $multioption = $filterOptions['top_filters_multioption'];
+        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+        if ($multioption == true) {
+            if ($selected === false) {
+                $url = $this->_addFilterToUrl($currentUrl, $name, $value);
+            } else {
+                $url = $this->_removeFilterFromUrl($currentUrl, $name, $value);
+            }
+        } else {
+            if ($selected === false) {
+                $topFilters = explode(',', $filterOptions['top_filters'];
+                foreach ($topFilters as $filter) {
+                    $filter = trim($filter);
+                    $currentUrl = $this->_removeFilterFromUrl($currentUrl, $filter, $value);
+                }
+                $url = $this->_addFilterToUrl($currentUrl, $name, $value);
+            } else {
+                $url = $this->_removeFilterFromUrl($currentUrl, $name, $value);
+            }
+        }
+
+        return $url;
+    }
+
+    protected function _removeFilterFromUrl($url, $filter, $value, $position = 0)
+    {
+        $filter = urlencode($filter);
+        $value = urlencode($value);
+        return str_replace(
+            array(
+                '&bx_' . $filter . '[' . $position . ']=' . $value,
+                '?bx_' . $filter . '[' . $position . ']=' . $value,
+            ), '', $url
+        );
+    }
+
+    protected function _returnImportantValues($values, $option, $filter, $position)
+    {
+        $data = array();
+        if ($option == 'ranged') {
+            $data['stringValue'] = array('min' => $values['rangeFromInclusive'], 'max' => $values['rangeToExclusive']);
+            $data['url'] = $this->_getFilterUrl($filter, array('from' => $values['rangeFromInclusive'], 'to' => $values['rangeToExclusive']), $values['selected'], true, $position);
+        } else {
+            $data['url'] = $this->_getFilterUrl($filter, $values['stringValue'], $values['selected'], false, $position);
+            $data['stringValue'] = $values['stringValue'];
+        }
+        $data['hitCount'] = $values['hitCount'];
+        $data['selected'] = $values['selected'];
+        return $data;
+    }
+
+    protected function _returnHierarchy($filter)
+    {
+        $whatToDisplay = array('level' => 2, 'parentId' => '');
+        $parents = array();
+        $values = $this->_allFilters[$filter];
+
+        $amount = count($values);
+        for ($i = 0; $i < $amount; $i++) {
+            $parentLevel = count($values[$i]['hierarchy']);
+            for ($j = $i + 1; $j < $amount; $j++) {
+                if ($parentLevel < count($values[$j]['hierarchy'])) {
+                    $level = count($values[$j]['hierarchy']);
+                    $childId = $values[$j]['hierarchyId'];
+                    $parents[$level][$childId] = array(
+                            'stringValue' => end($values[$j]['hierarchy']),
+                            'hitCount' => $values[$j]['hitCount'],
+                            'parentId' => $values[$i]['hierarchyId'],
+                            'url' => $this->_getFilterUrl($filter, $values[$j]['stringValue'], $values[$j]['selected'], false, 0),
+                            'selected' => $values[$j]['selected']
+                    );
+                    if ($values[$j]['selected'] === true) {
+                        $whatToDisplay = array('level' => $level + 1, 'parentId' => $values[$j]['hierarchyId']);
+                    }
+                    continue;
+                }
+                if (count($values[$i]['hierarchy']) == count($values[$j]['hierarchy'])) {
+                    break;
+                }
+            }
+        }
+        return array('values' => $parents, 'display' => $whatToDisplay);
+    }
+
+    protected function _returnTree($filter)
     {
         $results = array();
-        $parents = $this->returnHierarchy($filter);
+        $parents = $this->_returnHierarchy($filter);
         $level = 0;
         if ($parents['display']['level'] == 2) {
             $results = $parents['values'][$parents['display']['level']];
@@ -184,136 +315,9 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             }
             $results = array_reverse($results);
 
-
         }
         $results = array_merge($results, $highestChild);
-        $this->setMaxLevel($filter, $level);
-        return $results;
-    }
-
-    private function returnHierarchy($filter)
-    {
-        $whatToDisplay = array('level' => 2, 'parentId' => '');
-        $parents = array();
-        $values = $this->_allFilters[$filter];
-
-        $amount = count($values);
-        for ($i = 0; $i < $amount; $i++) {
-            $parentLevel = count($values[$i]['hierarchy']);
-            for ($j = $i + 1; $j < $amount; $j++) {
-                if ($parentLevel < count($values[$j]['hierarchy'])) {
-                    $level = count($values[$j]['hierarchy']);
-                    $childId = $values[$j]['hierarchyId'];
-                    $parents[$level][$childId] = array(
-                        'stringValue' => end($values[$j]['hierarchy']),
-                        'hitCount' => $values[$j]['hitCount'],
-                        'parentId' => $values[$i]['hierarchyId'],
-                        'url' => $this->getFilterUrl($filter, $values[$j]['stringValue'], $values[$j]['selected'], false, 0),
-                        'selected' => $values[$j]['selected']
-                    );
-                    if ($values[$j]['selected'] === true) {
-                        $whatToDisplay = array('level' => $level + 1, 'parentId' => $values[$j]['hierarchyId']);
-                    }
-                    continue;
-                }
-                if (count($values[$i]['hierarchy']) == count($values[$j]['hierarchy'])) {
-                    break;
-                }
-            }
-        }
-        return array('values' => $parents, 'display' => $whatToDisplay);
-    }
-
-    private function getFilterUrl($name, $value, $selected, $ranged = false, $position = 0, $hierarchical = null)
-    {
-        $multioption = Mage::getStoreConfig('Boxalino_General/filter/left_filters_multioption');
-        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
-        if (strpos($currentUrl, '?') === FALSE) {
-            $currentUrl .= '?';
-        }
-        if (!$ranged) {
-            if ($multioption == true && $hierarchical == null) {
-                if ($selected === false) {
-                    $url = $currentUrl . '&bx_' . $name . '[' . $position . ']' . '=' . urlencode($value);
-                } else {
-                    $url = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . urlencode($value), '', $currentUrl);
-                }
-            } else {
-                $position = 0;
-                if ($selected === false) {
-                    if (isset($_REQUEST['bx_' . $name])) {
-                        foreach ($_REQUEST['bx_' . $name] as $val) {
-                            $currentUrl = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . urlencode($val), '', $currentUrl);
-                        }
-                    }
-                    $url = $currentUrl . '&bx_' . $name . '[' . $position . ']' . '=' . urlencode($value);
-                } else {
-                    $url = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . urlencode($value), '', $currentUrl);
-                }
-            }
-        } else {
-            if ($selected === false) {
-                $url = $currentUrl . '&bx_' . $name . '[' . $position . ']' . '=' . $value['from'] . '-' . $value['to'];
-            } else {
-                $url = str_replace('&bx_' . $name . '[' . $position . ']' . '=' . $value['from'] . '-' . $value['to'], '', $currentUrl);
-            }
-        }
-        return $url;
-    }
-
-    private function returnImportantValues($values, $option, $filter, $position)
-    {
-        $data = array();
-        if ($option == 'ranged') {
-            $data['stringValue'] = array('min' => $values['rangeFromInclusive'], 'max' => $values['rangeToExclusive']);
-            $data['url'] = $this->getFilterUrl($filter, array('from' => $values['rangeFromInclusive'], 'to' => $values['rangeToExclusive']), $values['selected'], true, $position);
-        } else {
-            $data['url'] = $this->getFilterUrl($filter, $values['stringValue'], $values['selected'], false, $position);
-            $data['stringValue'] = $values['stringValue'];
-        }
-        $data['hitCount'] = $values['hitCount'];
-        $data['selected'] = $values['selected'];
-        return $data;
-    }
-
-    public function removeFilterFromUrl($url, $filter, $vals)
-    {
-        if (isset($_REQUEST['bx_' . $filter])) {
-            foreach ($vals as $val) {
-                $key = array_search($val, $_REQUEST['bx_' . $filter]);
-                if ($key !== false) {
-                    $filterKey = 'bx_' . $filter . '[' . $key . ']';
-
-                    // remove filter from url
-                    $url = str_replace($filterKey . '=' . $vals[$key], '', $url);
-                    $url = str_replace(urlencode($filterKey) . '=' . urlencode($vals[$key]), '', $url);
-
-                    // remove resulting duplicate ampersands
-                    $url = trim(str_replace(array('?&', '&&'), array('?', '&'), $url), ' ?&');
-                }
-            }
-        }
-        return $url;
-    }
-
-    public function getMinMaxValues($values)
-    {
-        $first = $values[0];
-        $last = end($values);
-        return array('min' => round(floor($first['stringValue']['min']), -2), 'max' => round(ceil($last['stringValue']['max'])), 1);
-    }
-
-    private function setMaxLevel($filter, $level)
-    {
         $this->maxLevel[$filter] = $level;
-    }
-
-    public function getMaxLevel($filter)
-    {
-        if (isset($this->maxLevel[$filter])) {
-            return $this->maxLevel[$filter];
-        }
-
-        return 0;
+        return $results;
     }
 }
