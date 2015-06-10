@@ -386,7 +386,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $filter = new \com\boxalino\p13n\api\thrift\Filter();
         $filter->fieldName = 'products_visibility';
         $filter->negative = true;
-        $filter->stringValues = array(Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE);
+        $filter->stringValues = array(Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE, Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG);
         return $filter;
     }
 
