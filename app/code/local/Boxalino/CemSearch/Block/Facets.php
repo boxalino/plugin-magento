@@ -69,7 +69,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                     if ($values['stringValue'] == 1 || $yes) {
                         $filters[$filter] = $allFilters[$filter][$key];
                         $filters[$filter]['title'] = $titles[$i];
-                        $filters[$filter]['url'] = $this->getTopFilterUrl($filter, $yes?$values['stringValue']:'1', $allFilters[$filter][$key]['selected']);
+                        $filters[$filter]['url'] = $this->_getTopFilterUrl($filter, $yes?$values['stringValue']:'1', $allFilters[$filter][$key]['selected']);
                         $filters[$filter]['selected'] = $allFilters[$filter][$key]['selected'];
                     }
                 }
@@ -191,7 +191,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             }
         } else {
             if ($selected === false) {
-                $topFilters = explode(',', $filterOptions['top_filters'];
+                $topFilters = explode(',', $filterOptions['top_filters']);
                 foreach ($topFilters as $filter) {
                     $filter = trim($filter);
                     $currentUrl = $this->_removeFilterFromUrl($currentUrl, $filter, $value);
