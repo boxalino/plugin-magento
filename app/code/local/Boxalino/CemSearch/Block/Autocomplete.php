@@ -238,14 +238,11 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
             }
 
             $this->_suggestData = $data;
-            if (isset($data[0]) && $data[0]['facets']) {
-                if ($htmlConfig['enabled'] == '1') {
-                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets']);
-                } else {
-                    $this->_suggestDataProducts = $p13n->getAutocompleteProducts($data[0]['facets'], $map, $fields);
-                }
+            $facets = array_key_exists(0, $data) && is_array($data[0]['facets']) ? $data[0]['facets'] : array();
+            if ($htmlConfig['enabled'] == '1') {
+                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($facets);
             } else {
-                $this->_suggestDataProducts = array();
+                $this->_suggestDataProducts = $p13n->getAutocompleteProducts($facets, $map, $fields);
             }
         }
         return $this->_suggestData;
