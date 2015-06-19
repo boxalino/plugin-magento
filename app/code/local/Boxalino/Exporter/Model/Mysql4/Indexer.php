@@ -1579,7 +1579,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
             //customer source
             $source = $sources->addChild('source');
-            $source->addAttribute('id', 'item_vals');
+            $source->addAttribute('id', 'customer_vals');
             $source->addAttribute('type', 'item_data_file');
 
             $source->addChild('file')->addAttribute('value', 'customers.csv');
