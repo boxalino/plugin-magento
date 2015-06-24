@@ -147,7 +147,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     protected function _getFilterUrl($name, $value, $selected, $ranged = false, $position = 0, $hierarchical = null)
     {
         $multioption = Mage::getStoreConfig('Boxalino_General/filter/left_filters_multioption');
-        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+        $currentUrl = Mage::helper('core/url')->getCurrentUrl();
         if (!$ranged) {
             if ($multioption == true && $hierarchical == null) {
                 if ($selected === false) {
@@ -182,7 +182,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     {
         $filterOptions = Mage::getStoreConfig('Boxalino_General/filter');
         $multioption = $filterOptions['top_filters_multioption'];
-        $currentUrl = urldecode(Mage::helper('core/url')->getCurrentUrl());
+        $currentUrl = Mage::helper('core/url')->getCurrentUrl();
         if ($multioption == true) {
             if ($selected === false) {
                 $url = $this->_addFilterToUrl($currentUrl, $name, $value);
