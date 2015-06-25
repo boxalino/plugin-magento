@@ -45,7 +45,7 @@ class Boxalino_CemSearch_Model_Observer
                         'quantity' => $item->getData('qty_ordered'),
                         'price' => $item->getPrice()
                     );
-                    $fullPrice = $fullPrice + $item->getPrice();
+                    $fullPrice += $item->getPrice() * $item->getData('qty_ordered');
                 }
             }
             $script = Mage::helper('Boxalino_CemSearch')->reportPurchase($products, $transactionId, $fullPrice, Mage::app()->getStore()->getCurrentCurrencyCode());
