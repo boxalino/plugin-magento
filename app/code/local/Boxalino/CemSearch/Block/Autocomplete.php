@@ -156,9 +156,9 @@ class Boxalino_CemSearch_Block_Autocomplete extends Mage_CatalogSearch_Block_Aut
         unset($product[Mage::getStoreConfig('Boxalino_General/search/entity_id')]);
 
         foreach($this->_order as $f) {
-            if ($f == 'image') {
+            if ($f == 'image' && isset($product[$f]) && !empty($product[$f])) {
                 $html .= '<div class="product-' . $f . '"><img src="' . $product[$f] . '" alt="' . $product['title'] . '" style="max-height:75px; max-width:75px;" /></div>';
-            } elseif (isset($product[$f])) {
+            } elseif (isset($product[$f]) && !empty($product[$f])) {
                 $html .= '<div class="product-' . $f . '"><span>' . $product[$f] . '</span></div>';
             }
         }
