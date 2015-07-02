@@ -1637,7 +1637,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $source->addChild('file')->addAttribute('value', 'transactions.csv');
             $source->addChild('orderIdColumn')->addAttribute('value', 'order_id');
             $customerIdColumn = $source->addChild('customerIdColumn');
-            $customerIdColumn->addAttribute('value', 'order_id');
+            $customerIdColumn->addAttribute('value', 'customer_id');
             $customerIdColumn->addAttribute('customer_property_id', 'customer_id');
             $productIdColumn = $source->addChild('productIdColumn');
             $productIdColumn->addAttribute('value', 'entity_id');
