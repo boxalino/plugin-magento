@@ -228,12 +228,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'description',
             'short_description',
             'sku',
+            'url_path',
             'price',
             'special_price',
             'special_from_date',
             'special_to_date',
-            'visibility',
             'category_ids',
+            'visibility',
             'status'
         );
 
@@ -536,6 +537,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $count++;
                 }
 
+                // we have to check for settings on the different levels: Store(View) & Global
                 self::logMem('Products - get attributes - before');
                 $columns = array(
                     'entity_id',
@@ -694,6 +696,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
 
                     $id = $product['entity_id'];
+                    $url_path = '';
 
                     $productParam = array();
                     $haveParent = false;
@@ -748,15 +751,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                                 fputcsv($filesMtM[$attr], array($id, $val), $this->_helperExporter->XML_DELIMITER, $this->_helperExporter->XML_ENCLOSURE);
                             }
 
-
                             $val = null;
-
                             continue;
                         }
 
                         $val = array_key_exists($attr, $product) ? $this->_helperSearch->escapeString($product[$attr]) : '';
                         switch ($attr) {
                             case 'category_ids':
+                                break;
+                            case 'url_path':
+                                $url_path = $val;
                                 break;
                             case 'description':
                             case 'short_description':
@@ -827,13 +831,16 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                      * Add url to product for each languages
                      */
                     if ($this->_storeConfig['export_product_url']) {
-                        $this->_transformedProducts['products'][$id] =
-                            array_merge(
-                                $this->_transformedProducts['products'][$id],
-                                array(
-                                    'default_url_' . $lang => $storeBaseUrl . $this->_helperExporter->rewrittenProductUrl($id, null, $storeId) . '?___store=' . $storeCode
-                                )
-                            );
+                        $url_rewrite_path = $this->_helperExporter->rewrittenProductUrl($id, null, $storeId);
+                        if (empty($url_rewrite_path) && !empty($url_path)) {
+                            $url_rewrite_path = url_path;
+                        }
+                        $this->_transformedProducts['products'][$id] = array_merge(
+                            $this->_transformedProducts['products'][$id],
+                            array(
+                                'default_url_' . $lang => $storeBaseUrl . $url_rewrite_path . '?___store=' . $storeCode
+                            )
+                        );
                     }
 
                     $productParam = null;
@@ -1434,7 +1441,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         foreach ($attrs as $attr) {
-            if ($attr == 'visibility' || $attr == 'status') {
+            if ($attr == 'visibility' || $attr == 'status' || $attr == 'url_path') {
                 continue;
             }
             $attr = $this->_helperSearch->sanitizeFieldName($attr);
@@ -1692,6 +1699,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         foreach ($attrs as $attr) {
+            if ($attr == 'category_ids' || $attr == 'url_path') {
+                continue;
+            }
+
             $ptype = 'string';
             // set property type
             switch ($attr) {
@@ -1734,8 +1745,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'has_lang' => false,
                     'reference' => $attr
                 );
-            } elseif ($attr == 'category_ids') {
-                continue;
             } else {
                 $ref = null;
                 $type = 'direct';
