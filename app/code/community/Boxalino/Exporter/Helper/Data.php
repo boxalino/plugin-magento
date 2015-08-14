@@ -197,10 +197,8 @@ class Boxalino_Exporter_Helper_Data extends Mage_Core_Helper_Data
     public function rewrittenProductUrl($productId, $storeId)
     {
         $coreUrl = Mage::getModel('core/url_rewrite');
-        $idPath = sprintf('product/%d', $productId);
         $coreUrl->setStoreId($storeId);
-        $coreUrl->loadByIdPath($idPath);
-
+        $coreUrl->loadByIdPath(sprintf('product/%d', $productId));
         return $coreUrl->getRequestPath();
     }
 

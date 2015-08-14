@@ -606,11 +606,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['datetime']);
 
-                $select = $db->select()
-                    ->union(
-                        array($select1, $select2, $select3, $select4, $select5),
-                        Zend_Db_Select::SQL_UNION_ALL
-                    );
+                $select = $db->select()->union(
+                    array($select1, $select2, $select3, $select4, $select5),
+                    Zend_Db_Select::SQL_UNION_ALL
+                );
 
                 $select1 = null;
                 $select2 = null;
@@ -679,12 +678,32 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         )
                     )
                     ->where('product_id IN(?)', $ids);
-                $ids = null;
                 foreach ($db->fetchAll($select) as $r) {
                     $products[$r['product_id']]['categories'][] = $r['category_id'];
                 }
                 $select = null;
                 self::logMem('Products - get categories - after');
+
+                if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
+                    self::logMem('Products - get EE URL key  - before');
+                    $select = $db->select()
+                        ->from(
+                            array('t_g' => $this->_prefix . 'catalog_product_entity_url_key'),
+                            array('entity_id')
+                        )
+                        ->joinLeft(
+                            array('t_s' => $this->_prefix . 'catalog_product_entity_url_key'),
+                            $db->quoteInto('t_s.attribute_id = t_g.attribute_id AND t_s.entity_id = t_g.entity_id AND t_s.store_id = ?', $storeId),
+                            array('value' => 'IF(t_s.store_id IS NULL, t_g.value, t_s.value)')
+                        )
+                        ->where('t_g.store_id = ?', 0)
+                        ->where('t_g.entity_id IN(?)', $ids);
+                    foreach ($db->fetchAll($select) as $r) {
+                        $products[$r['entity_id']]['url_key'] = $r['value'];
+                    }
+                    self::logMem('Products - get EE URL key  - after');
+                }
+                $ids = null;
 
                 foreach ($products as $product) {
                     self::logMem('Products - start transform');
@@ -801,10 +820,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $this->_count++;
                         $localeCount++;
 
-                        /**
-                         * Add special fields
-                         */
-                        //Add url to image cache
+                        // Add url to image cache
                         if ($this->_storeConfig['export_product_images']) {
                             $_product = Mage::getModel('catalog/product')->load($id);
                             $media_gallery = $_product->getMediaGallery();
@@ -821,16 +837,19 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $this->_transformedProducts['products'][$id] = array_merge($this->_transformedProducts['products'][$id], $productParam);
                     }
 
-                    /**
-                     * Add url to product for each languages
-                     */
+                    // Add url to product for each languages
                     if ($this->_storeConfig['export_product_url']) {
+                        if (array_key_exists('url_key', $product)) {
+                            $url_path = $product['url_key'] . '.html';
+                        } else {
+                            $url_path = $this->_helperExporter->rewrittenProductUrl(
+                                $id, $storeId
+                            );
+                        }
                         $this->_transformedProducts['products'][$id] = array_merge(
                             $this->_transformedProducts['products'][$id],
                             array('default_url_' . $lang => (
-                                $storeBaseUrl . $this->_helperExporter->rewrittenProductUrl(
-                                    $id, $storeId
-                                ) . '?___store=' . $storeCode
+                                $storeBaseUrl . $url_path . '?___store=' . $storeCode
                             ))
                         );
                     }
@@ -840,7 +859,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                     ksort($this->_transformedProducts['products'][$id]);
                     self::logMem('Products - end transform');
-
                 }
             }
 
