@@ -228,7 +228,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'description',
             'short_description',
             'sku',
-            'url_path',
             'price',
             'special_price',
             'special_from_date',
@@ -696,8 +695,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
 
                     $id = $product['entity_id'];
-                    $url_path = '';
-
                     $productParam = array();
                     $haveParent = false;
 
@@ -758,9 +755,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $val = array_key_exists($attr, $product) ? $this->_helperSearch->escapeString($product[$attr]) : '';
                         switch ($attr) {
                             case 'category_ids':
-                                break;
-                            case 'url_path':
-                                $url_path = $val;
                                 break;
                             case 'description':
                             case 'short_description':
@@ -831,15 +825,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                      * Add url to product for each languages
                      */
                     if ($this->_storeConfig['export_product_url']) {
-                        $url_rewrite_path = $this->_helperExporter->rewrittenProductUrl($id, null, $storeId);
-                        if (empty($url_rewrite_path) && !empty($url_path)) {
-                            $url_rewrite_path = url_path;
-                        }
                         $this->_transformedProducts['products'][$id] = array_merge(
                             $this->_transformedProducts['products'][$id],
-                            array(
-                                'default_url_' . $lang => $storeBaseUrl . $url_rewrite_path . '?___store=' . $storeCode
-                            )
+                            array('default_url_' . $lang => (
+                                $storeBaseUrl . $this->_helperExporter->rewrittenProductUrl(
+                                    $id, $storeId
+                                ) . '?___store=' . $storeCode
+                            ))
                         );
                     }
 
@@ -1441,7 +1433,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         foreach ($attrs as $attr) {
-            if ($attr == 'visibility' || $attr == 'status' || $attr == 'url_path') {
+            if ($attr == 'visibility' || $attr == 'status') {
                 continue;
             }
             $attr = $this->_helperSearch->sanitizeFieldName($attr);
@@ -1699,13 +1691,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         foreach ($attrs as $attr) {
-            if ($attr == 'category_ids' || $attr == 'url_path') {
-                continue;
-            }
-
-            $ptype = 'string';
             // set property type
             switch ($attr) {
+                case 'category_ids':
+                    continue 2;
                 case 'name':
                     $ptype = 'title';
                     break;
@@ -1733,6 +1722,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 case 'length':
                     $ptype = 'number';
                     break;
+                default:
+                    $ptype = 'string';
             }
 
             if (isset($this->_attributesValuesByName[$attr]) && $attr != 'visibility' && $attr != 'status') {
@@ -1760,7 +1751,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         break;
                     default:
                         $lang = false;
-                        break;
                 }
                 $properties[] = array(
                     'id' => $attr,
