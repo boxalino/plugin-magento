@@ -1,5 +1,15 @@
 # changelog of the boxalino magento plugin
 
+## v2.10 refactoring and bugfixes
+
+* Moved plugin from local to community pool to support custom overrides.
+* Adding support for URL export in Magento EE.
+* Improving handling of missing/empty images in the autocompletion.
+* Refactoring and improving facet block.
+* Exclude catalog only items in the search.
+* Fixing regressions in the customer synchronization.
+* Correcting order total calculation in tracking.
+
 ## v2.9 supporting configurable customer attributes
 
 * Added support to configure additional customer attributes in export.
