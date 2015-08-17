@@ -279,7 +279,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 if (!in_array($field, $this->_customerAttributes)) {
                     Mage::throwException("Customer attribute \"$field\" doesn't exist, please update your additional_customer_attributes setting in the Boxalino Exporter settings!");
                 }
-                if ($field != null && strlen($field) > 0 && !in_array($field, $customer_attributes)) {
+                if ($field != null && strlen($field) > 0 && !in_array($field, $this->_customerAttributes)) {
                     $attributes[] = $field;
                 }
             }
