@@ -1945,7 +1945,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             'account' => $this->_storeConfig['di_account'],
             'dev' => $this->_storeConfig['account_dev'] == 0 ? 'false' : 'true',
             'delta' => $this->_getIndexType() == 'delta' ? 'true' : 'false',
-            'data' => $this->getCurlFile("@$file.zip", "application/zip"),
+            'data' => $this->getCurlFile("$file.zip", "application/zip"),
         );
 
         $url = $this->_helperExporter->getZIPSyncUrl($this->_storeConfig['account_dev']);
@@ -1957,12 +1957,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     {
         try {
             if (class_exists('CURLFile')) {
-                return new CURLFile(substr($filename, 1), $type);
+                return new CURLFile($filename, $type);
             }
-        } catch(Exception $e){
-            return $filename . ";type=$type";
-        }
-        return $filename . ";type=$type";
+        } catch(Exception $e) {}
+        return "@$filename;type=$type";
     }
 
     protected function savePartToCsv($file, &$data)

@@ -45,7 +45,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     private function createChoiceRequest()
     {
         $this->choiceRequest = $this->p13n->getChoiceRequest($this->config->getAccount(), $this->config->getDomain());
-        $this->choiceRequest = $this->p13n->addRequestContext($this->choiceRequest);
     }
 
     public function __destruct()
@@ -270,7 +269,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             array($searchConfig['entity_id'], 'title', 'score');
         }
         $this->autocompleteRequest = $this->getAutocompleteRequest($this->config->getAccount(), $this->config->getDomain());
-        $this->autocompleteRequest = $this->p13n->addRequestContext($this->autocompleteRequest);
 
         $searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
         $searchQuery->indexId = $this->config->getAccount();
@@ -883,7 +881,6 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             }
             $choiceRequest->inquiries[] = $inquiry;
         }
-        $choiceRequest = $this->p13n->addRequestContext($choiceRequest);
 
         if (isset($_REQUEST['productId'])) {
             Boxalino_CemSearch_Model_Logger::saveFrontActions('recommendation_product_id', $_REQUEST['productId']);

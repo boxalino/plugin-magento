@@ -243,7 +243,7 @@ class HttpP13n
      * @param \com\boxalino\p13n\api\thrift\AutocompleteRequest|\com\boxalino\p13n\api\thrift\ChoiceRequest|\com\boxalino\p13n\api\thrift\BatchChoiceRequest $request
      * @return \com\boxalino\p13n\api\thrift\AutocompleteRequest|\com\boxalino\p13n\api\thrift\ChoiceRequest|\com\boxalino\p13n\api\thrift\BatchChoiceRequest
      */
-    public function addRequestContext($request)
+    protected function addRequestContext($request)
     {
         if (
             $request instanceof \com\boxalino\p13n\api\thrift\AutocompleteRequest ||
