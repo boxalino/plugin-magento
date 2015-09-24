@@ -1167,7 +1167,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
      */
     protected function _exportTransactions()
     {
-        if (!$this->_storeConfig['export_transactions']) {
+        // don't export transactions in delta sync or when disabled
+        if (!$this->_storeConfig['export_transactions'] || $this->_getIndexType() == 'delta') {
             return;
         }
 
@@ -1214,7 +1215,11 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 ->order(array('order.entity_id', 'item.product_type'))
                 ->limit($limit, ($page - 1) * $limit);
 
-            $this->_getIndexType() == 'delta' ? $select->where('order.created_at >= ? OR order.updated_at >= ?', $this->_getLastIndex()) : '';
+            // when in full transaction export mode, don't set the
+            if (!$this->_storeConfig['export_transactions_full']) {
+                $select->where('order.created_at >= ?', $this->_getLastIndex())
+                       ->orWhere('order.updated_at >= ?', $this->_getLastIndex());
+            }
 
             $transactions = $db->fetchAll($select);
             self::logMem("Transactions - loaded page $page");
@@ -2023,5 +2028,43 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             }
         }
         return array_key_exists($entityType, $this->_entityIds) ? $this->_entityIds[$entityType] : null;
+    }
+
+    /**
+     * @description Get date of last data sync
+     */
+    protected function _getLastIndex()
+    {
+        if ($this->_lastIndex == 0) {
+            $this->_setLastIndex();
+        }
+        return $this->_lastIndex;
+    }
+
+    /**
+     * @description set when was last data sync
+     */
+    protected function _setLastIndex()
+    {
+        $dates = array();
+        $indexes = Mage::getModel('index/indexer')->getProcessesCollection()->getData();
+        foreach ($indexes as $index) {
+            if ($index['indexer_code'] == 'boxalinoexporter_indexer' && !empty($index['started_at'])) {
+                $dates[] = DateTime::createFromFormat('Y-m-d H:i:s', $index['started_at']);
+            } elseif ($index['indexer_code'] == 'boxalinoexporter_delta' && !empty($index['ended_at'])) {
+                $dates[] = DateTime::createFromFormat('Y-m-d H:i:s', $index['ended_at']);
+            }
+        }
+        if (count($dates) == 2) {
+            if ($dates[0] > $dates[1]) {
+                $date = $dates[0]->format('Y-m-d H:i:s');
+            } else {
+                $date = $dates[1]->format('Y-m-d H:i:s');
+            }
+        } else {
+            $date = $dates[0]->format('Y-m-d H:i:s');
+        }
+
+        $this->_lastIndex = $date;
     }
 }

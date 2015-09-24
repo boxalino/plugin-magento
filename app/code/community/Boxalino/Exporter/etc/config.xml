@@ -55,6 +55,7 @@
                 <export_tags>1</export_tags>
                 <export_customers>1</export_customers>
                 <export_transactions>1</export_transactions>
+                <export_transactions_full>0</export_transactions>
                 <export_chunk>200</export_chunk>
             </export_data>
         </boxalinoexporter>
