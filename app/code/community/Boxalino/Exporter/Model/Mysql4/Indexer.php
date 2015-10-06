@@ -1215,7 +1215,25 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 ->order(array('order.entity_id', 'item.product_type'))
                 ->limit($limit, ($page - 1) * $limit);
 
-            // when in full transaction export mode, don't set the
+            $transaction_attributes = explode(',', $this->_storeConfig['additional_transactions_attributes']);
+            if (count($transaction_attributes)) {
+                $billing_columns = $shipping_columns = array();
+                foreach ($transaction_attributes as $attribute) {
+                    $billing_columns['billing_' . $attribute] = $attribute;
+                    $shipping_columns['shipping_' . $attribute] = $attribute;
+                }
+                $select->joinLeft(
+                           array('billing_address' => $this->_prefix . 'sales_flat_order_address'),
+                           'order.billing_address_id = billing_address.entity_id',
+                           $billing_columns
+                       )
+                       ->joinLeft(
+                           array('shipping_address' => $this->_prefix . 'sales_flat_order_address'),
+                           'order.shipping_address_id = shipping_address.entity_id',
+                           $shipping_columns
+                       );
+            }
+            // when in full transaction export mode, don't limit the query
             if (!$this->_storeConfig['export_transactions_full']) {
                 $select->where('order.created_at >= ?', $this->_getLastIndex())
                        ->orWhere('order.updated_at >= ?', $this->_getLastIndex());
@@ -1272,7 +1290,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
                 }
 
-                $transactions_to_save[] = array(
+                $final_transaction = array(
                     'order_id' => $transaction['entity_id'],
                     'entity_id' => $transaction['product_id'],
                     'customer_id' => array_key_exists('customer_id', $transaction) ? $transaction['customer_id'] : '',
@@ -1286,6 +1304,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'shipping_date' => $status == 2 ? $transaction['updated_at'] : null,
                     'status' => $transaction['status'],
                 );
+                if (count($transaction_attributes)) {
+                    foreach ($transaction_attributes as $attribute) {
+                        $final_transaction['billing_' . $attribute] = $transaction['billing_' . $attribute];
+                        $final_transaction['shipping_' . $attribute] = $transaction['shipping_' . $attribute];
+                    }
+                }
+                $transactions_to_save[] = $final_transaction;
             }
 
             $data = $transactions_to_save;
