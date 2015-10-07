@@ -1,5 +1,16 @@
 # changelog of the boxalino magento plugin
 
+## v2.11 transaction indexing extension
+
+* Added a default cron job configuration for the boxalino full indexer to run at 2am.
+* Transactions are now synced incrementally by default, introduced a
+  configuration option to force full transaction syncs.
+* Adding configuration to optionally export billing & shipping address
+  properties in the transactions.
+* Add support for previously ignored guest transactions as customer profiles.
+* Will now detect Indexing misconfigurations (overlaps of data intelligence
+  indexes and languages) and report them.
+
 ## v2.10 refactoring and bugfixes
 
 * Moved plugin from local to community pool to support custom overrides.
