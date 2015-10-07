@@ -60,4 +60,16 @@
             </export_data>
         </boxalinoexporter>
     </default>
+    <crontab>
+        <jobs>
+            <boxalinocem>
+                <schedule>
+                    <cron_expr>0 2 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>boxalinoexporter/indexer::reindexAll</model>
+                </run>
+            </boxalinocem>
+        </jobs>
+    </crontab>
 </config>
