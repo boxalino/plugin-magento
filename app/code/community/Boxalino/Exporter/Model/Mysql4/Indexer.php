@@ -184,8 +184,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         if (!array_key_exists($index, $indexStructure)) {
                             $indexStructure[$index] = array();
                         }
-                        if (!array_key_exists($lang, $indexStructure[$index])) {
-                            $indexStructure[$index][$lang] = array();
+                        if (array_key_exists($lang, $indexStructure[$index])) {
+                            throw new Exception(
+                                "Configuration error detected: Language '$lang' can only be pushed to account '$index' once. Please review and correct your boxalino plugin's configuration, including the various configuration levels per website, store view, etc."
+                            );
                         }
                         $indexStructure[$index][$lang] = array(
                             'config'  => $config,
