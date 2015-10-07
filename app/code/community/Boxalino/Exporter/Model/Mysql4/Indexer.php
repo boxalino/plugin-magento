@@ -1180,6 +1180,15 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         $page = 1;
         $header = true;
 
+        // We use the crypt key as salt when generating the guest user hash
+        // this way we can still optimize on those users behaviour, whitout
+        // exposing any personal data. The server salt is there to guarantee
+        // that we can't connect guest user profiles across magento installs.
+        $salt = $db->quote(
+            ((string) Mage::getConfig()->getNode('global/crypt/key')) .
+            $this->_storeConfig['di_username']
+        );
+
         while ($count >= $limit) {
             self::logMem('Transactions - load page ' . $page);
             $transactions_to_save = array();
@@ -1209,6 +1218,13 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'original_price',
                         'product_type',
                         'qty_ordered',
+                    )
+                )
+                ->joinLeft(
+                    array('guest' => $this->_prefix . 'sales_flat_order_address'),
+                    'order.billing_address_id = guest.entity_id',
+                    array(
+                        'guest_id' => 'IF(guest.email IS NOT NULL, SHA1(CONCAT(guest.email, ' . $salt . ')), NULL)'
                     )
                 )
                 ->where('order.status <> ?', 'canceled')
@@ -1293,7 +1309,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $final_transaction = array(
                     'order_id' => $transaction['entity_id'],
                     'entity_id' => $transaction['product_id'],
-                    'customer_id' => array_key_exists('customer_id', $transaction) ? $transaction['customer_id'] : '',
+                    'customer_id' => $transaction['customer_id'],
+                    'guest_id' => $transaction['guest_id'],
                     'price' => $transaction['original_price'],
                     'discounted_price' => $transaction['price'],
                     'quantity' => $transaction['qty_ordered'],
@@ -1686,6 +1703,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $customerIdColumn = $source->addChild('customerIdColumn');
             $customerIdColumn->addAttribute('value', 'customer_id');
             $customerIdColumn->addAttribute('customer_property_id', 'customer_id');
+            // guests are customers that don't sign up and therefore have no customer id or profile
+            $customerIdColumn->addAttribute('guest_property_id', 'guest_id');
             $productIdColumn = $source->addChild('productIdColumn');
             $productIdColumn->addAttribute('value', 'entity_id');
             $productIdColumn->addAttribute('product_property_id', 'product_entity_id');
