@@ -257,7 +257,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                         'url' => $this->_getFilterUrl(
                             $isCategories ? 'category_id' : $filter,
                             $isCategories ? $values[$j]['hierarchyId'] : $values[$j]['stringValue'],
-                            $values[$j]['selected'], false, 0
+                            $isCategories ? $values[$j]['hierarchyId'] == $currentId : $values[$j]['selected'], false, 0
                         ),
                         'selected' => $isCategories ? $values[$j]['hierarchyId'] == $currentId : $values[$j]['selected']
                     );

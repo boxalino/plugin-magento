@@ -569,7 +569,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         }
         if (array_key_exists('bx_category_id', $_REQUEST)) {
-            $normalFilters[] = 'category_id';
+            $normalFilters[] = 'category_id:hierarchical:1';
         }
         if (count($normalFilters)) {
             foreach ($normalFilters as $filterString) {
