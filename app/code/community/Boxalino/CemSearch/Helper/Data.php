@@ -315,11 +315,14 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             if (!empty($category)) {
                 $_REQUEST['bx_category_id'][0] = $category->getId();
             }
+            if (isset($_GET['cat'])) {
+                $_REQUEST['bx_category_id'][0] = $_GET['cat'];
+            }
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
 
             $this->searchAdapter->setupInquiry(
-                $generalConfig['quick_search'],
+                empty($generalConfig['quick_search']) ? 'search' : $generalConfig['quick_search'],
                 Mage::helper('catalogsearch')->getQueryText(),
                 substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2),
                 array($generalConfig['entity_id'], 'categories'),
@@ -327,9 +330,6 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
                 ($generalConfig['quick_search_limit'] == 0 ? 1000 : $generalConfig['quick_search_limit'])
             );
 
-            if (isset($_GET['cat'])) {
-                $this->searchAdapter->addFilterCategory($_GET['cat']);
-            }
             $this->searchAdapter->search();
             $this->searchAdapter->prepareAdditionalDataFromP13n();
         }
