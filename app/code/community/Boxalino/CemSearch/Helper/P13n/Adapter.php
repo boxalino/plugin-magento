@@ -557,8 +557,8 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
     private function prepareFacets()
     {
         $facets = array();
-        $normalFilters = '';
-        $topFilters = '';
+        $normalFilters = array();
+        $topFilters = array();
         $enableLeftFilters = Mage::getStoreConfig('Boxalino_General/filter/left_filters_enable');
         $enableTopFilters = Mage::getStoreConfig('Boxalino_General/filter/top_filters_enable');
 
@@ -568,7 +568,10 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         if ($enableTopFilters == 1) {
             $topFilters = explode(',', Mage::getStoreConfig('Boxalino_General/filter/top_filters'));
         }
-        if (!empty($normalFilters)) {
+        if (array_key_exists('bx_category_id', $_REQUEST)) {
+            $normalFilters[] = 'category_id';
+        }
+        if (count($normalFilters)) {
             foreach ($normalFilters as $filterString) {
                 $filter = explode(':', $filterString);
                 if ($filter[0] != '') {
@@ -582,7 +585,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
                 }
             }
         }
-        if ($topFilters) {
+        if (count($topFilters)) {
             foreach ($topFilters as $filter) {
                 if ($filter != '') {
                     $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();

@@ -237,6 +237,11 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         $whatToDisplay = array('level' => 2, 'parentId' => '');
         $parents = array();
         $values = $this->_allFilters[$filter];
+        $isCategories = ($filter == 'categories');
+        $currentId = null;
+        if ($isCategories && array_key_exists('bx_category_id', $_REQUEST)) {
+            $currentId = current($_REQUEST['bx_category_id']);
+        }
 
         $amount = count($values);
         for ($i = 0; $i < $amount; $i++) {
@@ -246,13 +251,17 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
                     $level = count($values[$j]['hierarchy']);
                     $childId = $values[$j]['hierarchyId'];
                     $parents[$level][$childId] = array(
-                            'stringValue' => end($values[$j]['hierarchy']),
-                            'hitCount' => $values[$j]['hitCount'],
-                            'parentId' => $values[$i]['hierarchyId'],
-                            'url' => $this->_getFilterUrl($filter, $values[$j]['stringValue'], $values[$j]['selected'], false, 0),
-                            'selected' => $values[$j]['selected']
+                        'stringValue' => end($values[$j]['hierarchy']),
+                        'hitCount' => $values[$j]['hitCount'],
+                        'parentId' => $values[$i]['hierarchyId'],
+                        'url' => $this->_getFilterUrl(
+                            $isCategories ? 'category_id' : $filter,
+                            $isCategories ? $values[$j]['hierarchyId'] : $values[$j]['stringValue'],
+                            $values[$j]['selected'], false, 0
+                        ),
+                        'selected' => $isCategories ? $values[$j]['hierarchyId'] == $currentId : $values[$j]['selected']
                     );
-                    if ($values[$j]['selected'] === true) {
+                    if ($parents[$level][$childId]['selected'] === true) {
                         $whatToDisplay = array('level' => $level + 1, 'parentId' => $values[$j]['hierarchyId']);
                     }
                     continue;

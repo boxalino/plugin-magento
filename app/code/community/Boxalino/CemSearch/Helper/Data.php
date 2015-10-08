@@ -313,15 +313,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             /* @var $category Mage_Catalog_Model_Category */
             $category = Mage::registry('current_category');
             if (!empty($category)) {
-                $categoryPath = $category->getId();
-                $categoryNames = array('Default Category');
-                foreach ($category->getParentCategories() as $parentCategory) {
-                    $categoryNames[] = $parentCategory->getName();
-                }
-                foreach ($categoryNames as $categoryName) {
-                    $categoryPath .= '/' . $categoryName;
-                }
-                $_REQUEST['bx_categories'][0] = $categoryPath;
+                $_REQUEST['bx_category_id'][0] = $category->getId();
             }
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
