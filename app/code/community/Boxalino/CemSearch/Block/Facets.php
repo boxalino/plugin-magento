@@ -145,6 +145,9 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
         $key = 'bx_' . $filter;
         if (!array_key_exists($key, $params)) $params[$key] = array();
         $params[$key][$position] = $value;
+        if (empty($query)) {
+            return $url . '?' . http_build_query($params);
+        }
         return str_replace($query, http_build_query($params), $url);
     }
 
@@ -212,19 +215,24 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     protected function _removeFilterFromUrl($url, $filter, $value, $position = 0)
     {
         $query = parse_url($url, PHP_URL_QUERY);
-        parse_str($query, $params);
-        $key = 'bx_' . $filter;
-        if (
-            array_key_exists($key, $params) &&
-            array_key_exists($position, $params[$key]) &&
-            $params[$key][$position] == $value
-        ) {
-            unset($params[$key][$position]);
-            if (count($params[$key]) == 0) {
-                unset($params[$key]);
+        if (!empty($query)) {
+            parse_str($query, $params);
+            $key = 'bx_' . $filter;
+            if (
+                array_key_exists($key, $params) &&
+                array_key_exists($position, $params[$key]) &&
+                $params[$key][$position] == $value
+            ) {
+                unset($params[$key][$position]);
+                if (count($params[$key]) == 0) {
+                    unset($params[$key]);
+                }
+            }
+            if (count($params)) {
+                return str_replace($query, http_build_query($params), $url);
             }
         }
-        return str_replace($query, http_build_query($params), $url);
+        return $url;
     }
 
     protected function _returnImportantValues($values, $option, $filter, $position)
