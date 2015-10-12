@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 05.06.14 13:57
  */
 

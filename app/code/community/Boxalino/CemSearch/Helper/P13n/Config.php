@@ -2,7 +2,7 @@
 
 /**
  * User: Michal Sordyl
- * Mail: michal.sordyl@codete.co
+ * Mail: michal.sordyl@boxalino.com
  * Date: 28.05.14
  */
 class Boxalino_CemSearch_Helper_P13n_Config
@@ -56,4 +56,4 @@ class Boxalino_CemSearch_Helper_P13n_Config
         return $this->username;
     }
 
-} 
+}

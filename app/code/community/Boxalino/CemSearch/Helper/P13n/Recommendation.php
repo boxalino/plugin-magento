@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 12.06.14 16:36
  */
 class Boxalino_CemSearch_Helper_P13n_Recommendation

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 17.06.14 11:31
  */
 class Boxalino_CemSearch_Block_Product_List_Upsell extends Mage_Catalog_Block_Product_List_Upsell

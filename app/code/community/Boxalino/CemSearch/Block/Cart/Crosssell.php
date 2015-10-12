@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 13.06.14 12:25
  */
 class Boxalino_CemSearch_Block_Cart_Crosssell extends Mage_Checkout_Block_Cart_Crosssell

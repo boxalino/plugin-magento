@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 16.06.14 12:29
  */
 class Boxalino_CemSearch_Block_Product_List_Related extends Mage_Catalog_Block_Product_List_Related

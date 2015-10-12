@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by: Szymon Nosal <szymon.nosal@codete.com>
+ * Created by: Szymon Nosal <szymon.nosal@boxalino.com>
  * Created at: 06.06.14 11:36
  */
 
@@ -9,7 +9,7 @@
  *
  * @category    Boxalino
  * @package     Boxalino_CemSearch
- * @author      Szymon Nosal <szymon.nosal@codete.com>
+ * @author      Szymon Nosal <szymon.nosal@boxalino.com>
  */
 class Boxalino_CemSearch_Model_Resource_Advanced_Collection extends Mage_Catalog_Model_Resource_Product_Collection
 {
