@@ -140,8 +140,12 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     protected function _addFilterToUrl($url, $filter, $value, $position = 0)
     {
-        return $url . (strpos($url, '?') === FALSE ? '?' : '&') .
-        'bx_' . $filter . '[' . $position . ']=' . urlencode($value);
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $params);
+        $key = 'bx_' . $filter;
+        if (!array_key_exists($key, $params)) $params[$key] = array();
+        $params[$key][$position] = $value;
+        return str_replace($query, http_build_query($params), $url);
     }
 
     protected function _getFilterUrl($name, $value, $selected, $ranged = false, $position = 0, $hierarchical = null)
@@ -207,14 +211,20 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
     protected function _removeFilterFromUrl($url, $filter, $value, $position = 0)
     {
-        $filter = urlencode($filter);
-        $value = urlencode($value);
-        return str_replace(
-            array(
-                '&bx_' . $filter . '[' . $position . ']=' . $value,
-                '?bx_' . $filter . '[' . $position . ']=' . $value,
-            ), '', $url
-        );
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $params);
+        $key = 'bx_' . $filter;
+        if (
+            array_key_exists($key, $params) &&
+            array_key_exists($position, $params[$key]) &&
+            $params[$key][$position] == $value
+        ) {
+            unset($params[$key][$position]);
+            if (count($params[$key]) == 0) {
+                unset($params[$key]);
+            }
+        }
+        return str_replace($query, http_build_query($params), $url);
     }
 
     protected function _returnImportantValues($values, $option, $filter, $position)
