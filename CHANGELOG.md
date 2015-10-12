@@ -1,5 +1,10 @@
 # changelog of the boxalino magento plugin
 
+## v2.12 URL parsing bugfixes for facets
+
+* Switching to category IDs in the category facet to simplify logic.
+* Replacing custom URL parsing logic with standard PHP functionality.
+
 ## v2.11 transaction indexing extension
 
 * Added a default cron job configuration for the boxalino full indexer to run at 2am.
