@@ -231,6 +231,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
             if (count($params)) {
                 return str_replace($query, http_build_query($params), $url);
             }
+            return str_replace('?' . $query, '', $url);
         }
         return $url;
     }
