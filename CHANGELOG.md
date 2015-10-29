@@ -1,5 +1,9 @@
 # changelog of the boxalino magento plugin
 
+## v2.13 new search integration (without going in database)
+
+* Change search integration to use directly Magento objects like already done for product list
+
 ## v2.12 URL parsing bugfixes for facets
 
 * Switching to category IDs in the category facet to simplify logic.
