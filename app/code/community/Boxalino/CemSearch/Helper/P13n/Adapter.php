@@ -636,6 +636,16 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         return;
     }
 
+    public function getTotalHitCount()
+    {
+        $count = 0;
+        $response = $this->getChoiceResponse();
+        foreach ($response->variants as $variant) {
+            $count += $variant->searchResult->totalHitCount;
+        }
+        return $count;
+    }
+
     public function getEntitiesIds()
     {
         $result = array();

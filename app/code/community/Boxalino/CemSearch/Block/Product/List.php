@@ -30,7 +30,7 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
                 $entity_ids = array(0);
             }
             $this->_productCollection->addFieldToFilter('entity_id', $entity_ids)
-                ->addAttributeToSelect('*');
+                 ->addAttributeToSelect('*');
 
             // enforce boxalino ranking
             $this->_productCollection->getSelect()->order(new Zend_Db_Expr('FIELD(e.entity_id,' . implode(',', $entity_ids).')'));
@@ -42,6 +42,9 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
                 $this->_addProductAttributesAndPrices($this->_productCollection);
             }
             Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($this->_productCollection);
+
+            // ensure data is loaded
+            $this->_productCollection->load();
         }
 
         return $this->_productCollection;

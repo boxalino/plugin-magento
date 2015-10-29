@@ -250,6 +250,7 @@ class Boxalino_CemSearch_Model_Advanced extends Mage_CatalogSearch_Model_Advance
 
         Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($collection);
         Mage::getSingleton('catalog/product_visibility')->addVisibleInSearchFilterToCollection($collection);
+
         return $this;
     }
 

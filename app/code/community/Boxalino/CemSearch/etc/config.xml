@@ -119,6 +119,7 @@
                 </rewrite>
                 <rewrite>
                     <advanced_collection>Boxalino_CemSearch_Model_Resource_Advanced_Collection</advanced_collection>
+                    <fulltext_collection>Boxalino_CemSearch_Model_Resource_Fulltext_Collection</fulltext_collection>
                 </rewrite>
             </catalogsearch_resource>
             <catalogsearch>
@@ -126,6 +127,11 @@
                     <advanced>Boxalino_CemSearch_Model_Advanced</advanced>
                 </rewrite>
             </catalogsearch>
+            <catalog_resource>
+                <rewrite>
+                    <product_collection>Boxalino_CemSearch_Model_Resource_Product_Collection</product_collection>
+                </rewrite>
+            </catalog_resource>
             <catalog>
                 <rewrite>
                     <category>Boxalino_CemSearch_Model_Category</category>
@@ -151,6 +157,7 @@
             <catalogsearch>
                 <rewrite>
                     <autocomplete>Boxalino_CemSearch_Block_Autocomplete</autocomplete>
+                    <result>Boxalino_CemSearch_Block_Result</result>
                 </rewrite>
             </catalogsearch>
             <checkout>
@@ -160,6 +167,7 @@
             </checkout>
             <catalog>
                 <rewrite>
+                    <product_list>Boxalino_CemSearch_Block_Product_List</product_list>
                     <product_list_related>Boxalino_CemSearch_Block_Product_List_Related</product_list_related>
                     <product_list_upsell>Boxalino_CemSearch_Block_Product_List_Upsell</product_list_upsell>
                 </rewrite>
@@ -182,9 +190,9 @@
             </general>
             <search>
                 <quick_search>search</quick_search>
-                <quick_search_limit>0</quick_search_limit>
+                <quick_search_limit>25</quick_search_limit>
                 <advanced_search>search</advanced_search>
-                <advanced_search_limit>0</advanced_search_limit>
+                <advanced_search_limit>25</advanced_search_limit>
                 <autocomplete>autocomplete</autocomplete>
                 <autocomplete_limit>6</autocomplete_limit>
                 <autocomplete_products_limit>3</autocomplete_products_limit>

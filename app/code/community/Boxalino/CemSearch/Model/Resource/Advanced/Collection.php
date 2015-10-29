@@ -11,7 +11,7 @@
  * @package     Boxalino_CemSearch
  * @author      Szymon Nosal <szymon.nosal@boxalino.com>
  */
-class Boxalino_CemSearch_Model_Resource_Advanced_Collection extends Mage_Catalog_Model_Resource_Product_Collection
+class Boxalino_CemSearch_Model_Resource_Advanced_Collection extends Boxalino_CemSearch_Model_Resource_Product_Collection
 {
     /**
      * Add products id to search
@@ -21,10 +21,7 @@ class Boxalino_CemSearch_Model_Resource_Advanced_Collection extends Mage_Catalog
      */
     public function addIdFromBoxalino($ids)
     {
-
         $this->addFieldToFilter('entity_id', array('in' => $ids));
-
         return $this;
     }
-
 }

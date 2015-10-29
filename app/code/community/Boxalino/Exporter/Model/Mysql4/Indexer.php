@@ -1076,7 +1076,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                 )
                 ->where('entity_type_id = ?', $this->getEntityIdFor('customer_address'))
-                ->where('attribute_code IN ("country_id","postcode")');
+                ->where('attribute_code IN (?)', array('country_id', 'postcode'));
 
             $addressAttr = array();
             foreach ($db->fetchAll($select) as $r) {

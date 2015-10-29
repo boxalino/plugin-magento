@@ -279,6 +279,7 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
         if ($this->searchAdapter === null) {
             $storeConfig = Mage::getStoreConfig('Boxalino_General/general');
+            $request = Mage::app()->getFrontController()->getRequest();
 
             $p13nConfig = new Boxalino_CemSearch_Helper_P13n_Config(
                 $storeConfig['host'],
@@ -291,15 +292,17 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
             $field = '';
             $dir = '';
-            if(isset($_REQUEST['order'])){
-                if($_REQUEST['order'] == 'name'){
+            $order = $request->getParam('order');
+            if(isset($order)){
+                if($order == 'name'){
                     $field = 'title';
-                } elseif($_REQUEST['order'] == 'price'){
+                } elseif($order == 'price'){
                     $field = 'discountedPrice';
                 }
             }
-            if(isset($_REQUEST['dir'])){
-                $dir = $_REQUEST['dir']=='asc'?false:true;
+            $dirOrder = $request->getParam('dir');
+            if($dirOrder){
+                $dir = $dirOrder == 'asc' ? false : true;
             } else{
                 $dir = false;
             }
@@ -310,26 +313,34 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 
             $this->searchAdapter = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
-            if (!array_key_exists('bx_category_id', $_REQUEST) || empty($_REQUEST['bx_category_id'])) {
-                if (isset($_GET['cat'])) {
-                    $_REQUEST['bx_category_id'][0] = $_GET['cat'];
-                }
+            $categoryId = $request->getParam('bx_category_id');
+            if (empty($categoryId)) {
                 /* @var $category Mage_Catalog_Model_Category */
                 $category = Mage::registry('current_category');
                 if (!empty($category)) {
                     $_REQUEST['bx_category_id'][0] = $category->getId();
                 }
+                // GET param 'cat' may override the current_category,
+                // i.e. when clicking on subcategories in a category page
+                $cat = $request->getParam('cat');
+                if (!empty($cat)) {
+                    $_REQUEST['bx_category_id'][0] = $cat;
+                }
             }
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
+            $pageSize = (int) $request->getParam(
+                'limit',
+                $generalConfig['quick_search_limit'] == 0 ? 1000 : $generalConfig['quick_search_limit']
+            );
+            $offset = abs(((int) $request->getParam('p', 1)) - 1) * $pageSize;
 
             $this->searchAdapter->setupInquiry(
                 empty($generalConfig['quick_search']) ? 'search' : $generalConfig['quick_search'],
                 Mage::helper('catalogsearch')->getQueryText(),
                 substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2),
                 array($generalConfig['entity_id'], 'categories'),
-                $p13nSort, 0,
-                ($generalConfig['quick_search_limit'] == 0 ? 1000 : $generalConfig['quick_search_limit'])
+                $p13nSort, $offset, $pageSize
             );
 
             $this->searchAdapter->search();

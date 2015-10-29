@@ -169,7 +169,7 @@
                         </quick_search>
                         <quick_search_limit translate="label">
                             <label>Quick search limit</label>
-                            <comment><![CDATA[ 0 = without limit ]]></comment>
+                            <comment><![CDATA[ 0 = without limit, this should match your default page size for best performance ]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
@@ -187,7 +187,7 @@
                         </advanced_search>
                         <advanced_search_limit translate="label">
                             <label>Advanced search limit</label>
-                            <comment><![CDATA[ 0 = without limit ]]></comment>
+                            <comment><![CDATA[ 0 = without limit, this should match your default page size for best performance ]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>11</sort_order>
                             <show_in_default>1</show_in_default>
