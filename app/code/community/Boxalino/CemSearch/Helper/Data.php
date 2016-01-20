@@ -329,10 +329,34 @@ class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
             }
 
             $generalConfig = Mage::getStoreConfig('Boxalino_General/search');
-            $pageSize = (int) $request->getParam(
+			
+			if ($generalConfig['quick_search_limit'] == 0) {
+
+				//find default value instead
+
+				$storeConfig = Mage::getStoreConfig('catalog/frontend');
+
+				$storeDisplayMode = $storeConfig['list_mode'];
+
+				//we may get grid-list, list-grid, grid or list
+
+				$storeMainMode = explode('-', $storeDisplayMode);
+
+				$storeMainMode = $storeMainMode[0];
+
+				$limit = $storeConfig[$storeMainMode . '_per_page'];
+
+			} else {
+
+				$limit = $generalConfig['quick_search_limit'];
+
+			}
+			
+			$pageSize = (int) $request->getParam(
                 'limit',
-                $generalConfig['quick_search_limit'] == 0 ? 1000 : $generalConfig['quick_search_limit']
+                $limit
             );
+			
             $offset = abs(((int) $request->getParam('p', 1)) - 1) * $pageSize;
 
             $this->searchAdapter->setupInquiry(

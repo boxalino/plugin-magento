@@ -71,7 +71,27 @@ class Boxalino_CemSearch_AdvancedController extends Mage_CatalogSearch_AdvancedC
 
         $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
 
-        $limit = $generalConfig['advanced_search_limit'] == 0 ? 1000 : $generalConfig['advanced_search_limit'];
+        if ($generalConfig['advanced_search_limit'] == 0) {
+
+			//find default value instead
+
+			$storeConfig = Mage::getStoreConfig('catalog/frontend');
+
+			$storeDisplayMode = $storeConfig['list_mode'];
+
+			//we may get grid-list, list-grid, grid or list
+
+			$storeMainMode = explode('-', $storeDisplayMode);
+
+			$storeMainMode = $storeMainMode[0];
+
+			$limit = $storeConfig[$storeMainMode . '_per_page'];
+
+		} else {
+
+			$limit = $generalConfig['advanced_search_limit'];
+
+		}
 
         //setup search
         $p13n->setupInquiry(
