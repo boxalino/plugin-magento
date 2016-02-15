@@ -705,9 +705,39 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     }
                     self::logMem('Products - get EE URL key  - after');
                 }
-                $ids = null;
+                $select = null;
 
-                foreach ($products as $product) {
+                self::logMem('Products - linked products - before');
+                $select = $db->select()
+                    ->from(
+                        array('pl'=> $this->_prefix . 'catalog_product_link'),
+                        array(
+                            'link_id',
+                            'product_id',
+                            'linked_product_id',
+                            'link_type_id'
+                        )
+                    )
+					->from(
+                        array('lt' => $this->_prefix . 'catalog_product_link_type'),
+                        array(
+                            'link_type_id',
+                            'code'
+                        )
+                    )
+                    ->where('lt.link_type_id = pl.link_type_id')
+                    ->where('product_id IN(?)', $ids);
+                foreach ($db->fetchAll($select) as $r) {
+                    if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
+						$products[$r['product_id']]['linked_products_' . $r['code']] = $r['linked_product_id'];
+					} else {
+						$products[$r['product_id']]['linked_products_' . $r['code']] .= ',' . $r['linked_product_id'];
+					}
+                }
+                self::logMem('Products - linked products - after');
+				
+                $ids = null;
+				foreach ($products as $product) {
                     self::logMem('Products - start transform');
 
                     if (count($product['website']) == 0 || !in_array($this->_storeConfig['groupId'], $product['website'])) {
