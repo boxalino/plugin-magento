@@ -727,13 +727,18 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('lt.link_type_id = pl.link_type_id')
                     ->where('product_id IN(?)', $ids);
-                foreach ($db->fetchAll($select) as $r) {
-                    if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
+                $linkCodes = array();
+				foreach ($db->fetchAll($select) as $r) {
+					$linkCodes[$r['code']] = 'linked_products_' . $r['code'];
+				    if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
 						$products[$r['product_id']]['linked_products_' . $r['code']] = $r['linked_product_id'];
 					} else {
 						$products[$r['product_id']]['linked_products_' . $r['code']] .= ',' . $r['linked_product_id'];
 					}
                 }
+				foreach($linkCodes as $code => $codeFieldName) {
+					$attrs[] = $codeFieldName;
+				}
                 self::logMem('Products - linked products - after');
 				
                 $ids = null;
