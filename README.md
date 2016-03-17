@@ -50,9 +50,9 @@ N.B.: This project is for Magento 1, in case you need our plugin for Magento 2, 
     * System > Cache Management - Flush Cache Storage
 6. Update the administrator role:
     * System > Permissions > Roles > Administrators - Save Role
-7. Follow the [documentation PDF](https://boxalino.zendesk.com/hc/en-gb/articles/203757896-Getting-started-with-the-boxalino-plugin-for-Magento) to create your first product index, needed to enable search & recommendations.
+7. Follow the [documentation PDF] to create your first product index, needed to enable search & recommendations.
 8. Set up a an indexing cronjob, running at least one full index per day. Use the delta indexer if you want to update more than once per hour.
 
 ## Documentation
 
-The latest documentation PDF can be found on the [Magento plugin's support page](https://boxalino.zendesk.com/hc/en-gb/articles/203757896-Getting-started-with-the-boxalino-plugin-for-Magento).
+http://documentation.boxalino.com/boxalino-magento-1-x-and-2-x-plugin/
