@@ -2,8 +2,8 @@
 
 class Boxalino_CemSearch_Helper_Data extends Mage_Core_Helper_Data
 {
-    private $additionalFields = null;
-    private $searchAdapter = null;
+    protected $additionalFields = null;
+    protected $searchAdapter = null;
 
     public function __construct()
     {

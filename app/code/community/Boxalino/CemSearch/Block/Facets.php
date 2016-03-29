@@ -3,7 +3,7 @@
 class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 {
     /** @var array */
-    private $_allFilters = array();
+    protected $_allFilters = array();
 
     /** @var array */
     public $maxLevel = array();
