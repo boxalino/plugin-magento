@@ -4,9 +4,6 @@ class Boxalino_Exporter_Model_Mysql4_Exporter_Delta extends Boxalino_Exporter_Mo
 {
     const INDEX_TYPE = 'delta';
 
-    /** @var date Date of last data sync */
-    protected $_lastIndex = 0;
-
     /**
      * @description Declare where Indexer should start
      * @return void

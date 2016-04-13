@@ -58,6 +58,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected $_entityIds = null;
     protected $_prefix = '';
 
+    /** @var date Date of last data sync */
+    protected $_lastIndex = 0;
+
     /**
      * @description Start of reindex
      */
@@ -190,9 +193,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             );
                         }
                         $indexStructure[$index][$lang] = array(
-                            'config'  => $config,
+                            'config' => $config,
                             'website' => $website,
-                            'store'   => $store,
+                            'store' => $store,
                         );
                     }
                 }
@@ -271,7 +274,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
     protected function _mergeCustomerAttributes($attributes = array())
     {
         if (isset($this->_storeConfig['additional_customer_attributes']) && $this->_storeConfig['additional_customer_attributes'] != '') {
-            if(count($this->_customerAttributes) == 0) {
+            if (count($this->_customerAttributes) == 0) {
                 foreach (Mage::getModel('customer/customer')->getAttributes() as $at) {
                     $this->_customerAttributes[] = $at->getAttributeCode();
                 }
@@ -558,9 +561,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select5 = clone $select1;
 
                 $select1->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_varchar'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_varchar'),
                         $joinCondition,
@@ -568,9 +571,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['varchar']);
                 $select2->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_text'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_text'),
                         $joinCondition,
@@ -578,9 +581,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['text']);
                 $select3->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_decimal'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_decimal'),
                         $joinCondition,
@@ -588,9 +591,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['decimal']);
                 $select4->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_int'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_int'),
                         $joinCondition,
@@ -598,9 +601,9 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('t_d.attribute_id IN(?)', $attrsFromDb['int']);
                 $select5->from(
-                        array('t_d' => $this->_prefix . 'catalog_product_entity_datetime'),
-                        $columns
-                    )
+                    array('t_d' => $this->_prefix . 'catalog_product_entity_datetime'),
+                    $columns
+                )
                     ->joinLeft(
                         array('t_s' => $this->_prefix . 'catalog_product_entity_datetime'),
                         $joinCondition,
@@ -710,7 +713,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 self::logMem('Products - linked products - before');
                 $select = $db->select()
                     ->from(
-                        array('pl'=> $this->_prefix . 'catalog_product_link'),
+                        array('pl' => $this->_prefix . 'catalog_product_link'),
                         array(
                             'link_id',
                             'product_id',
@@ -718,7 +721,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                             'link_type_id'
                         )
                     )
-					->from(
+                    ->from(
                         array('lt' => $this->_prefix . 'catalog_product_link_type'),
                         array(
                             'link_type_id',
@@ -728,21 +731,21 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     ->where('lt.link_type_id = pl.link_type_id')
                     ->where('product_id IN(?)', $ids);
                 $linkCodes = array();
-				foreach ($db->fetchAll($select) as $r) {
-					$linkCodes[$r['code']] = 'linked_products_' . $r['code'];
-				    if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
-						$products[$r['product_id']]['linked_products_' . $r['code']] = $r['linked_product_id'];
-					} else {
-						$products[$r['product_id']]['linked_products_' . $r['code']] .= ',' . $r['linked_product_id'];
-					}
+                foreach ($db->fetchAll($select) as $r) {
+                    $linkCodes[$r['code']] = 'linked_products_' . $r['code'];
+                    if (!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
+                        $products[$r['product_id']]['linked_products_' . $r['code']] = $r['linked_product_id'];
+                    } else {
+                        $products[$r['product_id']]['linked_products_' . $r['code']] .= ',' . $r['linked_product_id'];
+                    }
                 }
-				foreach($linkCodes as $code => $codeFieldName) {
-					$attrs[] = $codeFieldName;
-				}
+                foreach ($linkCodes as $code => $codeFieldName) {
+                    $attrs[] = $codeFieldName;
+                }
                 self::logMem('Products - linked products - after');
-				
+
                 $ids = null;
-				foreach ($products as $product) {
+                foreach ($products as $product) {
                     self::logMem('Products - start transform');
 
                     if (count($product['website']) == 0 || !in_array($this->_storeConfig['groupId'], $product['website'])) {
@@ -886,8 +889,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         $this->_transformedProducts['products'][$id] = array_merge(
                             $this->_transformedProducts['products'][$id],
                             array('default_url_' . $lang => (
-                                $storeBaseUrl . $url_path . '?___store=' . $storeCode
-                            ))
+                                    $storeBaseUrl . $url_path . '?___store=' . $storeCode
+                                ))
                         );
                     }
 
@@ -1078,7 +1081,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                 $select4 = clone $select
                     ->from(array('ce' => $this->_prefix . 'customer_entity'), array(
                         'entity_id' => 'entity_id',
-                        'attribute_id' =>  new Zend_Db_Expr($attributeId),
+                        'attribute_id' => new Zend_Db_Expr($attributeId),
                         'value' => 'email',
                     ))
                     ->joinLeft(array('ea' => $this->_prefix . 'eav_attribute'), 'ea.attribute_id = ' . $attributeId, 'ea.attribute_code');
@@ -1169,7 +1172,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'country' => !empty($countryCode) ? $this->_helperExporter->getCountry($countryCode)->getName() : '',
                     'zip' => array_key_exists('postcode', $billingResult) ? $billingResult['postcode'] : '',
                 );
-                foreach($customer_attributes as $attr) {
+                foreach ($customer_attributes as $attr) {
                     $customer_to_save[$attr] = array_key_exists($attr, $customer) ? $customer[$attr] : '';
                 }
                 $customers_to_save[] = $customer_to_save;
@@ -1222,7 +1225,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         // exposing any personal data. The server salt is there to guarantee
         // that we can't connect guest user profiles across magento installs.
         $salt = $db->quote(
-            ((string) Mage::getConfig()->getNode('global/crypt/key')) .
+            ((string)Mage::getConfig()->getNode('global/crypt/key')) .
             $this->_storeConfig['di_username']
         );
 
@@ -1276,20 +1279,20 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     $shipping_columns['shipping_' . $attribute] = $attribute;
                 }
                 $select->joinLeft(
-                           array('billing_address' => $this->_prefix . 'sales_flat_order_address'),
-                           'order.billing_address_id = billing_address.entity_id',
-                           $billing_columns
-                       )
-                       ->joinLeft(
-                           array('shipping_address' => $this->_prefix . 'sales_flat_order_address'),
-                           'order.shipping_address_id = shipping_address.entity_id',
-                           $shipping_columns
-                       );
+                    array('billing_address' => $this->_prefix . 'sales_flat_order_address'),
+                    'order.billing_address_id = billing_address.entity_id',
+                    $billing_columns
+                )
+                    ->joinLeft(
+                        array('shipping_address' => $this->_prefix . 'sales_flat_order_address'),
+                        'order.shipping_address_id = shipping_address.entity_id',
+                        $shipping_columns
+                    );
             }
             // when in full transaction export mode, don't limit the query
             if (!$this->_storeConfig['export_transactions_full']) {
                 $select->where('order.created_at >= ?', $this->_getLastIndex())
-                       ->orWhere('order.updated_at >= ?', $this->_getLastIndex());
+                    ->orWhere('order.updated_at >= ?', $this->_getLastIndex());
             }
 
             $transactions = $db->fetchAll($select);
@@ -1697,7 +1700,7 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             ) {
                 $type = 'string';
                 $column = $prop;
-                switch($prop) {
+                switch ($prop) {
                     case 'id':
                         $type = 'id';
                         $column = 'customer_id';
@@ -1942,7 +1945,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         };
 
 
-
         $zip = new ZipArchive();
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
 
@@ -2045,7 +2047,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             if (class_exists('CURLFile')) {
                 return new CURLFile($filename, $type);
             }
-        } catch(Exception $e) {}
+        } catch (Exception $e) {
+        }
         return "@$filename;type=$type";
     }
 
