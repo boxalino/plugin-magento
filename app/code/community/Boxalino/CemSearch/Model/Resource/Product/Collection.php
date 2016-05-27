@@ -15,6 +15,10 @@ class Boxalino_CemSearch_Model_Resource_Product_Collection extends Mage_Catalog_
      */
     public function getSize()
     {
+        if(Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getChoiceResponse() == null) {
+            return parent::getSize();
+        }
+
         return Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getTotalHitCount();
     }
 
@@ -25,7 +29,9 @@ class Boxalino_CemSearch_Model_Resource_Product_Collection extends Mage_Catalog_
      */
     protected function _renderLimit()
     {
-        // ignore limit
+        if(Mage::helper('Boxalino_CemSearch')->getSearchAdapter()->getChoiceResponse() == null) {
+            return parent::_renderLimit();
+        }
         $this->_select->limit();
         return $this;
     }

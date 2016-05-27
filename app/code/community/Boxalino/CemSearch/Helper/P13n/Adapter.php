@@ -28,7 +28,7 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
         $this->createChoiceRequest();
     }
 
-    private function getChoiceResponse()
+    public function getChoiceResponse()
     {
         if (empty(self::$choiceResponse)) {
             $this->search();
@@ -529,6 +529,9 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
 
     public function search()
     {
+        if($this->searchQuery->queryText == "" && Mage::getStoreConfig('Boxalino_General/general/enable_navigation') == 0) {
+            return;
+        }
         if (!empty($this->filters)) {
             $this->searchQuery->filters = $this->filters;
         }

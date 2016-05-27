@@ -184,6 +184,7 @@
         <Boxalino_General>
             <general>
                 <enabled>1</enabled>
+                <enable_navigation>1</enable_navigation>
                 <account_dev>0</account_dev>
                 <host>cdn.bx-cloud.com</host>
                 <logs_saving>0</logs_saving>

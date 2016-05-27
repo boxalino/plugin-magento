@@ -13,6 +13,10 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
             return parent::_getProductCollection();
         }
 
+        if(get_class($this->getLayer()) != "Mage_CatalogSearch_Model_Layer" && Mage::getStoreConfig('Boxalino_General/general/navigation_enabled') == 0) {
+            return parent::_getProductCollection();
+        }
+
         // make sure to only use products which are in the current category
         if ($category = Mage::registry('current_category')) {
             if (!$category->getIsAnchor()) {
