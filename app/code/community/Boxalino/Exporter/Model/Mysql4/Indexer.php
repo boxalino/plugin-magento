@@ -727,10 +727,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     )
                     ->where('lt.link_type_id = pl.link_type_id')
                     ->where('product_id IN(?)', $ids);
-                $linkCodes = array();
+					
+				$linkCodes = array("relation"=>"linked_products_relation", "super"=>"linked_products_super", "up_sell"=>"linked_products_up_sell", "cross_sell"=>"linked_products_cross_sell");
 				foreach ($db->fetchAll($select) as $r) {
-					$linkCodes[$r['code']] = 'linked_products_' . $r['code'];
-				    if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
+					if(!isset($products[$r['product_id']]['linked_products_' . $r['code']])) {
 						$products[$r['product_id']]['linked_products_' . $r['code']] = $r['linked_product_id'];
 					} else {
 						$products[$r['product_id']]['linked_products_' . $r['code']] .= ',' . $r['linked_product_id'];
