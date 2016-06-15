@@ -12,8 +12,8 @@ class Boxalino_CemSearch_Block_Product_List extends Mage_Catalog_Block_Product_L
         if (Mage::getStoreConfig('Boxalino_General/general/enabled') == 0) {
             return parent::_getProductCollection();
         }
-
-        if(get_class($this->getLayer()) != "Mage_CatalogSearch_Model_Layer" && Mage::getStoreConfig('Boxalino_General/general/navigation_enabled') == 0) {
+		
+        if(get_class($this->getLayer()) != "Mage_CatalogSearch_Model_Layer" && get_class($this->getLayer()) != "EM_LayeredNavigation_Model_Search_Layer"  && Mage::getStoreConfig('Boxalino_General/general/navigation_enabled') == 0) {
             return parent::_getProductCollection();
         }
 
