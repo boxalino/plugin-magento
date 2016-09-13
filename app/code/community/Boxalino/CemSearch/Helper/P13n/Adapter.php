@@ -479,47 +479,49 @@ class Boxalino_CemSearch_Helper_P13n_Adapter
             if ($extraConfig['products'] == '1' && ($i == 1 || $extraConfig['enabled_for_all'] == '0')) {
                 $j = 0;
                 $jMax = $extraConfig['items'];
-                foreach ($hit->searchResult->facetResponses[0]->values as $f) {
-                    if ($j++ >= $jMax) {
-                        break;
-                    }
+                if(isset($hit->searchResult->facetResponses[0])) {
+                  foreach ($hit->searchResult->facetResponses[0]->values as $f) {
+                      if ($j++ >= $jMax) {
+                          break;
+                      }
 
-                    $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
+                      $id = substr(md5($hit->suggestion . '_' . $f->stringValue), 0, 10);
 
-                    if (!in_array($id, $fs)) {
-                        if ($j >= $jMax) {
-                            break;
-                        }
-                        continue;
-                    }
+                      if (!in_array($id, $fs)) {
+                          if ($j >= $jMax) {
+                              break;
+                          }
+                          continue;
+                      }
 
-                    $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
-                    $p13n->setupInquiry(
-                        $generalConfig['quick_search'],
-                        $this->autocompleteResponse->prefixSearchResult->queryText,
-                        $lang,
-                        $fields,
-                        $p13nSort,
-                        0, 4
-                    );
-                    $p13n->setWithRelaxation(false);
+                      $p13n = new Boxalino_CemSearch_Helper_P13n_Adapter($p13nConfig);
+                      $p13n->setupInquiry(
+                          $generalConfig['quick_search'],
+                          $this->autocompleteResponse->prefixSearchResult->queryText,
+                          $lang,
+                          $fields,
+                          $p13nSort,
+                          0, 4
+                      );
+                      $p13n->setWithRelaxation(false);
 
-                    $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
-                    $tmp->stringValue = $f->stringValue;
+                      $tmp = new \com\boxalino\p13n\api\thrift\FacetValue();
+                      $tmp->stringValue = $f->stringValue;
 
-                    $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
-                    $facet->fieldName = 'categories';
-                    $facet->numerical = false;
-                    $facet->range = false;
-                    $facet->selectedValues = array($tmp);
+                      $facet = new \com\boxalino\p13n\api\thrift\FacetRequest();
+                      $facet->fieldName = 'categories';
+                      $facet->numerical = false;
+                      $facet->range = false;
+                      $facet->selectedValues = array($tmp);
 
-                    $p13n->searchQuery->facetRequests[] = $facet;
-                    $p13n->search();
-                    $response = $p13n->getChoiceResponse();
+                      $p13n->searchQuery->facetRequests[] = $facet;
+                      $p13n->search();
+                      $response = $p13n->getChoiceResponse();
 
-                    if (isset($response->variants[0]) && isset($response->variants[0]->searchResult->hits)) {
-                        $products[$id] = $this->extractItemsFromHits($response->variants[0]->searchResult->hits, $id, $entity_id, $map);
-                    }
+                      if (isset($response->variants[0]) && isset($response->variants[0]->searchResult->hits)) {
+                          $products[$id] = $this->extractItemsFromHits($response->variants[0]->searchResult->hits, $id, $entity_id, $map);
+                      }
+                  }
                 }
             }
         }
