@@ -4,7 +4,7 @@
 
 Welcome to the Boxalino Magento 1.x plugin.
 
-## IMPORTANT: This project is obsolete and has been replaced by https://github.com/boxalino/plugin-magento-1-v2
+## IMPORTANT: This project is obsolete and has been replaced by https://github.com/boxalino/plugin-magento1-v2
 
 The Boxalino plugin for Magento enables you to easily and quickly benefit from all the functionalities of Boxalino Intelligence:
 
