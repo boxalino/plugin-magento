@@ -1226,6 +1226,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_storeConfig['di_username']
         );
 
+        $customerAttributes = array(
+            4 => "title",
+            5 => "firstname",
+            7 => "lastname"
+        );
+
         while ($count >= $limit) {
             self::logMem('Transactions - load page ' . $page);
             $transactions_to_save = array();
@@ -1264,9 +1270,26 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'guest_id' => 'IF(guest.email IS NOT NULL, SHA1(CONCAT(guest.email, ' . $salt . ')), NULL)'
                     )
                 )
+                ->joinLeft(
+                    array('customer' => $this->_prefix . 'customer_entity'),
+                    'order.customer_id = customer.entity_id',
+                    array(
+                        'email'
+                    )
+                )
                 ->where('order.status <> ?', 'canceled')
                 ->order(array('order.entity_id', 'item.product_type'))
                 ->limit($limit, ($page - 1) * $limit);
+
+            foreach($customerAttributes as $attrId => $attr){
+                $select->joinLeft(
+                    array('customer_' . $attr  => $this->_prefix . 'customer_entity_varchar'),
+                    "order.customer_id = customer_" . $attr . ".entity_id AND customer_" . $attr . ".attribute_id = $attrId",
+                    array(
+                        $attr => 'value'
+                    )
+                );
+            }
 
             $transaction_attributes = explode(',', $this->_storeConfig['additional_transactions_attributes']);
             if (count($transaction_attributes)) {
@@ -1348,6 +1371,10 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'entity_id' => $transaction['product_id'],
                     'customer_id' => $transaction['customer_id'],
                     'guest_id' => $transaction['guest_id'],
+                    'title' => $transaction['title'],
+                    'firstname' => $transaction['firstname'],
+                    'lastname' => $transaction['lastname'],
+                    'email' => $transaction['email'],
                     'price' => $transaction['original_price'],
                     'discounted_price' => $transaction['price'],
                     'quantity' => $transaction['qty_ordered'],
