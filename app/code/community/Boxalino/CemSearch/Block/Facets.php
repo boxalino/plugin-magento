@@ -141,7 +141,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     protected function _addFilterToUrl($url, $filter, $value, $position = 0)
     {
         $query = parse_url($url, PHP_URL_QUERY);
-        parse_str($query, $params);
+        parse_str(html_entity_decode($query), $params);
         $key = 'bx_' . $filter;
         if (!array_key_exists($key, $params)) $params[$key] = array();
         $params[$key][$position] = $value;
