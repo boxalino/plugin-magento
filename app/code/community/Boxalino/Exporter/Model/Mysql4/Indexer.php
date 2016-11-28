@@ -1226,12 +1226,6 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
             $this->_storeConfig['di_username']
         );
 
-        $customerAttributes = array(
-            4 => "title",
-            5 => "firstname",
-            7 => "lastname"
-        );
-
         while ($count >= $limit) {
             self::logMem('Transactions - load page ' . $page);
             $transactions_to_save = array();
@@ -1267,29 +1261,17 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     array('guest' => $this->_prefix . 'sales_flat_order_address'),
                     'order.billing_address_id = guest.entity_id',
                     array(
-                        'guest_id' => 'IF(guest.email IS NOT NULL, SHA1(CONCAT(guest.email, ' . $salt . ')), NULL)'
-                    )
-                )
-                ->joinLeft(
-                    array('customer' => $this->_prefix . 'customer_entity'),
-                    'order.customer_id = customer.entity_id',
-                    array(
-                        'email'
+                        'guest_id' => 'IF(guest.email IS NOT NULL, SHA1(CONCAT(guest.email, ' . $salt . ')), NULL)',
+                        'guest.firstname',
+                        'guest.lastname',
+                        'guest.email',
+                        'title' => 'guest.prefix'
                     )
                 )
                 ->where('order.status <> ?', 'canceled')
                 ->order(array('order.entity_id', 'item.product_type'))
                 ->limit($limit, ($page - 1) * $limit);
 
-            foreach($customerAttributes as $attrId => $attr){
-                $select->joinLeft(
-                    array('customer_' . $attr  => $this->_prefix . 'customer_entity_varchar'),
-                    "order.customer_id = customer_" . $attr . ".entity_id AND customer_" . $attr . ".attribute_id = $attrId",
-                    array(
-                        $attr => 'value'
-                    )
-                );
-            }
 
             $transaction_attributes = explode(',', $this->_storeConfig['additional_transactions_attributes']);
             if (count($transaction_attributes)) {
