@@ -216,7 +216,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
     {
         $query = parse_url($url, PHP_URL_QUERY);
         if (!empty($query)) {
-            parse_str($query, $params);
+            parse_str(html_entity_decode($query), $params);
             $key = 'bx_' . $filter;
             if (
                 array_key_exists($key, $params) &&
