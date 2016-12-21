@@ -34,7 +34,7 @@ class Boxalino_CemSearch_Block_Facets extends Mage_Core_Block_Template
 
         // get query parameters
         if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $q);
+            parse_str(html_entity_decode($parsedUrl['query']), $q);
 
             // remove bx filters
             foreach ($q as $k => $v) {
