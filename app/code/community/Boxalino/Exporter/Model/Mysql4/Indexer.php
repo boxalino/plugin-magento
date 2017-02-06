@@ -1238,11 +1238,19 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     array(
                         'entity_id',
                         'status',
+                        'coupon_code',
                         'updated_at',
                         'created_at',
                         'customer_id',
                         'base_subtotal',
                         'shipping_amount',
+                        'base_shipping_amount',
+                        'increment_id',
+                        'relation_child_real_id',
+                        'base_grand_total',
+                        'base_discount_amount',
+                        'base_shipping_tax_amount',
+                        'grand_total'
                     )
                 )
                 ->joinLeft(
@@ -1360,12 +1368,22 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                     'price' => $transaction['original_price'],
                     'discounted_price' => $transaction['price'],
                     'quantity' => $transaction['qty_ordered'],
-                    'total_order_value' => ($transaction['base_subtotal'] + $transaction['shipping_amount']),
+                    'total_order_value' => $transaction['base_grand_total'],
                     'shipping_costs' => $transaction['shipping_amount'],
                     'order_date' => $transaction['created_at'],
                     'confirmation_date' => $status == 1 ? $transaction['updated_at'] : null,
                     'shipping_date' => $status == 2 ? $transaction['updated_at'] : null,
                     'status' => $transaction['status'],
+                    'coupon_code' => $transaction['coupon_code'],
+                    'increment_id' => $transaction['increment_id'],
+                    'relation_child_real_id' => $transaction['relation_child_real_id'],
+                    'base_discount_amount' => $transaction['base_discount_amount'],
+                    'shipping_amount' => $transaction['shipping_amount'],
+                    'base_shipping_amount' => $transaction['base_shipping_amount'],
+                    'base_shipping_tax_amount' => $transaction['base_shipping_tax_amount'],
+                    'base_subtotal' => $transaction['base_subtotal'],
+                    'grand_total' => $transaction['grand_total'],
+                    'base_grand_total' => $transaction['base_grand_total'],
                 );
                 if (count($transaction_attributes)) {
                     foreach ($transaction_attributes as $attribute) {
