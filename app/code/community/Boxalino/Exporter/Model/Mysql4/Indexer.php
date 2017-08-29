@@ -1250,7 +1250,8 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
                         'base_grand_total',
                         'base_discount_amount',
                         'base_shipping_tax_amount',
-                        'grand_total'
+                        'grand_total',
+                        'quote_id'
                     )
                 )
                 ->joinLeft(
@@ -1418,6 +1419,66 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
         }
 
         self::logMem('Transactions - end of export');
+
+        $this->exportTransactionQuote();
+    }
+
+    private function exportTransactionQuote() {
+
+        self::logMem('Transactions basket - start of export');
+        $db = $this->_getReadAdapter();
+
+        $limit = $this->_storeConfig['export_chunk'];
+        $totalLimit = 1000000;
+        $count = 0;
+        $page = 1;
+        $header = true;
+        while ($totalLimit >= $count) {
+            self::logMem('Transactions - load page ' . $page);
+            $transactions_to_save = array();
+            $select = $db
+                ->select()
+                ->from(
+                    array('q' => $this->_prefix . 'sales_flat_quote'),
+                    array(
+                        'store_id',
+                        'created_at',
+                        'is_active',
+                        'items_count',
+                        'grand_total',
+                        'base_grand_total',
+                        'customer_id'
+                    )
+                )->join(array('q_i' => $this->_prefix . 'sales_flat_quote_item'),
+                    'q_i.quote_id = q.entity_id',
+                    array(
+                        'quote_id',
+                        'product_id',
+                        'name',
+                        'qty',
+                        'price'
+                    )
+                )
+                ->limit($limit, ($page - 1) * $limit);
+
+            $stmt = $db->query($select);
+            self::logMem("Transactions - loaded page $page");
+
+            if($stmt->rowCount()) {
+                while($row = $stmt->fetch()){
+                    if($header) {
+                        $transactions_to_save[] = array_keys($row);
+                        $header = false;
+                    }
+                    $transactions_to_save[] = $row;
+                    $count++;
+                }
+            } else {
+                break;
+            }
+            $this->savePartToCsv('transactions_quote.csv', $transactions_to_save);
+            $page++;
+        }
     }
 
     /**
@@ -1747,6 +1808,12 @@ abstract class Boxalino_Exporter_Model_Mysql4_Indexer extends Mage_Core_Model_My
 
                 $property->addChild('params');
             }
+            $source = $sources->addChild('source');
+            $source->addAttribute('id', 'customer_quote');
+            $source->addAttribute('type', 'item_data_file');
+            $source->addChild('file')->addAttribute('value', 'transactions_quote.csv');
+            $source->addChild('itemIdColumn')->addAttribute('value', 'customer_id');
+            $this->sxml_append_options($source);
         }
 
         if ($this->_storeConfig['export_transactions']) {
